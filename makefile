@@ -17,7 +17,7 @@ OBJECTS	    := $(SOURCE:src/%.c=obj/%.o)
 DBG_OBJECTS := $(OBJECTS:.o=_dbg.o)
 
 .PHONY: default
-default: all
+default: debug
 
 $(EXE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
