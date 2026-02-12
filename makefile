@@ -3,6 +3,12 @@ CFLAGS := -std=c17 -pedantic -Wall -Wextra -Iinclude
 LDFLAGS := -lm -Llib -lraylib
 BEAR := $(shell command -v bear)
 
+CPUS := $(shell nproc) # nombre de coeurs utilisé pour la compilation parallèle
+MAKEFLAGS += --no-print-directory
+ifneq ($(MAKELEVEL),0)
+	MAKEFLAGS += -j $(CPUS) -l $(CPUS) -O
+endif
+
 EXE := bin/carcassonne
 DBG := $(EXE)_dbg
 
@@ -30,7 +36,7 @@ compile_commands.json: $(SOURCE)
 ifeq ($(strip $(BEAR)),)
 	@printf "\x1b[91merr: \x1b[0mpas d'executable 'bear' trouvé.\n"
 else
-	@$(BEAR) -- ${MAKE} -B --no-print-directory debug | sed 's/^/  /'
+	@$(BEAR) -- ${MAKE} -B debug | sed 's/^/  /'
 endif
 
 .PHONY: all release debug run clean bear
@@ -38,10 +44,10 @@ endif
 all: debug release
 release:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(EXE))...\n"
-	@${MAKE} --no-print-directory -j $(EXE) | sed 's/^/  /'
+	@${MAKE} $(EXE) | sed 's/^/  /'
 debug:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(DBG))...\n"
-	@${MAKE} --no-print-directory -j $(DBG) | sed 's/^/  /'
+	@${MAKE} $(DBG) | sed 's/^/  /'
 
 run: debug
 	@printf "\x1b[95mexecution de debug:\x1b[0;0m\n"
