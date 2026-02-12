@@ -54,7 +54,7 @@ run: debug
 	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$${PWD}/lib $(DBG)
 
 clean:
-	@rm -f $(OBJECTS) $(DBG_OBJECTS)
+	@rm -f obj/*.o
 	@rm -f $(EXE) $(DBG)
 
 bear: compile_commands.json
