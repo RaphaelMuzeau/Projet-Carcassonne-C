@@ -11,10 +11,12 @@ endif
 
 EXE := bin/carcassonne
 DBG := $(EXE)_dbg
+TEST:= $(EXE)_test
 
 SOURCE      := $(wildcard src/*.c)
 OBJECTS	    := $(SOURCE:src/%.c=obj/%.o)
 DBG_OBJECTS := $(OBJECTS:.o=_dbg.o)
+TEST_OBJECTS:= $(OBJECTS:.o=_test.o)
 
 .PHONY: default
 default: debug
@@ -25,11 +27,17 @@ $(EXE): $(OBJECTS)
 $(DBG): $(DBG_OBJECTS)
 	$(CC) $(LDFLAGS) $^ -o $@
 
+$(TEST): $(TEST_OBJECTS)
+	$(CC) $(LDFLAGS) $^ -o $@
+
 $(OBJECTS): obj/%.o : src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -O2
 
 $(DBG_OBJECTS): obj/%_dbg.o : src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -g
+
+$(TEST_OBJECTS): obj/%_test.o : src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@ -g -DRUN_UNIT_TESTS
 
 compile_commands.json: $(SOURCE)
 	@printf "Generation de \x1b[94m$@\x1b[0m..\n"
@@ -39,15 +47,19 @@ else
 	@$(BEAR) -- ${MAKE} -B debug | sed 's/^/  /'
 endif
 
-.PHONY: all release debug run clean bear
+.PHONY: all release debug test run clean bear
 
-all: debug release
+all: debug release test
 release:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(EXE))...\n"
 	@${MAKE} $(EXE) | sed 's/^/  /'
 debug:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(DBG))...\n"
 	@${MAKE} $(DBG) | sed 's/^/  /'
+test:
+	@printf "Compilation de \x1b[93m$@ \x1b[0m($(TEST))...\n"
+	@${MAKE} $(TEST) | sed 's/^/  /'
+	@LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$${PWD}/lib $(TEST)
 
 run: debug
 	@printf "\x1b[95mexecution de debug:\x1b[0;0m\n"
@@ -55,6 +67,6 @@ run: debug
 
 clean:
 	@rm -f obj/*.o
-	@rm -f $(EXE) $(DBG)
+	@rm -f $(EXE) $(DBG) $(TEST)
 
 bear: compile_commands.json
