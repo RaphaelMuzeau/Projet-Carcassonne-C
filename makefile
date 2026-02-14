@@ -20,16 +20,16 @@ DBG_OBJECTS := $(OBJECTS:.o=_dbg.o)
 default: debug
 
 $(EXE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 
 $(DBG): $(DBG_OBJECTS)
-	$(CC) $(DBG_OBJECTS) $(LDFLAGS) -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 
 $(OBJECTS): obj/%.o : src/%.c
-	$(CC) $(CFLAGS) -O2 -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -O2
 
 $(DBG_OBJECTS): obj/%_dbg.o : src/%.c
-	$(CC) $(CFLAGS) -g -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ -g
 
 compile_commands.json: $(SOURCE)
 	@printf "Generation de \x1b[94m$@\x1b[0m..\n"
