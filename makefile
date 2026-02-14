@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c17 -pedantic -Wall -Wextra -Iinclude
+CFLAGS := -std=c17 -pedantic -Wall -Wextra -fdiagnostics-color -Iinclude
 LDFLAGS := -lm -Llib -lraylib
 BEAR := $(shell command -v bear)
 
