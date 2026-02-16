@@ -7,14 +7,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-/*
-#include "model.h"
-#include "vue.h"
-#include "controller.h"
-*/
 
 typedef struct _Test {
-    _Bool (*run)(void);
+    bool (*run)(void);
     const char *name;
 } Test;
 #define TEST(FUNCTION) { FUNCTION, #FUNCTION } // creer un Test à partir du nom d'une fonction
@@ -23,34 +18,21 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-bool foo(void)
+bool placeholder(void) // à remplacer au plus vite
 {
     return true;
 }
-
-bool bar(void)
-{
-    return false;
-}
-
-bool baz(void)
-{
-    return true;
-}
-
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
-    TEST(foo),
-    TEST(bar),
-    TEST(baz),
+    TEST(placeholder),
 };
 
 // ===========================
 // ==== fin des fonctions ====
 // ===========================
 
-#define len(ARRAY) sizeof(ARRAY)/sizeof(ARRAY[0]) // maybe move these to their own header file?
-_Noreturn void lancer_tests(void) // TODO: make output prettier
+#define len(ARRAY) sizeof(ARRAY)/sizeof(ARRAY[0])
+_Noreturn void lancer_tests(void)
 {
     int passed = 0;
     int failed  = 0;
