@@ -2,6 +2,7 @@ CC := gcc
 CFLAGS := -std=c17 -pedantic -Wall -Wextra -fdiagnostics-color -Iinclude
 LDFLAGS := -lm -Llib -lraylib
 BEAR := $(shell command -v bear)
+SHELL:= bash
 
 CPUS := $(shell nproc) # nombre de coeurs utilisé pour la compilation parallèle
 MAKEFLAGS += --no-print-directory
