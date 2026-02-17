@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "grille.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -18,13 +19,19 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-bool placeholder(void) // à remplacer au plus vite
-{
+bool test_init_grille(void){
+    Grille grille = init_tableau(10);
+    for(int i = 0; i < 10; i++){
+        for(int j = 0; j < 10; j++)
+            if (grille.tableau[i][j] != NULL)
+                return false;
+
+    }
     return true;
 }
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
-    TEST(placeholder),
+    TEST(test_init_grille),
 };
 
 // ===========================
