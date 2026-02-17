@@ -1,12 +1,22 @@
 #ifndef grille_h
 #define grille_h
 
+enum Zone {
+    Z_ROUTE,
+    Z_VILLE,
+    Z_BLASON,
+    Z_PRE,
+    Z_VILLAGE,
+    Z_ABBAYE,
+};
+
 struct _Tuile {
-    char milieu,gauche,droite,haut,bas;
+    enum Zone milieu, gauche, droite, haut, bas;
     char meeple;
 };
 typedef struct _Tuile *Tuile;
-typedef struct _Grille{
+
+typedef struct _Grille {
     int taille;
     Tuile **tableau;
 } Grille;
