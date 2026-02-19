@@ -48,7 +48,7 @@ else
 	@$(BEAR) -- ${MAKE} -B debug | sed 's/^/  /'
 endif
 
-.PHONY: all release debug test run clean bear
+.PHONY: all release debug test run clean bear help
 
 all: debug release test
 release:
@@ -71,3 +71,14 @@ clean:
 	@rm -f $(EXE) $(DBG) $(TEST)
 
 bear: compile_commands.json
+
+help:
+	@echo "Commandes disponibles:"
+	@echo "  all     - Lancer toutes les cibles (release, debug, test)"
+	@echo "  release - Compiler avec optimisation"
+	@echo "  debug   - Compiler avec symboles de debugage"
+	@echo "  test    - Compiler et lancer les tests unitaires"
+	@echo "  bear    - Generer compile_commands.json (nécessite bear)"
+	@echo "  run     - Executer le programme (compile debug si besoin)"
+	@echo "  clean   - Supprimer les artefacts de compilation et les executables"
+	@echo "  help    - Afficher ce message d'aide"
