@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "grille.h"
+#include "pile.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -27,6 +28,15 @@ bool test_init_grille(void){
                 return false;
 
     }
+    return true;
+}
+
+bool test_init_pile(void)
+{
+    Pile pile = creer_pile(10);
+    if (pile.nb_element_max != 10 && pile.nb_element)
+        return false;
+
     return true;
 }
 // ajout à la liste de tests à executer

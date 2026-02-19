@@ -1,26 +1,29 @@
 #ifndef pile_h
 #define pile_h
 
-typedef struct _pile {
+#include "grille.h"
+#include <stdbool.h>
+
+typedef struct _Pile {
     int nb_element, nb_element_max;
-    struct tuile *tab;
+    Tuile *tab;
 
-} pile;
+} Pile;
 
-pile createPile(int max_element);
+Pile creer_pile(int max_element);
 
-bool estVide(pile P);
+bool pile_vide(Pile P);
 
-bool estPleine(pile P);
+bool pile_pleine(Pile P);
 
-bool accederSommet(pile P, struct tuile *T);
+bool acceder_sommet(Pile P, Tuile *T);
 
-int empiler(pile P, struct tuile T);
+int empiler(Pile P, Tuile T);
 
-bool depiler(pile P, struct tuile *T);
+bool depiler(Pile P, Tuile T);
 
-void vider(pile P);
+void vider(Pile *P);
 
-void detruire(pile P);
+void detruire(Pile P);
 
 #endif
