@@ -55,27 +55,50 @@ bool test_recup_tuile(void)
     return true;
 }
 
-bool test_reinserer_tuile(void)
+bool test_detruire_pile(void)
 {
-        int i;
-        Pile p = creer_pile(5);
 
-        Tuile t = malloc(sizeof(struct _Tuile));
-        t->bas = Z_ABBAYE;
-        t->droite = Z_ABBAYE;
-        t->haut = Z_ABBAYE;
-        t->milieu = Z_ABBAYE;
-        t->gauche = Z_ABBAYE;
+    Pile p = creer_pile(1);
 
-        for (i = 0; i < p.nb_element_max ; i++) {
-            if (!reinserer_tuile(&p, t))
-                return false;
-        }
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
+    inserer_tuile(&p, t);
 
-        if (reinserer_tuile(&p, t))
-            return false;
-
+    if (detruire_pile(&p) != true)
+        return false;
     return true;
+}
+
+bool test_inserer_tuile(void)
+{
+    int i;
+    bool result_test = true;
+    Pile p = creer_pile(1);
+
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
+
+    for (i = 0; i < p.nb_element_max ; i++) {
+        if (!inserer_tuile(&p, t)) {
+            result_test = false;
+            break;
+        }
+    }
+
+    if (inserer_tuile(&p, t))
+        result_test = false;
+
+    detruire_pile(&p);
+
+    return result_test;
 
 }
 
@@ -84,7 +107,9 @@ Test unit_tests[] = {
     TEST(test_init_grille),
     TEST(test_init_pile),
     TEST(test_recup_tuile),
-    TEST(test_reinserer_tuile),
+    TEST(test_detruire_pile),
+    TEST(test_inserer_tuile),
+
 };
 
 // ===========================

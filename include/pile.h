@@ -18,6 +18,8 @@ bool pile_pleine(Pile p);
 
 Tuile recup_tuile(Pile p);
 
-bool reinserer_tuile(Pile *p, Tuile t);
+bool inserer_tuile(Pile *p, Tuile t);
+
+bool detruire_pile(Pile *p);
 
 #endif

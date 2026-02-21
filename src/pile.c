@@ -37,13 +37,14 @@ Tuile recup_tuile(Pile p)
     id = rand()%p.nb_element;
     tmp = p.tab[id];
 
-    p.tab[id] = p.tab[p.nb_element];
+    p.tab[id] = p.tab[p.nb_element-1];
+    free(p.tab[p.nb_element-1]);
     p.nb_element--;
 
     return tmp;
 }
 
-bool reinserer_tuile(Pile *p, Tuile t)
+bool inserer_tuile(Pile *p, Tuile t)
 {
 
     if (pile_pleine(*p))
@@ -51,5 +52,15 @@ bool reinserer_tuile(Pile *p, Tuile t)
 
     p->tab[p->nb_element] = t;
     p->nb_element++;
+    return true;
+}
+
+bool detruire_pile(Pile *p)
+{
+    if (!pile_vide(*p)) {
+        for (int i = 0; i < p->nb_element; i++) {
+            free(p->tab[i]);
+        }
+    }
     return true;
 }
