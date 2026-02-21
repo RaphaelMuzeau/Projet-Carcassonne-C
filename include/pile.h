@@ -12,18 +12,12 @@ typedef struct _Pile {
 
 Pile creer_pile(int max_element);
 
-bool pile_vide(Pile P);
+bool pile_vide(Pile p);
 
-bool pile_pleine(Pile P);
+bool pile_pleine(Pile p);
 
-bool acceder_sommet(Pile P, Tuile *T);
+Tuile recup_tuile(Pile p);
 
-int empiler(Pile P, Tuile T);
-
-bool depiler(Pile P, Tuile T);
-
-void vider(Pile *P);
-
-void detruire(Pile P);
+bool reinserer_tuile(Pile *p, Tuile t);
 
 #endif
