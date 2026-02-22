@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "grille.h"
+#include "pile.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -29,9 +30,75 @@ bool test_init_grille(void){
     }
     return true;
 }
+
+bool test_init_pile(void)
+{
+    Pile p = creer_pile(10);
+
+    if (!pile_vide(p)) {
+        return false;
+    }
+
+    if (p.nb_element_max != 10)
+        return false;
+
+    return true;
+}
+
+bool test_inserer_tuile(void)
+{
+    int i;
+    bool result_test = true;
+    Pile p = creer_pile(1);
+
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
+
+    for (i = 0; i < p.nb_element_max ; i++) {
+        if (!inserer_tuile(&p, t)) {
+            result_test = false;
+            break;
+        }
+    }
+
+    if (inserer_tuile(&p, t))
+        result_test = false;
+
+    detruire_pile(&p);
+
+    return result_test;
+}
+
+bool test_recup_tuile(void)
+{
+    Pile p = creer_pile(5);
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
+
+    inserer_tuile(&p, t);
+    if (recup_tuile(&p) != t || p.nb_element != 0)
+        return false;
+
+    if (recup_tuile(&p) != NULL)
+        return false;
+
+    return true;
+}
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_init_grille),
+    TEST(test_init_pile),
+    TEST(test_inserer_tuile),
+    TEST(test_recup_tuile),
 };
 
 // ===========================
