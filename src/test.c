@@ -97,8 +97,8 @@ bool test_recup_tuile(void)
 Test unit_tests[] = {
     TEST(test_init_grille),
     TEST(test_init_pile),
-    TEST(test_recup_tuile),
     TEST(test_inserer_tuile),
+    TEST(test_recup_tuile),
 };
 
 // ===========================
