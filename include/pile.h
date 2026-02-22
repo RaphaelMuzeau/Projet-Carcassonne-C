@@ -20,6 +20,6 @@ Tuile recup_tuile(Pile p);
 
 bool inserer_tuile(Pile *p, Tuile t);
 
-bool detruire_pile(Pile *p);
+void detruire_pile(Pile *p);
 
 #endif

@@ -39,7 +39,7 @@ bool test_init_pile(void)
         return false;
     }
 
-    if (p.nb_element != 0)
+    if (p.nb_element_max != 10)
         return false;
 
     return true;
@@ -55,23 +55,6 @@ bool test_recup_tuile(void)
     return true;
 }
 
-bool test_detruire_pile(void)
-{
-
-    Pile p = creer_pile(1);
-
-    Tuile t = malloc(sizeof(struct _Tuile));
-    t->bas = Z_ABBAYE;
-    t->droite = Z_ABBAYE;
-    t->haut = Z_ABBAYE;
-    t->milieu = Z_ABBAYE;
-    t->gauche = Z_ABBAYE;
-    inserer_tuile(&p, t);
-
-    if (detruire_pile(&p) != true)
-        return false;
-    return true;
-}
 
 bool test_inserer_tuile(void)
 {
@@ -107,7 +90,6 @@ Test unit_tests[] = {
     TEST(test_init_grille),
     TEST(test_init_pile),
     TEST(test_recup_tuile),
-    TEST(test_detruire_pile),
     TEST(test_inserer_tuile),
 
 };
