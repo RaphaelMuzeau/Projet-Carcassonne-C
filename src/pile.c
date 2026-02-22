@@ -38,7 +38,6 @@ Tuile recup_tuile(Pile p)
     tmp = p.tab[id];
 
     p.tab[id] = p.tab[p.nb_element-1];
-    free(p.tab[p.nb_element-1]);
     p.nb_element--;
 
     return tmp;
@@ -62,5 +61,7 @@ bool detruire_pile(Pile *p)
             free(p->tab[i]);
         }
     }
+
+    free(p->tab);
     return true;
 }
