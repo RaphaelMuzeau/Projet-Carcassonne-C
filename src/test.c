@@ -48,13 +48,21 @@ bool test_init_pile(void)
 bool test_recup_tuile(void)
 {
     Pile p = creer_pile(5);
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
 
-    if (recup_tuile(p) != NULL)
+    if (recup_tuile(&p) != t && p.nb_element != 0)
+        return false;
+
+    if (recup_tuile(&p) != NULL)
         return false;
 
     return true;
 }
-
 
 bool test_inserer_tuile(void)
 {
@@ -91,7 +99,6 @@ Test unit_tests[] = {
     TEST(test_init_pile),
     TEST(test_recup_tuile),
     TEST(test_inserer_tuile),
-
 };
 
 // ===========================

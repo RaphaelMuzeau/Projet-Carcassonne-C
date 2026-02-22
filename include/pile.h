@@ -16,7 +16,7 @@ bool pile_vide(Pile p);
 
 bool pile_pleine(Pile p);
 
-Tuile recup_tuile(Pile p);
+Tuile recup_tuile(Pile *p);
 
 bool inserer_tuile(Pile *p, Tuile t);
 

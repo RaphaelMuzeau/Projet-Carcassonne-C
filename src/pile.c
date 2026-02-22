@@ -27,18 +27,18 @@ bool pile_pleine(Pile p)
     return false;
 }
 
-Tuile recup_tuile(Pile p)
+Tuile recup_tuile(Pile *p)
 {
-    if (pile_vide(p))
+    if (pile_vide(*p))
         return NULL;
 
     Tuile tmp;
     int id;
-    id = rand()%p.nb_element;
-    tmp = p.tab[id];
+    id = rand()%p->nb_element;
+    tmp = p->tab[id];
 
-    p.tab[id] = p.tab[p.nb_element-1];
-    p.nb_element--;
+    p->tab[id] = p->tab[p->nb_element-1];
+    p->nb_element--;
 
     return tmp;
 }
@@ -56,11 +56,8 @@ bool inserer_tuile(Pile *p, Tuile t)
 
 void detruire_pile(Pile *p)
 {
-    if (!pile_vide(*p)) {
-        for (int i = 0; i < p->nb_element; i++) {
-            free(p->tab[i]);
-        }
+    for (int i = 0; i < p->nb_element; i++) {
+        free(p->tab[i]);
     }
-
     free(p->tab);
 }
