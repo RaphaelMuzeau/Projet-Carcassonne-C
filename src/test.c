@@ -45,25 +45,6 @@ bool test_init_pile(void)
     return true;
 }
 
-bool test_recup_tuile(void)
-{
-    Pile p = creer_pile(5);
-    Tuile t = malloc(sizeof(struct _Tuile));
-    t->bas = Z_ABBAYE;
-    t->droite = Z_ABBAYE;
-    t->haut = Z_ABBAYE;
-    t->milieu = Z_ABBAYE;
-    t->gauche = Z_ABBAYE;
-
-    if (recup_tuile(&p) != t && p.nb_element != 0)
-        return false;
-
-    if (recup_tuile(&p) != NULL)
-        return false;
-
-    return true;
-}
-
 bool test_inserer_tuile(void)
 {
     int i;
@@ -90,7 +71,26 @@ bool test_inserer_tuile(void)
     detruire_pile(&p);
 
     return result_test;
+}
 
+bool test_recup_tuile(void)
+{
+    Pile p = creer_pile(5);
+    Tuile t = malloc(sizeof(struct _Tuile));
+    t->bas = Z_ABBAYE;
+    t->droite = Z_ABBAYE;
+    t->haut = Z_ABBAYE;
+    t->milieu = Z_ABBAYE;
+    t->gauche = Z_ABBAYE;
+
+    inserer_tuile(&p, t);
+    if (recup_tuile(&p) != t || p.nb_element != 0)
+        return false;
+
+    if (recup_tuile(&p) != NULL)
+        return false;
+
+    return true;
 }
 
 // ajout à la liste de tests à executer
