@@ -1,8 +1,8 @@
 #ifndef pile_h
 #define pile_h
 
-#include "grille.h"
 #include <stdbool.h>
+#include "tuile.h"
 
 typedef struct _Pile {
     int nb_element, nb_element_max;
