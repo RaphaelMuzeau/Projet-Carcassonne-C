@@ -20,7 +20,7 @@ enum Direction {
 };
 
 struct _Tuile {
-    enum Zone milieu, gauche, droite, haut, bas;
+    enum Zone milieu, nord, sud, est, ouest;
     char meeple;
 };
 typedef struct _Tuile *Tuile;

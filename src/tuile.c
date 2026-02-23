@@ -11,9 +11,28 @@ Tuile init_tuile(void)
 void pivot_90(Tuile piece)
 {
     char tmp;
-    tmp = piece->haut;
-    piece->haut = piece->droite;
-    piece->droite = piece->bas;
-    piece->bas = piece->gauche;
-    piece->gauche = tmp;
+    tmp = piece->nord;
+    piece->nord = piece->est;
+    piece->est = piece->sud;
+    piece->sud = piece->ouest;
+    piece->ouest = tmp;
+}
+
+bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)
+{
+    if (arrivee == NULL || depart == NULL)
+        return true;
+
+    switch (d) {
+    case D_NORD:
+        return (depart->nord == arrivee->sud);
+    case D_SUD:
+        return (depart->sud == arrivee->nord);
+    case D_OUEST:
+        return (depart->ouest == arrivee->est);
+    case D_EST:
+        return (depart->est == arrivee->ouest);
+    default:
+        return false;
+    }
 }

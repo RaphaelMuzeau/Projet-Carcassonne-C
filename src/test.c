@@ -54,11 +54,11 @@ bool test_inserer_tuile(void)
     Pile p = creer_pile(1);
 
     Tuile t = malloc(sizeof(struct _Tuile));
-    t->bas = Z_ABBAYE;
-    t->droite = Z_ABBAYE;
-    t->haut = Z_ABBAYE;
+    t->sud = Z_ABBAYE;
+    t->est = Z_ABBAYE;
+    t->nord = Z_ABBAYE;
     t->milieu = Z_ABBAYE;
-    t->gauche = Z_ABBAYE;
+    t->ouest = Z_ABBAYE;
 
     for (i = 0; i < p.nb_element_max ; i++) {
         if (!inserer_tuile(&p, t)) {
@@ -79,11 +79,11 @@ bool test_recup_tuile(void)
 {
     Pile p = creer_pile(5);
     Tuile t = malloc(sizeof(struct _Tuile));
-    t->bas = Z_ABBAYE;
-    t->droite = Z_ABBAYE;
-    t->haut = Z_ABBAYE;
+    t->sud = Z_ABBAYE;
+    t->est = Z_ABBAYE;
+    t->nord = Z_ABBAYE;
     t->milieu = Z_ABBAYE;
-    t->gauche = Z_ABBAYE;
+    t->ouest = Z_ABBAYE;
 
     inserer_tuile(&p, t);
     if (recup_tuile(&p) != t || p.nb_element != 0)

@@ -11,4 +11,6 @@ typedef struct _Grille {
 Grille init_grille(int taille);
 void destruction_grille(Grille grille);
 
+bool est_vide(Grille grille, int x, int y);
+
 #endif
