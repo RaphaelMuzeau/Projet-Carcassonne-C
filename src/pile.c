@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "pile.h"
-#include "grille.h"
+#include "tuile.h"
 
 Pile creer_pile(int max_element)
 {
