@@ -15,13 +15,32 @@ void detruire_varstring(VarString chaine)
     free(chaine.texte);
 }
 
+// fonction anonyme,
+// Alloue si besoin l'espace necessaire à une chaine de la
+// longueur donnée ('\0' non inclus)
+void agrandir_varstring(VarString *chaine, size_t taille)
+{
+    if (chaine == NULL) return;
+    if (taille < chaine->capacite) return;
+
+    // arrondit la nouvelle capacite au prochain multiple de VARSTRING_REALLOC_SIZE
+    size_t new_cap = taille + (VARSTRING_REALLOC_SIZE - taille % VARSTRING_REALLOC_SIZE);
+
+    chaine->texte = realloc(chaine->texte, new_cap);
+    if (chaine->texte == NULL) {
+        perror("carcassonne");
+        exit(EXIT_FAILURE);
+    }
+    chaine->capacite = new_cap;
+}
+
 /* manipulation de la chaine */
 void vider_varstring(VarString *chaine)
 {
     if (chaine == NULL) return;
 
     chaine->texte[0] = '\0';
-    chaine->len     = 0;
+    chaine->len      = 0;
 }
 
 void ajouter_char(VarString *chaine, char c)
@@ -29,16 +48,7 @@ void ajouter_char(VarString *chaine, char c)
     if (chaine == NULL) return;
     if (c == '\0') return;
 
-    size_t required_cap = chaine->len + VARSTRING_REALLOC_SIZE;
-
-    // agrandir la chaine si necessaire
-    if (required_cap >= chaine->capacite) {
-        chaine->texte = realloc(chaine->texte, required_cap);
-        if (chaine->texte == NULL)
-            perror("carcassonne");
-        chaine->capacite = required_cap;
-    }
-
+    agrandir_varstring(chaine, chaine->len + 1);
     chaine->texte[chaine->len++] = c;
     chaine->texte[chaine->len]   = '\0';
 }
@@ -48,16 +58,8 @@ void ajouter_chaine(VarString *chaine, char *restrict autre)
     if (chaine == NULL) return;
     if (autre == NULL) return;
 
-    size_t l = strlen(autre);
-    size_t new_len = chaine->len + l;
-
-    // agrandir la chaine si necessaire
-    if (new_len >= chaine->capacite) {
-        chaine->texte = realloc(chaine->texte, new_len + 1);
-        if (chaine->texte == NULL)
-            perror("carcassonne");
-        chaine->capacite = new_len + 1;
-    }
+    size_t new_len = chaine->len + strlen(autre);
+    agrandir_varstring(chaine, new_len);
 
     strcpy(&chaine->texte[chaine->len], autre);
     chaine->len = new_len;
