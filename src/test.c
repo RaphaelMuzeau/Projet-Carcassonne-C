@@ -107,9 +107,9 @@ bool test_varstring_ajout_char(void)
     ajouter_char(&s, 'l');
     ajouter_char(&s, 'o');
 
-    if (strcmp(s.text, "hello")) return false;
-    if (s.len != strlen(s.text)) return false;
-    if (s.capacity < strlen(s.text) + 1) return false;
+    if (strcmp(s.texte, "hello")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
 
     detruire_varstring(s);
     return true;
@@ -121,15 +121,15 @@ bool test_varstring_ajout_chaine(void)
 
     ajouter_chaine(&s, "hello");
 
-    if (strcmp(s.text, "hello")) return false;
-    if (s.len != strlen(s.text)) return false;
-    if (s.capacity < strlen(s.text) + 1) return false;
+    if (strcmp(s.texte, "hello")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
 
     ajouter_chaine(&s, " world");
 
-    if (strcmp(s.text, "hello world")) return false;
-    if (s.len != strlen(s.text)) return false;
-    if (s.capacity < strlen(s.text) + 1) return false;
+    if (strcmp(s.texte, "hello world")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
 
     detruire_varstring(s);
     return true;
@@ -142,7 +142,7 @@ bool test_varstring_vider(void)
     ajouter_chaine(&s, "hello");
     vider_varstring(&s);
 
-    if (*s.text != '\0') return false;
+    if (*s.texte != '\0') return false;
     if (s.len != 0) return false;
 
     detruire_varstring(s);
@@ -155,14 +155,14 @@ bool test_varstring_ajouter_null(void)
 
     ajouter_chaine(&s, "hello");
     size_t expected_len = s.len;
-    size_t expected_cap = s.capacity;
+    size_t expected_cap = s.capacite;
 
     ajouter_chaine(&s, NULL);
     ajouter_char(&s, '\0');
 
-    if (strcmp(s.text, "hello")) return false;
+    if (strcmp(s.texte, "hello")) return false;
     if (s.len != expected_len) return false;
-    if (s.capacity != expected_cap) return false;
+    if (s.capacite != expected_cap) return false;
 
     detruire_varstring(s);
     return true;
