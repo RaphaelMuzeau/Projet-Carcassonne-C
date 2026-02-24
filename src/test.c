@@ -7,8 +7,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "grille.h"
 #include "pile.h"
+#include "varstring.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -95,12 +97,97 @@ bool test_recup_tuile(void)
     return true;
 }
 
+bool test_varstring_ajout_char(void)
+{
+    VarString s = creer_varstring();
+
+    ajouter_char(&s, 'h');
+    ajouter_char(&s, 'e');
+    ajouter_char(&s, 'l');
+    ajouter_char(&s, 'l');
+    ajouter_char(&s, 'o');
+
+    if (strcmp(s.texte, "hello")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
+
+    detruire_varstring(s);
+    return true;
+}
+
+bool test_varstring_ajout_chaine(void)
+{
+    VarString s = creer_varstring();
+
+    ajouter_chaine(&s, "hello");
+
+    if (strcmp(s.texte, "hello")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
+
+    ajouter_chaine(&s, " world");
+
+    if (strcmp(s.texte, "hello world")) return false;
+    if (s.len != strlen(s.texte)) return false;
+    if (s.capacite < strlen(s.texte) + 1) return false;
+
+    detruire_varstring(s);
+    return true;
+}
+
+bool test_varstring_vider(void)
+{
+    VarString s = creer_varstring();
+
+    ajouter_chaine(&s, "hello");
+    vider_varstring(&s);
+
+    if (*s.texte != '\0') return false;
+    if (s.len != 0) return false;
+
+    detruire_varstring(s);
+    return true;
+}
+
+bool test_varstring_ajouter_null(void)
+{
+    VarString s = creer_varstring();
+
+    ajouter_chaine(&s, "hello");
+    size_t expected_len = s.len;
+    size_t expected_cap = s.capacite;
+
+    ajouter_chaine(&s, NULL);
+    ajouter_char(&s, '\0');
+
+    if (strcmp(s.texte, "hello")) return false;
+    if (s.len != expected_len) return false;
+    if (s.capacite != expected_cap) return false;
+
+    detruire_varstring(s);
+    return true;
+}
+
+bool test_varstring_null(void)
+{
+    // pourrait declencher un crash
+    ajouter_char(NULL, '\0');
+    ajouter_chaine(NULL, NULL);
+    vider_varstring(NULL);
+    return true;
+}
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_init_grille),
     TEST(test_init_pile),
     TEST(test_inserer_tuile),
     TEST(test_recup_tuile),
+    TEST(test_varstring_ajout_char),
+    TEST(test_varstring_ajout_chaine),
+    TEST(test_varstring_vider),
+    TEST(test_varstring_ajouter_null),
+    TEST(test_varstring_null),
 };
 
 // ===========================
