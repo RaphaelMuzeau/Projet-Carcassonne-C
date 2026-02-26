@@ -4,10 +4,10 @@
 #include <stdbool.h>
 
 enum Zone {
+    Z_PRE = 0,
     Z_ROUTE,
     Z_VILLE,
     Z_BLASON,
-    Z_PRE,
     Z_VILLAGE,
     Z_ABBAYE,
 };

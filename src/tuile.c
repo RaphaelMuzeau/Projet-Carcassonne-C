@@ -4,7 +4,7 @@
 Tuile init_tuile(void)
 {
     Tuile s;
-    s = malloc(sizeof(struct _Tuile));
+    s = calloc(1, sizeof(struct _Tuile));
     return s;
 }
 

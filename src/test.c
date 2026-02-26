@@ -47,6 +47,62 @@ bool test_init_pile(void)
     return true;
 }
 
+bool test_tuile_creer(void)
+{
+    Tuile t = init_tuile();
+
+    if (t->milieu != Z_PRE) return false;
+    if (t->nord != Z_PRE)   return false;
+    if (t->sud != Z_PRE)    return false;
+    if (t->est != Z_PRE)    return false;
+    if (t->ouest != Z_PRE)  return false;
+    if (t->meeple) return false;
+
+    free(t);
+    return true;
+}
+
+// FIXME: Ce test ne passe pas pour l'instant
+bool test_tuile_compatibilite(void)
+{
+    Tuile depart  = init_tuile();
+    Tuile arrivee = init_tuile();
+
+    depart->nord  = Z_ROUTE;
+    depart->sud   = Z_PRE;
+    depart->est   = Z_VILLE;
+    depart->ouest = Z_BLASON;
+
+    depart->sud   = Z_ROUTE;
+    depart->nord  = Z_PRE;
+    depart->ouest = Z_VILLE;
+    depart->est   = Z_VILLE;
+
+    if (!compatibilite_tuile(depart, arrivee, D_NORD))  return false;
+    if (!compatibilite_tuile(depart, arrivee, D_SUD))   return false;
+    if (!compatibilite_tuile(depart, arrivee, D_EST))   return false;
+    if (!compatibilite_tuile(depart, arrivee, D_OUEST)) return false;
+    if (!compatibilite_tuile(arrivee, depart, D_NORD))  return false;
+    if (!compatibilite_tuile(arrivee, depart, D_SUD))   return false;
+    if (!compatibilite_tuile(arrivee, depart, D_EST))   return false;
+    if (!compatibilite_tuile(arrivee, depart, D_OUEST)) return false;
+
+    pivot_90(arrivee);
+
+    if (compatibilite_tuile(depart, arrivee, D_NORD))  return false;
+    if (compatibilite_tuile(depart, arrivee, D_SUD))   return false;
+    if (compatibilite_tuile(depart, arrivee, D_EST))   return false;
+    if (compatibilite_tuile(depart, arrivee, D_OUEST)) return false;
+    if (compatibilite_tuile(arrivee, depart, D_NORD))  return false;
+    if (compatibilite_tuile(arrivee, depart, D_SUD))   return false;
+    if (compatibilite_tuile(arrivee, depart, D_EST))   return false;
+    if (compatibilite_tuile(arrivee, depart, D_OUEST)) return false;
+
+    free(depart);
+    free(arrivee);
+    return true;
+}
+
 bool test_inserer_tuile(void)
 {
     int i;
@@ -97,6 +153,8 @@ bool test_recup_tuile(void)
 
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
+    TEST(test_tuile_creer),
+    TEST(test_tuile_compatibilite),
     TEST(test_init_grille),
     TEST(test_init_pile),
     TEST(test_inserer_tuile),
