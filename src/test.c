@@ -62,7 +62,6 @@ bool test_tuile_creer(void)
     return true;
 }
 
-// FIXME: Ce test ne passe pas pour l'instant
 bool test_tuile_compatibilite(void)
 {
     Tuile depart  = init_tuile();
@@ -73,10 +72,10 @@ bool test_tuile_compatibilite(void)
     depart->est   = Z_VILLE;
     depart->ouest = Z_BLASON;
 
-    depart->sud   = Z_ROUTE;
-    depart->nord  = Z_PRE;
-    depart->ouest = Z_VILLE;
-    depart->est   = Z_VILLE;
+    arrivee->sud   = Z_ROUTE;
+    arrivee->nord  = Z_PRE;
+    arrivee->ouest = Z_VILLE;
+    arrivee->est   = Z_VILLE;
 
     if (!compatibilite_tuile(depart, arrivee, D_NORD))  return false;
     if (!compatibilite_tuile(depart, arrivee, D_SUD))   return false;

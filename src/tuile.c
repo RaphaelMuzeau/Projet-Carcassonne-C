@@ -5,6 +5,12 @@ Tuile init_tuile(void)
 {
     Tuile s;
     s = calloc(1, sizeof(struct _Tuile));
+    s->milieu = Z_PRE;
+    s->nord   = Z_PRE;
+    s->sud    = Z_PRE;
+    s->est    = Z_PRE;
+    s->ouest  = Z_PRE;
+
     return s;
 }
 
@@ -25,13 +31,13 @@ bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)
 
     switch (d) {
     case D_NORD:
-        return (depart->nord == arrivee->sud);
+        return (depart->nord & arrivee->sud);
     case D_SUD:
-        return (depart->sud == arrivee->nord);
+        return (depart->sud & arrivee->nord);
     case D_OUEST:
-        return (depart->ouest == arrivee->est);
+        return (depart->ouest & arrivee->est);
     case D_EST:
-        return (depart->est == arrivee->ouest);
+        return (depart->est & arrivee->ouest);
     default:
         return false;
     }

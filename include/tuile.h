@@ -3,13 +3,15 @@
 
 #include <stdbool.h>
 
+// Z_BLASON et Z_VILLE ont un bit en commun pour etre considérés
+// comme compatible avec un & binaire.
 enum Zone {
-    Z_PRE = 0,
-    Z_ROUTE,
-    Z_VILLE,
-    Z_BLASON,
-    Z_VILLAGE,
-    Z_ABBAYE,
+    Z_PRE     = 0x01, // 0b000001
+    Z_ROUTE   = 0x02, // 0b000010
+    Z_VILLE   = 0x04, // 0b000100
+    Z_BLASON  = 0x0c, // 0b001100
+    Z_VILLAGE = 0x10, // 0b010000
+    Z_ABBAYE  = 0x20, // 0b100000
 };
 
 enum Direction {
