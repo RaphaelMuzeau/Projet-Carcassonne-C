@@ -21,9 +21,11 @@ Grille init_grille(int taille)
 void destruction_grille(Grille grille)
 {
     int taille = grille.taille;
-    int i;
+    int i, j;
 
     for(i = 0; i < taille; i++) {
+        for (j = 0; j < taille; j++)
+            free(grille.tableau[i][j]);
         free(grille.tableau[i]);
     }
     free(grille.tableau);
@@ -43,7 +45,7 @@ bool placer_tuile(Grille grille, int x, int y, Tuile piece)
     if (est_vide(grille, x-1, y) && est_vide(grille, x+1, y) && est_vide(grille, x, y-1) && est_vide(grille, x, y+1))
         return false;
 
-    if(compatibilite_tuile(grille.tableau[x][y],grille.tableau[x-1][y],D_OUEST)
+    if (compatibilite_tuile(grille.tableau[x][y],grille.tableau[x-1][y],D_OUEST)
         && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x+1][y],D_EST)
         && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x][y+1],D_NORD)
         && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x][y-1],D_SUD)) {

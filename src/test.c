@@ -20,19 +20,6 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-bool test_init_grille(void)
-{
-    Grille grille = init_grille(10);
-
-    for(int i = 0; i < 10; i++) {
-        for(int j = 0; j < 10; j++)
-            if (grille.tableau[i][j] != NULL)
-                return false;
-    }
-
-    return true;
-}
-
 bool test_init_pile(void)
 {
     Pile p = creer_pile(10);
@@ -102,6 +89,109 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
+bool test_grille_creer(void)
+{
+    Grille grille = init_grille(10);
+
+    if (grille.taille != 10) return false;
+
+    for(int i = 0; i < grille.taille; i++)
+        for(int j = 0; j < grille.taille; j++)
+            if (grille.tableau[i][j] != NULL)
+                return false;
+
+
+    destruction_grille(grille);
+    return true;
+}
+
+bool test_grille_est_vide(void)
+{
+    Grille grille = init_grille(10);
+
+    // cases allouées sont vides
+    for(int i = 0; i < grille.taille; i++)
+        for(int j = 0; j < grille.taille; j++)
+            if (!est_vide(grille, i, j))
+                return false;
+
+    // cases hors champs
+    if (!est_vide(grille, -11, 0)) return false;
+    if (!est_vide(grille, 11, 0)) return false;
+    if (!est_vide(grille, 0, -11)) return false;
+    if (!est_vide(grille, 0, 11)) return false;
+
+    // case presente
+    grille.tableau[1][2] = init_tuile();
+    if (est_vide(grille, 1, 2)) return false;
+
+    destruction_grille(grille);
+    return true;
+}
+
+bool test_grille_placer_tuile(void)
+{
+    Grille grille = init_grille(10);
+    Tuile t = init_tuile();
+
+    // placement hors champs
+    if (placer_tuile(grille, -11, 0, t)) return false;
+    if (placer_tuile(grille, 11, 0, t)) return false;
+    if (placer_tuile(grille, 0, -11, t)) return false;
+    if (placer_tuile(grille, 0, 11, t)) return false;
+
+    // placement sans connexion
+    if (placer_tuile(grille, 1, 1, t)) return false;
+    if (placer_tuile(grille, 1, 0, t)) return false;
+    if (placer_tuile(grille, 0, 1, t)) return false;
+    if (placer_tuile(grille, 1, 9, t)) return false;
+    if (placer_tuile(grille, 9, 1, t)) return false;
+    if (grille.tableau[1][1] == t) return false;
+    if (grille.tableau[1][0] == t) return false;
+    if (grille.tableau[0][1] == t) return false;
+    if (grille.tableau[1][9] == t) return false;
+    if (grille.tableau[9][1] == t) return false;
+
+    grille.tableau[1][1] = t;
+
+    // tuile occupée
+    if (placer_tuile(grille, 1, 1, t)) return false;
+
+    // placement compatible
+    t = init_tuile();
+    if (!placer_tuile(grille, 0, 1, t)) return false;
+    if (grille.tableau[0][1] != t) return false;
+    t = init_tuile();
+    if (!placer_tuile(grille, 1, 0, t)) return false;
+    if (grille.tableau[1][0] != t) return false;
+    t = init_tuile();
+    if (!placer_tuile(grille, 2, 1, t)) return false;
+    if (grille.tableau[2][1] != t) return false;
+    t = init_tuile();
+    if (!placer_tuile(grille, 1, 2, t)) return false;
+    if (grille.tableau[1][2] != t) return false;
+
+    // placement incompatible
+    t = init_tuile();
+    t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
+    if (!placer_tuile(grille, 5, 5, t)) return false;
+    if (grille.tableau[5][5] != t) return false;
+
+    t = init_tuile();
+    if (placer_tuile(grille, 0, 1, t)) return false;
+    if (grille.tableau[0][1] == t) return false;
+    if (placer_tuile(grille, 1, 0, t)) return false;
+    if (grille.tableau[1][0] == t) return false;
+    if (placer_tuile(grille, 2, 1, t)) return false;
+    if (grille.tableau[2][1] == t) return false;
+    if (placer_tuile(grille, 1, 2, t)) return false;
+    if (grille.tableau[1][2] == t) return false;
+    free(t);
+
+    destruction_grille(grille);
+    return true;
+}
+
 bool test_inserer_tuile(void)
 {
     int i;
@@ -154,7 +244,9 @@ bool test_recup_tuile(void)
 Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_compatibilite),
-    TEST(test_init_grille),
+    TEST(test_grille_creer),
+    TEST(test_grille_est_vide),
+    TEST(test_grille_placer_tuile),
     TEST(test_init_pile),
     TEST(test_inserer_tuile),
     TEST(test_recup_tuile),
