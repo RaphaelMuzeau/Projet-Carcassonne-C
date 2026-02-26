@@ -31,6 +31,9 @@ void destruction_grille(Grille grille)
     free(grille.tableau);
 }
 
+#define compatibilite_tuile_check(g, x1, y1, x2, y2, d) (est_vide(g,x1,y1)   \
+                                                        || est_vide(g,x2,y2) \
+                                                        || compatibilite_tuile(g.tableau[x1][y1], g.tableau[x2][y2], d))
 bool placer_tuile(Grille grille, int x, int y, Tuile piece)
 {
     // tuile hors champ
@@ -45,10 +48,10 @@ bool placer_tuile(Grille grille, int x, int y, Tuile piece)
     if (est_vide(grille, x-1, y) && est_vide(grille, x+1, y) && est_vide(grille, x, y-1) && est_vide(grille, x, y+1))
         return false;
 
-    if (compatibilite_tuile(grille.tableau[x][y],grille.tableau[x-1][y],D_OUEST)
-        && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x+1][y],D_EST)
-        && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x][y+1],D_NORD)
-        && compatibilite_tuile(grille.tableau[x][y],grille.tableau[x][y-1],D_SUD)) {
+    if (compatibilite_tuile_check(grille, x, y, x-1, y,   D_OUEST)
+     && compatibilite_tuile_check(grille, x, y, x+1, y,   D_EST)
+     && compatibilite_tuile_check(grille, x, y, x,   y+1, D_NORD)
+     && compatibilite_tuile_check(grille, x, y, x,   y-1, D_SUD)) {
         grille.tableau[x][y] = piece;
         return true;
     }
