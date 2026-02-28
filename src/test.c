@@ -346,7 +346,7 @@ Test unit_tests[] = {
 _Noreturn void lancer_tests(void)
 {
     int passed = 0;
-    int failed  = 0;
+    int failed = 0;
 
     Test t;
     bool result;
