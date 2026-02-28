@@ -5,9 +5,8 @@
 #include "tuile.h"
 
 typedef struct _Pile {
-    int nb_element, nb_element_max;
     Tuile *tab;
-
+    int nb_element, nb_element_max;
 } Pile;
 
 Pile creer_pile(int max_element);
