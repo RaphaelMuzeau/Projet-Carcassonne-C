@@ -5,9 +5,30 @@
 Développement d'un jeu "Carcassonne" interactif avec interface graphique pour GNU/Linux en utilisant le langage C ainsi qu'une librairie graphique.
 La phase de développement est comprise entre le 22 janvier et le 9 avril avec une équipe composée de trois personne : 
 
-MUZEAU Raphaël <br>
-DANNA--VASSEUR Lucas <br>
-CORTALES--BECKER Tom <br>
+[MUZEAU Raphaël](https://github.com/RaphaelMuzeau) contact: raphael.muzeau@etudiant.univ-perp.fr<br>
+[DANNA--VASSEUR Lucas](https://github.com/DannVass-Lucas) contact: lucas.danna--vasse@etudiant.univ-perp.fr <br>
+[CORTALE--BECKER Tom](https://github.com/CrtlTom) contact: tom.cortale-beck@etudiant.univ-perp.fr<br>
+
+### Faisabilité :
+
+Plusieurs idées ont émergé après l'énonciation du projet. Le premier point qui nous a fait gamberger est la représentation de la grille. Deux idées ont émergées avec chacun des avantages et des incovénients.  
+  
+  #### &emsp; 1. Les listes chaînées :
+  
+&emsp; L'*avantage* principal que nous voyions dans les listes chaînées était un usage *mémoire plus faible*. Notre idée partait du principe que cette liste chaînée serait dynamiquement allouée/désallouée selon l'évolution de la partie ce qui réduisait drastiquement le coût mémoire. Mais plusieurs problématiques se sont posées au fur et à mesure que nous réfléchissions à des algorithmes efficaces pour le bon fonctionnement du jeu. <br>
+&emsp; Parmi les *désavantages* que nous avions, le premier était de réussir de dire à notre programme que deux tuiles étaient "liées". Nous aurions voulu chainer les tuiles entre elles pour faciliter nos algorithmes, mais, si pour deux tuiles côtés à côtés, le problème était assez simpliste. Une fois arrivé au moment de lier quatre tuiles entre elles, toutes nos tentatives d'algorithmes échouaient. plus nous posions des problèmes sur papier, plus nous en voyions les limites algorithmique aussi, nos algorithmes se complexifiaient de plus en plus que nous trouvions des "solutions". 
+
+#### &emsp; 2. Le tableau 2D :
+
+&emsp; Notre deuxième idée était beaucoup plus simple. Un tableau 2D de taille `nb_tuile * nb_tuile`. Le *désavantage* évident étant sa demande en ressource mémoire bien plus importante qu'une liste chaînée dynamique. <br> 
+&emsp; Nous avons alors réfléchis à alloué dynamiquement ce tableau, mais le coup en calcul devenait linéairement plus grand au fur et à mesure que la partie avançait. <br>
+&emsp; Une autre de nos tentatives était de créer des petits tableaux de taille arbitraires (nous étions partis sur 3 pour nos premiers tests) qui seraient ensuite chaînés entre eux. Mais là encore, nous retombions sur la même problématique que la liste chaîné lorsque nous voulions chaîner plus de trois tableaux entre eux. <br>
+&emsp; Nous avons donc décidé de rester sur l'idée d'un *tableau statique 2D* statique.
+
+L'implémentation de la tuile était la suite logique. La tuile continent alors "six" informations. Ce qui la compose *(Ville, route, abbaye, village, blason)* et si un meeple est placé dessus.
+
+Ensuite nous avons réfléchis à l'implémentation de la pile. Nous avons vu le problème très simplement. La pile possède toutes les tuiles, un simple tableau possèdant toutes les tuiles est donc suffisant.  
+
 
 ---
 
@@ -20,6 +41,7 @@ CORTALES--BECKER Tom <br>
 - Sauvegarde et recharge d'une partie en cours.
 - Une interface graphique.
 
+TODO : Ajouter le fonctionnement de la fenêtre de comptage des points.
 ### *Règle du jeu :*
 
 Le Carcasonne est un jeu pouvant être joué de 2 à 5 joueurs. Celui-ci est composé de 72 tuiles (dans sa version d'origine) dont trois types dinstincts : <br>
@@ -73,24 +95,40 @@ Les tuiles "abbaye" sont toujours représentées par une "abbaye" à leur centre
 <br>
 Une fois n'importe quelle zone complétée, le joueur peut alors récupérer son meeple, sinon, celui-ci reste à sa position jusqu'à la fin de la partie.
 Les points sont attribués au joueur ayant le plus de meeple sur ladite zone.
+
 ### En fin de partie :
 
-Lors d'une fin de partie, certaines zone ne sont pas complétées. La délibération des points sera ainsi faite : 
+Lors d'une fin de partie, certaines zones ne sont pas complétées. La délibération des points sera ainsi faite : 
 
 - Chaque route incomplète rapporte **1 point**
-- Chaque ville incomplète rapporte **1 point**, et **1 point** de plus si la tuile possède un blason.
+- Chaque ville incomplète rapporte **1 point** et **1 point** de plus si la tuile possède un blason.
 - Chaque abbaye rapporte **1 point** et **1 point** par tuile adjacente.
  
  
 ---
 ## Conception Architecturale
 
-### Modèle MVC
+### Modèle MVC :
 
 - **Modèle** génère et contient la grille, représente l'ensemble des structures manipulées par l'utilisateur via le contrôleur, ainsi que l'automatisation des points.
 - **Vue** affiche l'état du modèle en temps réel selon les entrées utilisateur.
 - **Contrôleur** recoit les entrées de la vue et modifie le modèle en conséquence. (ex, positionnement d'une tuile certaines coordonées).
 
-#### Dépendances
+### Arborescence :
+
+```
+.
+├── bin
+├── data
+├── include
+├── lib
+├── obj
+└── src
+│   └── model
+│   └── view
+│   └── controller
+```
+
+#### Dépendances :
 
 Utilisation de la librairie [Raylib](https://github.com/raysan5/raylib) pour l'interface utilisateur.
