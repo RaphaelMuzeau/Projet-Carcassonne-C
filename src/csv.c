@@ -7,7 +7,7 @@
 void lire_tuile(enum Zone *p, FILE *f)
 {
     unsigned char valeur;
-    fread(&valeur, sizeof(unsigned char), 1, f);
+    valeur = fgetc(f);
 
     switch(valeur) {
 
@@ -28,7 +28,7 @@ void lire_tuile(enum Zone *p, FILE *f)
             break;
         case 'v':
             fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
-            fread(&valeur, sizeof(unsigned char), 1, f);
+            valeur = fgetc(f);
             if (valeur == 'e') {
                 *p = Z_VILLE;
                 fseek(f, sizeof(unsigned char), SEEK_CUR);
@@ -63,9 +63,9 @@ Pile lire_tuiles_csv(char* nom_fichier)
 int compter_lignes(char *fichier)
 {
     FILE *f = fopen(fichier, "r");
-    unsigned char valeur;
+    int valeur;
     int nb_lignes = 0;
-    while (fread(&valeur, sizeof(unsigned char), 1, f) != 0) {
+    while ((valeur = fgetc(f)) != EOF) {
         if (valeur == '\n')
             nb_lignes++;
     }
