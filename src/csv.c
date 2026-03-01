@@ -40,22 +40,35 @@ void lire_tuile(enum Zone *p, FILE *f)
     }
 }
 
-Pile lire_tuiles_csv(char* nom_fichier, int max_element)
+Pile lire_tuiles_csv(char* nom_fichier)
 {
-    int i = 0;
+    int max_element = compter_lignes(nom_fichier);
     Pile p = creer_pile(max_element);
     FILE *fichier = fopen(nom_fichier, "r");
 
-    while (i < p.nb_element_max) {
-       p.tab[i] = init_tuile();
-       lire_tuile(&p.tab[i]->nord, fichier);
-       lire_tuile(&p.tab[i]->sud, fichier);
-       lire_tuile(&p.tab[i]->est, fichier);
-       lire_tuile(&p.tab[i]->ouest, fichier);
-       lire_tuile(&p.tab[i]->milieu, fichier);
-       i++;
+    while (p.nb_element < p.nb_element_max) {
+       p.tab[p.nb_element] = init_tuile();
+       lire_tuile(&p.tab[p.nb_element]->nord, fichier);
+       lire_tuile(&p.tab[p.nb_element]->sud, fichier);
+       lire_tuile(&p.tab[p.nb_element]->est, fichier);
+       lire_tuile(&p.tab[p.nb_element]->ouest, fichier);
+       lire_tuile(&p.tab[p.nb_element]->milieu, fichier);
+       p.nb_element++;
     }
 
     fclose(fichier);
     return p;
+}
+
+int compter_lignes(char *fichier)
+{
+    FILE *f = fopen(fichier, "r");
+    unsigned char valeur;
+    int nb_lignes = 0;
+    while (fread(&valeur, sizeof(unsigned char), 1, f) != 0) {
+        if (valeur == '\n')
+            nb_lignes++;
+    }
+
+    return nb_lignes;
 }

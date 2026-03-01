@@ -11,6 +11,7 @@
 #include "grille.h"
 #include "pile.h"
 #include "varstring.h"
+#include "csv.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -22,7 +23,6 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-// TODO: Faire les fonctions de test des lecteurs csv
 bool test_init_pile(void)
 {
     Pile p = creer_pile(10);
@@ -322,6 +322,47 @@ bool test_varstring_null(void)
     return true;
 }
 
+bool test_csv_compter_lignes(void)
+{
+
+    if (compter_lignes("data/test/0_test.csv") != 1) return false;
+    if (compter_lignes("data/test/1_test.csv") != 11) return false;
+
+    return true;
+}
+bool test_csv_lecture_tuile(void)
+{
+    FILE *f = fopen("data/test/0_test.csv", "r");
+    Tuile t = init_tuile();
+
+    lire_tuile(&t->est, f);
+    lire_tuile(&t->nord, f);
+    lire_tuile(&t->ouest, f);
+    lire_tuile(&t->sud, f);
+    lire_tuile(&t->milieu, f);
+
+    if (t->est != Z_ROUTE) return false;
+    if (t->nord != Z_VILLE) return false;
+    if (t->ouest!= Z_BLASON) return false;
+    if (t->sud != Z_PRE) return false;
+    if (t->milieu != Z_ABBAYE) return false;
+
+    return true;
+}
+
+bool test_csv_lecture_fichier(void)
+{
+    int i;
+    Pile p;
+    p = lire_tuiles_csv("data/test/1_test.csv");
+
+    if (p.nb_element < p.nb_element_max) return false;
+
+    for (i = 0; i < p.nb_element_max; i++)
+        if (p.tab[i] == NULL) return false;
+
+    return true;
+}
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -337,6 +378,9 @@ Test unit_tests[] = {
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),
+    TEST(test_csv_compter_lignes),
+    TEST(test_csv_lecture_tuile),
+    TEST(test_csv_lecture_fichier),
 };
 
 // ===========================
