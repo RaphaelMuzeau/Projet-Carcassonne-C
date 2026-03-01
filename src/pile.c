@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdbool.h>
+#include "libca.h"
 #include "pile.h"
 #include "tuile.h"
 
@@ -8,7 +8,7 @@ Pile creer_pile(int max_element)
     Pile p;
     p.nb_element_max = max_element;
     p.nb_element = 0;
-    p.tab = malloc(sizeof(Tuile)*max_element);
+    p.tab = ca_alloc(max_element, sizeof(Tuile));
 
     return p;
 }
