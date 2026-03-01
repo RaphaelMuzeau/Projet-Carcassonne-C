@@ -22,6 +22,7 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
+// TODO: Faire les fonctions de test des lecteurs csv
 bool test_init_pile(void)
 {
     Pile p = creer_pile(10);
