@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+#include "libca.h"
 #include "grille.h"
 #include "pile.h"
 #include "varstring.h"
@@ -199,7 +200,7 @@ bool test_inserer_tuile(void)
     bool result_test = true;
     Pile p = creer_pile(1);
 
-    Tuile t = malloc(sizeof(struct _Tuile));
+    Tuile t = ca_alloc(1, sizeof(struct _Tuile));
     t->sud = Z_ABBAYE;
     t->est = Z_ABBAYE;
     t->nord = Z_ABBAYE;
@@ -224,7 +225,7 @@ bool test_inserer_tuile(void)
 bool test_recup_tuile(void)
 {
     Pile p = creer_pile(5);
-    Tuile t = malloc(sizeof(struct _Tuile));
+    Tuile t = ca_alloc(1, sizeof(struct _Tuile));
     t->sud = Z_ABBAYE;
     t->est = Z_ABBAYE;
     t->nord = Z_ABBAYE;

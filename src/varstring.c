@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <stdio.h>
+#include "libca.h"
 #include "varstring.h"
 
 /* gestion de mémoire */
@@ -26,11 +25,7 @@ void agrandir_varstring(VarString *chaine, size_t taille)
     // arrondit la nouvelle capacite au prochain multiple de VARSTRING_REALLOC_SIZE
     size_t new_cap = taille + (VARSTRING_REALLOC_SIZE - taille % VARSTRING_REALLOC_SIZE);
 
-    chaine->texte = realloc(chaine->texte, new_cap);
-    if (chaine->texte == NULL) {
-        perror("carcassonne");
-        exit(EXIT_FAILURE);
-    }
+    chaine->texte = ca_realloc(chaine->texte, new_cap, sizeof(char));
     chaine->capacite = new_cap;
 }
 

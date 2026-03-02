@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdbool.h>
+#include "libca.h"
 #include "grille.h"
 #include "tuile.h"
 
@@ -7,13 +7,10 @@ Grille init_grille(int taille)
 {
     Grille grille;
     grille.taille = taille;
-    grille.tableau = (Tuile **) malloc(taille*sizeof(Tuile *));
+    grille.tableau = ca_alloc(taille, sizeof(Tuile *));
 
-    for(int i = 0; i < taille; i++) {
-        grille.tableau[i] = (Tuile *) malloc(taille*sizeof(Tuile));
-        for(int j = 0; j < taille; j++)
-            grille.tableau[i][j] = NULL;
-    }
+    for(int i = 0; i < taille; i++)
+        grille.tableau[i] = ca_alloc(taille, sizeof(Tuile));
 
     return grille;
 }

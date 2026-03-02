@@ -1,10 +1,10 @@
-#include <stdlib.h>
+#include "libca.h"
 #include "tuile.h"
 
 Tuile init_tuile(void)
 {
     Tuile s;
-    s = calloc(1, sizeof(struct _Tuile));
+    s = ca_alloc(1, sizeof(struct _Tuile));
     s->milieu = Z_PRE;
     s->nord   = Z_PRE;
     s->sud    = Z_PRE;
