@@ -36,8 +36,9 @@ Lorsqu'une la zone est complété, ce joueur recevra des points en conséquence 
 
 
 #### Déroulement :
-À chaque tour: 
+À chaque tour,
 1. Un joueur pioche une tuile sur la pile et la pose de manière à prolonger le 		paysage formé par les tuiles deja presentes.
+	> Si la tuile ne peut pas etre placée, le joueur peut passer son tour, cette tuile ne sera pas réutilisée.
 2. Ce joueur peut alors decider ou non de poser un __unique__ meeple sur une des zones de cette tuile pour se l'attribuer.
 3. Les points gagnés sont evalués.
 
@@ -98,6 +99,51 @@ Lors d'une fin de partie, certaines zones ne sont pas complétées. La délibér
  
 Le joueur avec le plus de points remporte la partie.
 
+### *Interface Utilisateur :*
+
+Toutes les interactions avec le jeu se feront par le biais d'une interface graphique, en fenetre flottante ou en plein écran.
+
+Le joueur sera d'abord acceuilli par un écran titre simple:
+
+![](data/analyse/ui1.png)
+
+Une partie standard lance le jeu avec les regles standards de carcassonnes, 72 tuiles, 7 meeples par joueur.
+
+L'interface principale du jeu se compose d'un unique écran décrit ci-dessous:
+
+![](data/analyse/ui2.png)
+
+Le joueur peut librement deplacer la camera sur le terrain de tuiles.
+
+Si le joueur decide de quitter la partie, un pop-up lui propose de sauvegarder sa progression dans un fichier.
+
+![](data/analyse/ui3.png)
+
+Au moment de lancer une partie custom, un écran de configuration permet de gerer les parametres de la partie. Pour une partie standard, cet écran n'indique que le nombre de joueurs.
+
+![](data/analyse/ui4.png)
+
+Pour charger une partie, le joueur ne peut que selectionner parmis les fichiers disponibles.
+
+![](data/analyse/ui5.png)
+
+### *Format csv*
+
+Les tuiles d'une partie peuvent êtres importées à l'aide d'un fichier un csv:
+```csv
+# cote 1, cote 2, cote 3, cote 4, centre
+route,ville,route,pre,route
+route,ville,pre,route,route
+blason,blason,blason,route,blason
+route,ville,pre,route,route
+route,ville,ville,route,route
+```
+chaque entrées specifie les zones présentes à chaque coté de la tuile et en son centre, écrite en toute lettre *(route, ville, blason, pre, village, abbaye)*. Une abbaye ou un village ne peuvent apparaitre qu'au centre d'une tuile.
+
+Ces fichiers csv seront listé avec les parties chargeable comme une partie standard dont la pile de tuile sera prédefini.
+
+Ces fichiers ne précisent pas l'ordre de *tirage* des tuiles, qui reste aléatoire, la pile est "mélangée" même si elle est chargée à partir d'une fichier.
+
 ---
 
 ## Conception Architecturale
@@ -118,9 +164,9 @@ Le joueur avec le plus de points remporte la partie.
 ├── lib
 ├── obj
 └── src
-│   └── model
-│   └── view
-│   └── controller
+    └── model
+    └── view
+    └── controller
 ```
 
 #### Dépendances :
