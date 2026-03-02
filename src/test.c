@@ -330,16 +330,17 @@ bool test_csv_compter_lignes(void)
 
     return true;
 }
+
 bool test_csv_lecture_tuile(void)
 {
     FILE *f = fopen("data/test/0_test.csv", "r");
     Tuile t = init_tuile();
 
-    lire_tuile(&t->est, f);
-    lire_tuile(&t->nord, f);
-    lire_tuile(&t->ouest, f);
-    lire_tuile(&t->sud, f);
-    lire_tuile(&t->milieu, f);
+    lire_zone(&t->est, f);
+    lire_zone(&t->nord, f);
+    lire_zone(&t->ouest, f);
+    lire_zone(&t->sud, f);
+    lire_zone(&t->milieu, f);
 
     if (t->est != Z_ROUTE) return false;
     if (t->nord != Z_VILLE) return false;
@@ -363,6 +364,7 @@ bool test_csv_lecture_fichier(void)
 
     return true;
 }
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),

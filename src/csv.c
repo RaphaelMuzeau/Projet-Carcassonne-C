@@ -1,39 +1,48 @@
-#include <stdbool.h>
 #include <stdio.h>
 #include "csv.h"
 #include "pile.h"
 #include "tuile.h"
 
-void lire_tuile(enum Zone *p, FILE *f)
+// TODO: Ajouter une gestion des erreurs à :
+// compter_lignes, lire_tuiles_csv.
+// Ajouter un comportement par défaut au switch case en cas de comportement inattendu.
+
+void lire_zone(enum Zone *z, FILE *f)
 {
     unsigned char valeur;
     valeur = fgetc(f);
 
     switch(valeur) {
 
+        // Chaque lettre représente une tuile, le saut réalisé ensuite permet
+        // de passer à la prochaine valeur (suite du mot + virgule -> pour
+        // les valeurs en fin de ligne, le "\n" sera aussi sauté)
+
         case 'r':
-            *p = Z_ROUTE;
+            *z = Z_ROUTE;
             fseek(f, sizeof(unsigned char)*5, SEEK_CUR);
             break;
         case 'p':
             fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
             break;
         case 'a':
-            *p = Z_ABBAYE;
+            *z = Z_ABBAYE;
             fseek(f, sizeof(unsigned char)*6, SEEK_CUR);
             break;
         case 'b':
-            *p = Z_BLASON;
+            *z = Z_BLASON;
             fseek(f, sizeof(unsigned char)*6, SEEK_CUR);
             break;
         case 'v':
+            // ville et village ayant la même 1er lettre. On compare aussi le 4e caractère
+            // e ou a.
             fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
             valeur = fgetc(f);
             if (valeur == 'e') {
-                *p = Z_VILLE;
+                *z = Z_VILLE;
                 fseek(f, sizeof(unsigned char), SEEK_CUR);
             } else {
-                *p = Z_VILLAGE;
+                *z = Z_VILLAGE;
                 fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
             }
             break;
@@ -44,16 +53,17 @@ Pile lire_tuiles_csv(char* nom_fichier)
 {
     int max_element = compter_lignes(nom_fichier);
     Pile p = creer_pile(max_element);
+    Tuile t;
     FILE *fichier = fopen(nom_fichier, "r");
 
     while (p.nb_element < p.nb_element_max) {
-       p.tab[p.nb_element] = init_tuile();
-       lire_tuile(&p.tab[p.nb_element]->nord, fichier);
-       lire_tuile(&p.tab[p.nb_element]->sud, fichier);
-       lire_tuile(&p.tab[p.nb_element]->est, fichier);
-       lire_tuile(&p.tab[p.nb_element]->ouest, fichier);
-       lire_tuile(&p.tab[p.nb_element]->milieu, fichier);
-       p.nb_element++;
+       t = init_tuile();
+       lire_zone(&t->nord, fichier);
+       lire_zone(&t->sud, fichier);
+       lire_zone(&t->est, fichier);
+       lire_zone(&t->ouest, fichier);
+       lire_zone(&t->milieu, fichier);
+       inserer_tuile(&p, t);
     }
 
     fclose(fichier);
@@ -62,9 +72,10 @@ Pile lire_tuiles_csv(char* nom_fichier)
 
 int compter_lignes(char *fichier)
 {
-    FILE *f = fopen(fichier, "r");
+    FILE *f = fopen(fichier, "r");;
     int valeur;
     int nb_lignes = 0;
+
     while ((valeur = fgetc(f)) != EOF) {
         if (valeur == '\n')
             nb_lignes++;
