@@ -162,6 +162,7 @@ Ces fichiers ne précisent pas l'ordre de *tirage* des tuiles, qui reste aléato
 ├── data
 │   ├── parties
 │   └── assets  // données requisent par l'interface graphique
+│
 ├── include
 ├── lib
 ├── obj
