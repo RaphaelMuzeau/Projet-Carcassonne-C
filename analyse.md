@@ -150,9 +150,9 @@ Ces fichiers ne précisent pas l'ordre de *tirage* des tuiles, qui reste aléato
 
 ### Modèle MVC :
 
-- **Modèle** génère et contient la grille, représente l'ensemble des structures manipulées par l'utilisateur via le contrôleur, ainsi que l'automatisation des points.
-- **Vue** affiche l'état du modèle en temps réel selon les entrées utilisateur.
-- **Contrôleur** recoit les entrées de la vue et modifie le modèle en conséquence. (ex, positionnement d'une tuile certaines coordonées).
+- **Modèle**  -- génère et contient le terrain du jeu, la pile de tuile, les meeples placés, les joueurs et leurs données.
+- **Vue** -- affiche l'état du modèle en temps réel et reçoit les entrées utilisateur.
+- **Contrôleur** -- recoit les entrées de la vue et modifie le modèle en conséquence. (ex, positionnement d'une tuile à certaines coordonées, calcul des points, placement et retrait des meeples..).
 
 ### Arborescence :
 
@@ -160,14 +160,18 @@ Ces fichiers ne précisent pas l'ordre de *tirage* des tuiles, qui reste aléato
 .
 ├── bin
 ├── data
+│   ├── parties
+│   └── assets  // données requisent par l'interface graphique
 ├── include
 ├── lib
 ├── obj
 └── src
-    └── model
-    └── view
+    ├── model
+    ├── view
     └── controller
 ```
+
+Seuls les fichiers présents dans `data/parties` seront présentés au joueur.
 
 #### Dépendances :
 
