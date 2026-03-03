@@ -1,11 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "csv.h"
 #include "pile.h"
 #include "tuile.h"
-
-// TODO: Ajouter une gestion des erreurs à :
-// compter_lignes, lire_tuiles_csv.
-// Ajouter un comportement par défaut au switch case en cas de comportement inattendu.
 
 void lire_zone(enum Zone *z, FILE *f)
 {
@@ -46,6 +43,9 @@ void lire_zone(enum Zone *z, FILE *f)
                 fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
             }
             break;
+        default:
+            perror("Ce fichier est invalide !");
+            exit(EXIT_FAILURE);
     }
 }
 
@@ -55,6 +55,8 @@ Pile lire_tuiles_csv(char* nom_fichier)
     Pile p = creer_pile(max_element);
     Tuile t;
     FILE *fichier = fopen(nom_fichier, "r");
+
+    if (fichier == NULL) return p;
 
     while (p.nb_element < p.nb_element_max) {
        t = init_tuile();
@@ -72,7 +74,9 @@ Pile lire_tuiles_csv(char* nom_fichier)
 
 int compter_lignes(char *fichier)
 {
-    FILE *f = fopen(fichier, "r");;
+    FILE *f = fopen(fichier, "r");
+    if (f == NULL)  return 0;
+
     int valeur;
     int nb_lignes = 0;
 
@@ -81,5 +85,6 @@ int compter_lignes(char *fichier)
             nb_lignes++;
     }
 
+    fclose(f);
     return nb_lignes;
 }

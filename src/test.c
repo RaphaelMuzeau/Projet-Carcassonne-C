@@ -356,6 +356,7 @@ bool test_csv_lecture_fichier(void)
     int i;
     Pile p;
     p = lire_tuiles_csv("data/test/1_test.csv");
+    // Le test aura le même résultat avec un fichier qui n'existe pas de par la logique.
 
     if (p.nb_element < p.nb_element_max) return false;
 
