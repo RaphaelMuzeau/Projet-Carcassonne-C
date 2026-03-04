@@ -3,14 +3,11 @@
 ### Analyse des besoins
 
 Développement d'un jeu "Carcassonne" interactif avec interface graphique pour GNU/Linux en utilisant le langage C ainsi qu'une librairie graphique.
-La phase de développement est comprise entre le 22 janvier et le 9 avril avec une équipe composée de trois personne : 
+La phase de développement est comprise entre le 22 janvier et le 9 avril 2026 avec une équipe composée de trois personne : 
 
 [MUZEAU Raphaël](https://github.com/RaphaelMuzeau) contact: raphael.muzeau@etudiant.univ-perp.fr<br>
 [DANNA--VASSEUR Lucas](https://github.com/DannVass-Lucas) contact: lucas.danna--vasse@etudiant.univ-perp.fr <br>
 [CORTALE--BECKER Tom](https://github.com/CrtlTom) contact: tom.cortale-beck@etudiant.univ-perp.fr<br>
-
-### Faisabilité :
-
 
 ---
 
@@ -31,7 +28,7 @@ Le Carcasonne est un jeu pouvant être joué de 2 à 5 joueurs. Celui-ci est com
 - Ville
 - Abbaye
 
-Chaque joueur possède 7 meeple d'une couleur différentes (rouge, jaune, noir, vert, bleu...). Ces meeple servent aux joueurs à s'attribuer une zone.  <br>
+Chaque joueur possède 7 meeple d'une couleur différente (rouge, jaune, noir, vert, bleu...). Ces meeple servent aux joueurs à s'attribuer une zone.  <br>
 Lorsqu'une zone est complétée, ce joueur recevra des points en conséquence et pourra récuperer son meeple.
 
 
@@ -44,7 +41,7 @@ Lorsqu'une zone est complétée, ce joueur recevra des points en conséquence et
 
 Le jeu se termine lorsque la pile de tuiles est vide.
 
-	Étudions chaque zone une à une, du placement de la première tuile de ladite zone à la validation de la zone, lorsque la dernière tuile sera posée pour la compléter.
+Étudions chaque zone une à une, du placement de la première tuile de ladite zone à la validation de la zone, lorsque la dernière tuile sera posée pour la compléter.
 
  - ### La route :
 
@@ -70,7 +67,7 @@ Le jeu se termine lorsque la pile de tuiles est vide.
 	
 	Une *ville* n'est considérée comme terminée que lorsque l'intérieur de la ville est entourée de "muraille" (ville aux abord d'un pré) sans aucun "trou". 
 	
-	![](data/analyse/ville1.png) <br>
+	![](data/analyse/ville1.png)<br>
 	![](data/analyse/ville2.png)
 	
 	Ici, durant la partie en cours, chaque tuile vaut **2 points** mais, si celle-ci est estampillée d'un ***blason***, alors vous gagnez **2 points** en plus sur la tuile constituant la ville.
