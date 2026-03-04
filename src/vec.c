@@ -30,7 +30,6 @@ void agrandir_vec(Vec *v, int taille)
 {
     // arrondit la nouvelle capacite au prochain multiple de VEC_REALLOC_NB
     int new_cap = taille + (VEC_REALLOC_NB - taille % VEC_REALLOC_NB);
-    assert(new_cap > taille && "Capacite requise d'un vecteur depasse INT_MAX");
 
     v->tableau = ca_realloc(v->tableau, new_cap, sizeof(Tuile));
     for (int i = v->capacite; i < new_cap; i++)
@@ -60,7 +59,6 @@ void vset(Vec *v, Tuile t, int y)
         int diff_cap = v->capacite - old_cap;
 
         v->decy += diff_cap;
-        assert(v->decy > 0 && "Un decalage negatif est impossible dans un vecteur");
 
         // decale les anciennes valeurs et les remplace par NULL
         memmove(v->tableau + diff_cap, v->tableau, old_cap * sizeof(Tuile));
@@ -92,7 +90,6 @@ void agrandir_vec2D(Vec2D *g, int taille)
 {
     // arrondit la nouvelle capacite au prochain multiple de VEC_REALLOC_NB
     int new_cap = taille + (VEC2D_REALLOC_NB - taille % VEC2D_REALLOC_NB);
-    assert(new_cap > taille && "Capacite requise d'une grille depasse INT_MAX");
 
     g->tableau = ca_realloc(g->tableau, new_cap, sizeof(Vec));
     for (int i = g->capacite; i < new_cap; i++)
@@ -111,7 +108,7 @@ Tuile get(Vec2D g, int x, int y)
 
 void set(Vec2D *g, Tuile t, int x, int y)
 {
-    long index = (long) x + g->decx; // /!\ sur windows, int et long ont la meme taille :)
+    long index = (long) x + g->decx;
     assert(index <= INT_MAX && "Placement au dela des valeurs maximales de la grille");
 
     if (index >= g->capacite)
@@ -122,7 +119,6 @@ void set(Vec2D *g, Tuile t, int x, int y)
         int diff_cap = g->capacite - old_cap;
 
         g->decx += diff_cap;
-        assert(g->decx > 0 && "Un decalage negatif est impossible dans un vecteur");
 
         // decale les anciens Vecs et les remplace par des vecteurs vierges
         memmove(g->tableau + diff_cap, g->tableau, old_cap * sizeof(Vec));
