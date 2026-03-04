@@ -22,7 +22,7 @@ La phase de développement est comprise entre le 22 janvier et le 9 avril 2026 a
 
 ### *Règles du jeu :*
 
-Le Carcasonne est un jeu pouvant être joué de 2 à 5 joueurs. Celui-ci est composé de 72 tuiles (dans sa version d'origine) constituées de differentes zones :
+Le Carcassonne est un jeu pouvant être joué de 2 à 5 joueurs. Celui-ci est composé de 72 tuiles (dans sa version d'origine) constituées de differentes zones :
 
 - Route
 - Ville
