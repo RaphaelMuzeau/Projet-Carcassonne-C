@@ -301,56 +301,10 @@ bool test_vec2D_set_get(void)
     return true;
 }
 
-bool test_grille_creer(void)
-{
-    Grille grille = init_grille(10);
-
-    if (grille.taille != 10) return false;
-
-    for(int i = 0; i < grille.taille; i++)
-        for(int j = 0; j < grille.taille; j++)
-            if (grille.tableau[i][j] != NULL)
-                return false;
-
-
-    destruction_grille(grille);
-    return true;
-}
-
-bool test_grille_est_vide(void)
-{
-    Grille grille = init_grille(10);
-
-    // cases allouées sont vides
-    for(int i = 0; i < grille.taille; i++)
-        for(int j = 0; j < grille.taille; j++)
-            if (!est_vide(grille, i, j))
-                return false;
-
-    // cases hors champs
-    if (!est_vide(grille, -11, 0)) return false;
-    if (!est_vide(grille, 11, 0)) return false;
-    if (!est_vide(grille, 0, -11)) return false;
-    if (!est_vide(grille, 0, 11)) return false;
-
-    // case presente
-    grille.tableau[1][2] = init_tuile();
-    if (est_vide(grille, 1, 2)) return false;
-
-    destruction_grille(grille);
-    return true;
-}
-
 bool test_grille_placer_tuile(void)
 {
-    Grille grille = init_grille(10);
+    Vec2D grille = creer_vec2D();
     Tuile t = init_tuile();
-
-    // placement hors champs
-    if (placer_tuile(grille, -11, 0, t)) return false;
-    if (placer_tuile(grille, 11, 0, t)) return false;
-    if (placer_tuile(grille, 0, -11, t)) return false;
-    if (placer_tuile(grille, 0, 11, t)) return false;
 
     // placement sans connexion
     if (placer_tuile(grille, 1, 1, t)) return false;
@@ -358,13 +312,13 @@ bool test_grille_placer_tuile(void)
     if (placer_tuile(grille, 0, 1, t)) return false;
     if (placer_tuile(grille, 1, 9, t)) return false;
     if (placer_tuile(grille, 9, 1, t)) return false;
-    if (grille.tableau[1][1] == t) return false;
-    if (grille.tableau[1][0] == t) return false;
-    if (grille.tableau[0][1] == t) return false;
-    if (grille.tableau[1][9] == t) return false;
-    if (grille.tableau[9][1] == t) return false;
+    if (get(grille, 1, 1) == t) return false;
+    if (get(grille, 1, 0) == t) return false;
+    if (get(grille, 0, 1) == t) return false;
+    if (get(grille, 1, 9) == t) return false;
+    if (get(grille, 9, 1) == t) return false;
 
-    grille.tableau[1][1] = t;
+    set(&grille, t, 1, 1);
 
     // tuile occupée
     if (placer_tuile(grille, 1, 1, t)) return false;
@@ -372,34 +326,35 @@ bool test_grille_placer_tuile(void)
     // placement compatible
     t = init_tuile();
     if (!placer_tuile(grille, 0, 1, t)) return false;
-    if (grille.tableau[0][1] != t) return false;
+    if (get(grille, 0, 1)  != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 1, 0, t)) return false;
-    if (grille.tableau[1][0] != t) return false;
+    if (get(grille, 1, 0)  != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 2, 1, t)) return false;
-    if (grille.tableau[2][1] != t) return false;
+    if (get(grille, 2, 1) != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 1, 2, t)) return false;
-    if (grille.tableau[1][2] != t) return false;
+    if (get(grille, 1, 2) != t) return false;
 
     // placement incompatible
     t = init_tuile();
     t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
-    grille.tableau[5][5] = t;
+    set(&grille, t, 5, 5);
 
     t = init_tuile();
     if (placer_tuile(grille, 0, 1, t)) return false;
-    if (grille.tableau[0][1] == t) return false;
+    if (get(grille, 0, 1)  == t) return false;
     if (placer_tuile(grille, 1, 0, t)) return false;
-    if (grille.tableau[1][0] == t) return false;
+    if (get(grille, 1, 0)  == t) return false;
     if (placer_tuile(grille, 2, 1, t)) return false;
-    if (grille.tableau[2][1] == t) return false;
+    if (get(grille, 2, 1)  == t) return false;
     if (placer_tuile(grille, 1, 2, t)) return false;
-    if (grille.tableau[1][2] == t) return false;
+    if (get(grille, 1, 2) == t) return false;
+
     free(t);
 
-    destruction_grille(grille);
+    detruire_vec2D(grille);
     return true;
 }
 
@@ -541,8 +496,6 @@ Test unit_tests[] = {
     TEST(test_vec2D_creer),
     TEST(test_vec2D_get_null),
     TEST(test_vec2D_set_get),
-    TEST(test_grille_creer),
-    TEST(test_grille_est_vide),
     TEST(test_grille_placer_tuile),
     TEST(test_init_pile),
     TEST(test_inserer_tuile),
