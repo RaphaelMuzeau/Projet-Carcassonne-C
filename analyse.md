@@ -158,7 +158,7 @@ Ces fichiers ne précisent pas l'ordre de *tirage* des tuiles, qui reste aléato
 ├── data
 │   ├── parties
 │   └── assets  // données requisent par l'interface graphique
-│
+│   └── test    // fichiers utilisés par les tests unitaires
 ├── include
 ├── lib
 ├── obj
