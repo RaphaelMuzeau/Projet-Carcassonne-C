@@ -331,7 +331,7 @@ bool test_csv_compter_lignes(void)
     return true;
 }
 
-bool test_csv_lecture_tuile(void)
+bool test_csv_lecture_zone(void)
 {
     FILE *f = fopen("data/test/0_test.csv", "r");
     Tuile t = init_tuile();
@@ -363,6 +363,7 @@ bool test_csv_lecture_fichier(void)
     for (i = 0; i < p.nb_element_max; i++)
         if (p.tab[i] == NULL) return false;
 
+    detruire_pile(&p);
     return true;
 }
 
@@ -382,7 +383,7 @@ Test unit_tests[] = {
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),
     TEST(test_csv_compter_lignes),
-    TEST(test_csv_lecture_tuile),
+    TEST(test_csv_lecture_zone),
     TEST(test_csv_lecture_fichier),
 };
 
