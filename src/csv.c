@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include "csv.h"
 #include "pile.h"
 #include "tuile.h"
 
-void lire_zone(enum Zone *z, FILE *f)
+bool lire_zone(enum Zone *z, FILE *f)
 {
     unsigned char valeur;
     valeur = fgetc(f);
@@ -31,8 +32,8 @@ void lire_zone(enum Zone *z, FILE *f)
         fseek(f, sizeof(unsigned char)*6, SEEK_CUR);
         break;
     case 'v':
-        // ville et village ayant la même 1er lettre. On compare aussi le 4e caractère
-        // e ou a.
+        // ville et village ayant la même 1er lettre.
+        // On compare aussi le 4e caractère "e" ou "a".
         fseek(f, sizeof(unsigned char)*3, SEEK_CUR);
         valeur = fgetc(f);
         if (valeur == 'e') {
@@ -44,38 +45,49 @@ void lire_zone(enum Zone *z, FILE *f)
         }
         break;
     default:
-        perror("Ce fichier est invalide !");
-        exit(EXIT_FAILURE);
+        return false;
     }
+
+    return true;
 }
 
 Pile lire_tuiles_csv(char* nom_fichier)
 {
-    int max_element = compter_lignes(nom_fichier);
-    Pile p = creer_pile(max_element);
-    Tuile t;
     FILE *fichier = fopen(nom_fichier, "r");
+    int max_element = compter_lignes(fichier);
+    Pile p = creer_pile(max_element);
+    if (fichier == NULL) return p;
+
+    Tuile t;
+    fseek(fichier, 0, SEEK_SET);
 
     if (fichier == NULL) return p;
 
     while (p.nb_element < p.nb_element_max) {
-       t = init_tuile();
-       lire_zone(&t->nord, fichier);
-       lire_zone(&t->sud, fichier);
-       lire_zone(&t->est, fichier);
-       lire_zone(&t->ouest, fichier);
-       lire_zone(&t->milieu, fichier);
-       inserer_tuile(&p, t);
+        t = init_tuile();
+        if (!lire_zone(&t->nord, fichier)) goto fichier_invalide;
+        if (!lire_zone(&t->sud, fichier)) goto fichier_invalide;
+        if (!lire_zone(&t->est, fichier)) goto fichier_invalide;
+        if (!lire_zone(&t->ouest, fichier)) goto fichier_invalide;
+        if (!lire_zone(&t->milieu, fichier)) goto fichier_invalide;
+        inserer_tuile(&p, t);
+
     }
 
     fclose(fichier);
     return p;
+
+    fichier_invalide:
+        fclose(fichier);
+        free(t);
+        detruire_pile(&p);
+        p = creer_pile(0);
+        return p;
 }
 
-int compter_lignes(char *fichier)
+int compter_lignes(FILE *f)
 {
-    FILE *f = fopen(fichier, "r");
-    if (f == NULL)  return 0;
+    if (f == NULL) return 0;
 
     int valeur;
     int nb_lignes = 0;
@@ -85,6 +97,5 @@ int compter_lignes(char *fichier)
             nb_lignes++;
     }
 
-    fclose(f);
     return nb_lignes;
 }

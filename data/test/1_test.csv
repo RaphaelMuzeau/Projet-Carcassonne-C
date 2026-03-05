@@ -1,11 +1,5 @@
 ville,ville,route,route,route
-pre,ville,pre,ville,pre
+route,ville,ville,pre,abbaye
 blason,blason,blason,blason,blason
-ville,route,ville,ville,ville
-pre,pre,ville,ville,ville
 route,route,pre,route,village
-pre,route,pre,route,route
-pre,route,route,pre,route
-pre,pre,pre,route,abbaye
-route,route,pre,pre,route
-route,ville,village,pre,abbaye
+blason,blason,blason,route,blason
