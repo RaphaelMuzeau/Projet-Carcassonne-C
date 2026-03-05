@@ -43,47 +43,47 @@ Le jeu se termine lorsque la pile de tuiles est vide.
 
 Étudions chaque zone une à une, du placement de la première tuile de ladite zone à la validation de la zone, lorsque la dernière tuile sera posée pour la compléter.
 
- - ### La route :
+- ### La route :
 
-	Une fois une tuile avec une zone "route" posée, le joueur peut décider d'y poser un meeple pour s'attribuer la route. Un joueur peut poser un meeple sur une route si, et seulement si, aucun autre meeple ne s'y trouve.
-	
-	![](data/analyse/route1.png)
-	
-	Cependant, il est possible que deux joueurs possèdent une même route, comme dans l'exemple ci-contre : 
-	
-	![](data/analyse/route2.png)
-	
-	Ce cas ne peut arriver que lorsque deux routes séparées à l'origine se joignent. Dans ce cas, les deux joueurs se sont bien **attribués** la route quand ils étaient seuls, ce qui respecte la règle d'origine. Cette règle vaut pour toutes les *zones*.
-		
-	Une *route* est considérée comme terminée lorsque le point de départ d'une route (ville, abbaye ou décoration) rencontre un autre point de départ (ici, considéré comme la "fin" de la route). Autrement dit, qu'aucun chemin de la route ne mène à une tuile vide.
-	
-	Une fois une route terminée, le joueur ayant placé le plus de meeple dessus gagne **1 point** par tuile traversée par la route. Si plusieurs joueurs ont posé le même nombre de meeple, il gagnent tous l'intégralité des points. Si aucun meeple n'a été placé sur la route, aucun point n'est accordé.
-	
-	![](data/analyse/route3.png)
-	
+Une fois une tuile avec une zone "route" posée, le joueur peut décider d'y poser un meeple pour s'attribuer la route. Un joueur peut poser un meeple sur une route si, et seulement si, aucun autre meeple ne s'y trouve.
+
+![](data/analyse/route1.png)
+
+Cependant, il est possible que deux joueurs possèdent une même route, comme dans l'exemple ci-contre : 
+
+![](data/analyse/route2.png)
+
+Ce cas ne peut arriver que lorsque deux routes séparées à l'origine se joignent. Dans ce cas, les deux joueurs se sont bien **attribués** la route quand ils étaient seuls, ce qui respecte la règle d'origine. Cette règle vaut pour toutes les *zones*.
+
+Une *route* est considérée comme terminée lorsque le point de départ d'une route (ville, abbaye ou décoration) rencontre un autre point de départ (ici, considéré comme la "fin" de la route). Autrement dit, qu'aucun chemin de la route ne mène à une tuile vide.
+
+Une fois une route terminée, le joueur ayant placé le plus de meeple dessus gagne **1 point** par tuile traversée par la route. Si plusieurs joueurs ont posé le même nombre de meeple, il gagnent tous l'intégralité des points. Si aucun meeple n'a été placé sur la route, aucun point n'est accordé.
+
+![](data/analyse/route3.png)
+
 - ### La ville :
 
-	Une fois une tuile avec une zone "ville" posée, le joueur peut décider d'y poser un meeple pour s'attribuer la ville. La règle reste la même que pour la route, aucun autre meeple ne doit y être déja présent.
-	
-	Une *ville* n'est considérée comme terminée que lorsque l'intérieur de la ville est entourée de "muraille" (ville aux abord d'un pré) sans aucun "trou". 
-	
-	![](data/analyse/ville1.png)<br>
-	![](data/analyse/ville2.png)
-	
-	Ici, durant la partie en cours, chaque tuile vaut **2 points** mais, si celle-ci est estampillée d'un ***blason***, alors vous gagnez **2 points** en plus sur la tuile constituant la ville.
-	
-	![](data/analyse/ville3.png)
+Une fois une tuile avec une zone "ville" posée, le joueur peut décider d'y poser un meeple pour s'attribuer la ville. La règle reste la même que pour la route, aucun autre meeple ne doit y être déja présent.
+
+Une *ville* n'est considérée comme terminée que lorsque l'intérieur de la ville est entourée de "muraille" (ville aux abord d'un pré) sans aucun "trou". 
+
+![](data/analyse/ville1.png)<br>
+![](data/analyse/ville2.png)
+
+Ici, durant la partie en cours, chaque tuile vaut **2 points** mais, si celle-ci est estampillée d'un ***blason***, alors vous gagnez **2 points** en plus sur la tuile constituant la ville.
+
+![](data/analyse/ville3.png)
 
 - ### L'abbaye :
 
-	Les tuiles *abbaye* sont toujours représentées par une abbaye à leur centre. Ici, pour compléter une zone, il vous faut l'entourer de huit autres tuiles avec l'abbaye en son centre, comme sous l'image ci-dessous : 
-	
-	![](data/analyse/abbaye1.png)
-	
-	Durant la partie en cours, une zone rapporte un point par tuile, l'abbaye incluse. Une zone complète vous rapporte alors **9 points**.
-	
+Les tuiles *abbaye* sont toujours représentées par une abbaye à leur centre. Ici, pour compléter une zone, il vous faut l'entourer de huit autres tuiles avec l'abbaye en son centre, comme sous l'image ci-dessous : 
+
+![](data/analyse/abbaye1.png)
+
+Durant la partie en cours, une zone rapporte un point par tuile, l'abbaye incluse. Une zone complète vous rapporte alors **9 points**.
+
 Une fois n'importe quelle zone complétée, les joueurs peuvent alors récupérer leurs meeple, sinon, ceux-ci restent à leur position jusqu'à la fin de la partie.
-	
+
 ### En fin de partie :
 
 Lors d'une fin de partie, certaines zones ne sont pas complétées. La délibération des points sera ainsi faite : 
@@ -91,7 +91,7 @@ Lors d'une fin de partie, certaines zones ne sont pas complétées. La délibér
 - Chaque tuile traversé par une route incomplète rapporte **1 point**
 - Chaque tuile traversé par une ville incomplète rapporte **1 point** et **1 point** de plus si la tuile possède un blason.
 - Chaque abbaye rapporte **1 point** et **1 point** par tuile adjacente.
- 
+
 Le joueur avec le plus de points remporte la partie.
 
 ### *Interface Utilisateur :*
