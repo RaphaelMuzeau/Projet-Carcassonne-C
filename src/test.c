@@ -328,11 +328,21 @@ bool test_csv_compter_lignes(void)
 
     FILE *f0, *f1, *f2;
     f0 = fopen("data/test/0_test.csv", "r");
-    if (compter_lignes(f0) != 1) return false;
+    if (compter_lignes(f0) != 1) {
+        fclose(f0);
+        return false;
+    }
+    fclose(f0);
     f1 = fopen("data/test/1_test.csv", "r");
-    if (compter_lignes(f1) != 5) return false;
+    if (compter_lignes(f1) != 5) {
+        fclose(f1);
+        return false;
+    }
+    fclose(f1);
     f2 = fopen("data/test/test_non_existant.csv", "r");
-    if (compter_lignes(f2) != 0) return false;
+    if (compter_lignes(f2) != 0) {
+        return false;
+    }
     return true;
 }
 
