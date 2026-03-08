@@ -11,7 +11,9 @@
 #include "libca.h"
 #include "grille.h"
 #include "pile.h"
+#include "tuile.h"
 #include "varstring.h"
+#include "csv.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -322,6 +324,128 @@ bool test_varstring_null(void)
     return true;
 }
 
+bool test_csv_compter_lignes(void)
+{
+
+    FILE *f0, *f1, *f2;
+    f0 = fopen("data/test/0_test.csv", "r");
+    if (compter_lignes(f0) != 1) {
+        fclose(f0);
+        return false;
+    }
+    fclose(f0);
+    f1 = fopen("data/test/1_test.csv", "r");
+    if (compter_lignes(f1) != 5) {
+        fclose(f1);
+        return false;
+    }
+    fclose(f1);
+    f2 = fopen("data/test/test_non_existant.csv", "r");
+    if (compter_lignes(f2) != 0) {
+        return false;
+    }
+    return true;
+}
+
+bool test_csv_lecture_zone(void)
+{
+    FILE *f = fopen("data/test/0_test.csv", "r");
+    Tuile t = init_tuile();
+
+    lire_zone(&t->est, f);
+    lire_zone(&t->nord, f);
+    lire_zone(&t->ouest, f);
+    lire_zone(&t->sud, f);
+    lire_zone(&t->milieu, f);
+
+    if (t->est != Z_ROUTE) return false;
+    if (t->nord != Z_VILLE) return false;
+    if (t->ouest!= Z_BLASON) return false;
+    if (t->sud != Z_PRE) return false;
+    if (t->milieu != Z_ABBAYE) return false;
+
+    free(t);
+    return true;
+}
+
+bool test_csv_lecture_fichier(void)
+{
+    int i;
+    Pile p;
+    p = lire_tuiles_csv("data/test/1_test.csv");
+
+    if (p.nb_element < p.nb_element_max) return false;
+
+    for (i = 0; i < p.nb_element_max; i++)
+        if (p.tab[i] == NULL) return false;
+
+    if (p.tab[0]->nord != Z_VILLE) return false;
+    if (p.tab[0]->sud != Z_VILLE) return false;
+    if (p.tab[0]->est != Z_ROUTE) return false;
+    if (p.tab[0]->ouest != Z_ROUTE) return false;
+    if (p.tab[0]->milieu != Z_ROUTE) return false;
+
+    if (p.tab[1]->nord != Z_ROUTE) return false;
+    if (p.tab[1]->sud != Z_VILLE) return false;
+    if (p.tab[1]->est != Z_VILLE) return false;
+    if (p.tab[1]->ouest != Z_PRE) return false;
+    if (p.tab[1]->milieu != Z_ABBAYE) return false;
+
+    if (p.tab[2]->nord != Z_BLASON) return false;
+    if (p.tab[2]->sud != Z_BLASON) return false;
+    if (p.tab[2]->est != Z_BLASON) return false;
+    if (p.tab[2]->ouest != Z_BLASON) return false;
+    if (p.tab[2]->milieu != Z_BLASON) return false;
+
+    if (p.tab[3]->nord != Z_ROUTE) return false;
+    if (p.tab[3]->sud != Z_ROUTE) return false;
+    if (p.tab[3]->est != Z_PRE) return false;
+    if (p.tab[3]->ouest != Z_ROUTE) return false;
+    if (p.tab[3]->milieu != Z_VILLAGE) return false;
+
+    if (p.tab[4]->nord != Z_BLASON) return false;
+    if (p.tab[4]->sud != Z_BLASON) return false;
+    if (p.tab[4]->est != Z_BLASON) return false;
+    if (p.tab[4]->ouest != Z_ROUTE) return false;
+    if (p.tab[4]->milieu != Z_BLASON) return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_csv_fichier_vide(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/2_test.csv");
+
+    if (p.nb_element_max != 0) return false;
+    detruire_pile(&p);
+
+    return true;
+}
+
+bool test_csv_fichier_introuvable(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/test_non_existant.csv");
+
+    if (p.nb_element_max != 0) return false;
+    detruire_pile(&p);
+
+    return true;
+}
+
+bool test_csv_fichier_invalide(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/3_test.csv");
+
+    if (p.nb_element_max != 0) return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -337,6 +461,12 @@ Test unit_tests[] = {
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),
+    TEST(test_csv_compter_lignes),
+    TEST(test_csv_lecture_zone),
+    TEST(test_csv_lecture_fichier),
+    TEST(test_csv_fichier_vide),
+    TEST(test_csv_fichier_introuvable),
+    TEST(test_csv_fichier_invalide),
 };
 
 // ===========================
