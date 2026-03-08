@@ -16,7 +16,7 @@ Tuile init_tuile(void)
 
 void pivot_90(Tuile piece)
 {
-    char tmp;
+    enum Zone tmp;
     tmp = piece->nord;
     piece->nord = piece->est;
     piece->est = piece->sud;
