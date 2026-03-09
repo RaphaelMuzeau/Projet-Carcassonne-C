@@ -9,10 +9,12 @@
 #include <stdbool.h>
 #include <string.h>
 #include "libca.h"
+#include <limits.h>
 #include "grille.h"
 #include "pile.h"
 #include "tuile.h"
 #include "varstring.h"
+#include "vec.h"
 #include "csv.h"
 
 typedef struct _Test {
@@ -94,56 +96,217 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
-bool test_grille_creer(void)
+bool test_vec_creer(void)
 {
-    Grille grille = init_grille(10);
+    Vec v = creer_vec();
 
-    if (grille.taille != 10) return false;
+    if (v.tableau != NULL) return false;
+    if (v.capacite != 0) return false;
+    if (v.decy != 0) return false;
 
-    for(int i = 0; i < grille.taille; i++)
-        for(int j = 0; j < grille.taille; j++)
-            if (grille.tableau[i][j] != NULL)
-                return false;
-
-
-    destruction_grille(grille);
+    detruire_vec(v);
     return true;
 }
 
-bool test_grille_est_vide(void)
+bool test_vec_get_null(void)
 {
-    Grille grille = init_grille(10);
+    Vec v = creer_vec();
 
-    // cases allouées sont vides
-    for(int i = 0; i < grille.taille; i++)
-        for(int j = 0; j < grille.taille; j++)
-            if (!est_vide(grille, i, j))
-                return false;
+    if (vget(v,  0) != NULL) return false;
+    if (vget(v,  5) != NULL) return false;
+    if (vget(v, -5) != NULL) return false;
+    if (vget(v, INT_MAX) != NULL) return false;
+    if (vget(v, INT_MIN) != NULL) return false;
 
-    // cases hors champs
-    if (!est_vide(grille, -11, 0)) return false;
-    if (!est_vide(grille, 11, 0)) return false;
-    if (!est_vide(grille, 0, -11)) return false;
-    if (!est_vide(grille, 0, 11)) return false;
+    // le vecteur ne doit pas avoir changé
+    if (v.tableau != NULL) return false;
+    if (v.capacite != 0) return false;
+    if (v.decy != 0) return false;
 
-    // case presente
-    grille.tableau[1][2] = init_tuile();
-    if (est_vide(grille, 1, 2)) return false;
+    detruire_vec(v);
+    return true;
+}
 
-    destruction_grille(grille);
+bool test_vec_set_get(void)
+{
+    Vec v = creer_vec();
+    Tuile t0 = init_tuile();
+
+    // acces simple
+    vset(&v, t0, 0);
+    if (v.tableau == NULL) return false;
+    if (v.capacite == 0) return false;
+    if (v.capacite != VEC_REALLOC_NB) return false;
+    if (v.decy != 0) return false;
+
+    if (v.tableau[0] != t0) return false;
+    if (vget(v, 0) != t0) return false;
+
+    // acces complexes
+    Tuile t1 = init_tuile();
+    vset(&v, t1, -50);
+
+    if (v.capacite % VEC_REALLOC_NB != 0) return false;
+    if (v.tableau[  0 + v.decy] != t0) return false;
+    if (v.tableau[-50 + v.decy] != t1) return false;
+    if (vget(v,   0) != t0) return false;
+    if (vget(v, -50) != t1) return false;
+
+    Tuile t2 = init_tuile();
+    vset(&v, t2, 50);
+
+    if (v.capacite % VEC_REALLOC_NB != 0) return false;
+    if (v.tableau[  0 + v.decy] != t0) return false;
+    if (v.tableau[-50 + v.decy] != t1) return false;
+    if (v.tableau[ 50 + v.decy] != t2) return false;
+    if (vget(v,   0) != t0) return false;
+    if (vget(v, -50) != t1) return false;
+    if (vget(v,  50) != t2) return false;
+
+    Tuile t3 = init_tuile();
+    vset(&v, t3, -51);
+
+    if (v.capacite % VEC_REALLOC_NB != 0) return false;
+    if (v.tableau[  0 + v.decy] != t0) return false;
+    if (v.tableau[-50 + v.decy] != t1) return false;
+    if (v.tableau[ 50 + v.decy] != t2) return false;
+    if (v.tableau[-51 + v.decy] != t3) return false;
+    if (vget(v,   0) != t0) return false;
+    if (vget(v, -50) != t1) return false;
+    if (vget(v,  50) != t2) return false;
+    if (vget(v, -51) != t3) return false;
+
+    // verifier l'initialisation correcte des cases libres
+    for (int i = -49; i < 0; i++) {
+        if (v.tableau[i + v.decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+    for (int i = 1; i < 50; i++) {
+        if (v.tableau[i + v.decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    // acces hors du tableau marchent encore
+    if (vget(v, 5000) != NULL) return false;
+    if (vget(v, -5000) != NULL) return false;
+
+    detruire_vec(v);
+    return true;
+}
+
+bool test_vec2D_creer(void)
+{
+    Vec2D g = creer_vec2D();
+
+    if (g.tableau != NULL) return false;
+    if (g.decx != 0) return false;
+    if (g.capacite != 0) return false;
+
+    detruire_vec2D(g);
+    return true;
+}
+
+bool test_vec2D_get_null(void)
+{
+    Vec2D g = creer_vec2D();
+
+    if (get(g, 0,  0) != NULL) return false;
+    if (get(g, 5,  0) != NULL) return false;
+    if (get(g, -5, 0) != NULL) return false;
+    if (get(g, 0,  0) != NULL) return false;
+    if (get(g, 0,  5) != NULL) return false;
+    if (get(g, 0, -5) != NULL) return false;
+
+    if (get(g, INT_MAX, 0) != NULL) return false;
+    if (get(g, INT_MIN, 0) != NULL) return false;
+    if (get(g, INT_MIN, INT_MAX) != NULL) return false;
+    if (get(g, INT_MAX, INT_MIN) != NULL) return false;
+
+    // le vecteur ne doit pas avoir changé
+    if (g.tableau != NULL) return false;
+    if (g.decx != 0) return false;
+    if (g.capacite != 0) return false;
+
+    detruire_vec2D(g);
+    return true;
+}
+
+bool test_vec2D_set_get(void)
+{
+    Vec2D g = creer_vec2D();
+    Tuile t0 = init_tuile();
+
+    // acces simple
+    set(&g, t0, 0, 0);
+    if (g.tableau == NULL) return false;
+    if (g.capacite == 0) return false;
+    if (g.capacite != VEC2D_REALLOC_NB) return false;
+    if (g.decx != 0) return false;
+
+    if (g.tableau[0].tableau[0] != t0) return false;
+    if (get(g, 0, 0) != t0) return false;
+
+    // acces complexes
+    Tuile t1 = init_tuile();
+    set(&g, t1, -50, -50);
+
+    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -50, -50) != t1) return false;
+
+    Tuile t2 = init_tuile();
+    set(&g, t2, 50, -50);
+
+    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -50, -50) != t1) return false;
+    if (get(g,  50, -50) != t2) return false;
+
+    Tuile t3 = init_tuile();
+    set(&g, t3, -50, 50);
+
+    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -50, -50) != t1) return false;
+    if (get(g,  50, -50) != t2) return false;
+    if (get(g, -50,  50) != t3) return false;
+
+    Tuile t4 = init_tuile();
+    set(&g, t4, 50, 50);
+
+    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -50, -50) != t1) return false;
+    if (get(g,  50, -50) != t2) return false;
+    if (get(g, -50,  50) != t3) return false;
+    if (get(g,  50,  50) != t4) return false;
+
+    // verifier l'initialisation correcte des vecteurs vides
+    for (int i = -49; i < 0; i++) {
+        if (g.tableau[i + g.decx].tableau != NULL) return false;
+        if (g.tableau[i + g.decx].capacite != 0) return false;
+        if (g.tableau[i + g.decx].decy != 0) return false;
+    }
+    for (int i = 1; i < 50; i++) {
+        if (g.tableau[i + g.decx].tableau != NULL) return false;
+        if (g.tableau[i + g.decx].capacite != 0) return false;
+        if (g.tableau[i + g.decx].decy != 0) return false;
+    }
+
+    // acces hors du tableau marchent encore
+    if (get(g, -5000, -5000) != NULL) return false;
+    if (get(g,  5000, -5000) != NULL) return false;
+    if (get(g, -5000,  5000) != NULL) return false;
+    if (get(g,  5000,  5000) != NULL) return false;
+
+    detruire_vec2D(g);
     return true;
 }
 
 bool test_grille_placer_tuile(void)
 {
-    Grille grille = init_grille(10);
+    Vec2D grille = creer_vec2D();
     Tuile t = init_tuile();
-
-    // placement hors champs
-    if (placer_tuile(grille, -11, 0, t)) return false;
-    if (placer_tuile(grille, 11, 0, t)) return false;
-    if (placer_tuile(grille, 0, -11, t)) return false;
-    if (placer_tuile(grille, 0, 11, t)) return false;
 
     // placement sans connexion
     if (placer_tuile(grille, 1, 1, t)) return false;
@@ -151,13 +314,13 @@ bool test_grille_placer_tuile(void)
     if (placer_tuile(grille, 0, 1, t)) return false;
     if (placer_tuile(grille, 1, 9, t)) return false;
     if (placer_tuile(grille, 9, 1, t)) return false;
-    if (grille.tableau[1][1] == t) return false;
-    if (grille.tableau[1][0] == t) return false;
-    if (grille.tableau[0][1] == t) return false;
-    if (grille.tableau[1][9] == t) return false;
-    if (grille.tableau[9][1] == t) return false;
+    if (get(grille, 1, 1) == t) return false;
+    if (get(grille, 1, 0) == t) return false;
+    if (get(grille, 0, 1) == t) return false;
+    if (get(grille, 1, 9) == t) return false;
+    if (get(grille, 9, 1) == t) return false;
 
-    grille.tableau[1][1] = t;
+    set(&grille, t, 1, 1);
 
     // tuile occupée
     if (placer_tuile(grille, 1, 1, t)) return false;
@@ -165,34 +328,35 @@ bool test_grille_placer_tuile(void)
     // placement compatible
     t = init_tuile();
     if (!placer_tuile(grille, 0, 1, t)) return false;
-    if (grille.tableau[0][1] != t) return false;
+    if (get(grille, 0, 1)  != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 1, 0, t)) return false;
-    if (grille.tableau[1][0] != t) return false;
+    if (get(grille, 1, 0)  != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 2, 1, t)) return false;
-    if (grille.tableau[2][1] != t) return false;
+    if (get(grille, 2, 1) != t) return false;
     t = init_tuile();
     if (!placer_tuile(grille, 1, 2, t)) return false;
-    if (grille.tableau[1][2] != t) return false;
+    if (get(grille, 1, 2) != t) return false;
 
     // placement incompatible
     t = init_tuile();
     t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
-    grille.tableau[5][5] = t;
+    set(&grille, t, 5, 5);
 
     t = init_tuile();
     if (placer_tuile(grille, 0, 1, t)) return false;
-    if (grille.tableau[0][1] == t) return false;
+    if (get(grille, 0, 1)  == t) return false;
     if (placer_tuile(grille, 1, 0, t)) return false;
-    if (grille.tableau[1][0] == t) return false;
+    if (get(grille, 1, 0)  == t) return false;
     if (placer_tuile(grille, 2, 1, t)) return false;
-    if (grille.tableau[2][1] == t) return false;
+    if (get(grille, 2, 1)  == t) return false;
     if (placer_tuile(grille, 1, 2, t)) return false;
-    if (grille.tableau[1][2] == t) return false;
+    if (get(grille, 1, 2) == t) return false;
+
     free(t);
 
-    destruction_grille(grille);
+    detruire_vec2D(grille);
     return true;
 }
 
@@ -450,8 +614,12 @@ bool test_csv_fichier_invalide(void)
 Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_compatibilite),
-    TEST(test_grille_creer),
-    TEST(test_grille_est_vide),
+    TEST(test_vec_creer),
+    TEST(test_vec_get_null),
+    TEST(test_vec_set_get),
+    TEST(test_vec2D_creer),
+    TEST(test_vec2D_get_null),
+    TEST(test_vec2D_set_get),
     TEST(test_grille_placer_tuile),
     TEST(test_init_pile),
     TEST(test_inserer_tuile),

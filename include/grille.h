@@ -2,16 +2,9 @@
 #define grille_h
 
 #include "tuile.h"
+#include "vec.h"
 
-typedef struct _Grille {
-    Tuile **tableau;
-    int taille;
-} Grille;
-
-Grille init_grille(int taille);
-void destruction_grille(Grille grille);
-
-bool placer_tuile(Grille grille, int x, int y, Tuile piece);
-bool est_vide(Grille grille, int x, int y);
+bool placer_tuile(Vec2D grille, int x, int y, Tuile piece);
+bool est_vide(Vec2D grille, int x, int y);
 
 #endif
