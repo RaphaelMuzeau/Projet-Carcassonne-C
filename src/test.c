@@ -130,9 +130,9 @@ bool test_vec_creer(void)
 {
     Vec v = creer_vec();
 
-    if (v.tableau != NULL) return false;
-    if (v.capacite != 0) return false;
-    if (v.decy != 0) return false;
+    if (v._tableau != NULL) return false;
+    if (v._capacite != 0) return false;
+    if (v._decy != 0) return false;
 
     detruire_vec(v);
     return true;
@@ -149,9 +149,9 @@ bool test_vec_get_null(void)
     if (vget(v, INT_MIN) != NULL) return false;
 
     // le vecteur ne doit pas avoir changé
-    if (v.tableau != NULL) return false;
-    if (v.capacite != 0) return false;
-    if (v.decy != 0) return false;
+    if (v._tableau != NULL) return false;
+    if (v._capacite != 0) return false;
+    if (v._decy != 0) return false;
 
     detruire_vec(v);
     return true;
@@ -164,31 +164,31 @@ bool test_vec_set_get(void)
 
     // acces simple
     vset(&v, t0, 0);
-    if (v.tableau == NULL) return false;
-    if (v.capacite == 0) return false;
-    if (v.capacite != VEC_REALLOC_NB) return false;
-    if (v.decy != 0) return false;
+    if (v._tableau == NULL) return false;
+    if (v._capacite == 0) return false;
+    if (v._capacite != VEC_REALLOC_NB) return false;
+    if (v._decy != 0) return false;
 
-    if (v.tableau[0] != t0) return false;
+    if (v._tableau[0] != t0) return false;
     if (vget(v, 0) != t0) return false;
 
     // acces complexes
     Tuile t1 = creer_tuile();
     vset(&v, t1, -50);
 
-    if (v.capacite % VEC_REALLOC_NB != 0) return false;
-    if (v.tableau[  0 + v.decy] != t0) return false;
-    if (v.tableau[-50 + v.decy] != t1) return false;
+    if (v._capacite % VEC_REALLOC_NB != 0) return false;
+    if (v._tableau[  0 + v._decy] != t0) return false;
+    if (v._tableau[-50 + v._decy] != t1) return false;
     if (vget(v,   0) != t0) return false;
     if (vget(v, -50) != t1) return false;
 
     Tuile t2 = creer_tuile();
     vset(&v, t2, 50);
 
-    if (v.capacite % VEC_REALLOC_NB != 0) return false;
-    if (v.tableau[  0 + v.decy] != t0) return false;
-    if (v.tableau[-50 + v.decy] != t1) return false;
-    if (v.tableau[ 50 + v.decy] != t2) return false;
+    if (v._capacite % VEC_REALLOC_NB != 0) return false;
+    if (v._tableau[  0 + v._decy] != t0) return false;
+    if (v._tableau[-50 + v._decy] != t1) return false;
+    if (v._tableau[ 50 + v._decy] != t2) return false;
     if (vget(v,   0) != t0) return false;
     if (vget(v, -50) != t1) return false;
     if (vget(v,  50) != t2) return false;
@@ -196,11 +196,11 @@ bool test_vec_set_get(void)
     Tuile t3 = creer_tuile();
     vset(&v, t3, -51);
 
-    if (v.capacite % VEC_REALLOC_NB != 0) return false;
-    if (v.tableau[  0 + v.decy] != t0) return false;
-    if (v.tableau[-50 + v.decy] != t1) return false;
-    if (v.tableau[ 50 + v.decy] != t2) return false;
-    if (v.tableau[-51 + v.decy] != t3) return false;
+    if (v._capacite % VEC_REALLOC_NB != 0) return false;
+    if (v._tableau[  0 + v._decy] != t0) return false;
+    if (v._tableau[-50 + v._decy] != t1) return false;
+    if (v._tableau[ 50 + v._decy] != t2) return false;
+    if (v._tableau[-51 + v._decy] != t3) return false;
     if (vget(v,   0) != t0) return false;
     if (vget(v, -50) != t1) return false;
     if (vget(v,  50) != t2) return false;
@@ -208,11 +208,11 @@ bool test_vec_set_get(void)
 
     // verifier l'initialisation correcte des cases libres
     for (int i = -49; i < 0; i++) {
-        if (v.tableau[i + v.decy] != NULL) return false;
+        if (v._tableau[i + v._decy] != NULL) return false;
         if (vget(v, i) != NULL) return false;
     }
     for (int i = 1; i < 50; i++) {
-        if (v.tableau[i + v.decy] != NULL) return false;
+        if (v._tableau[i + v._decy] != NULL) return false;
         if (vget(v, i) != NULL) return false;
     }
 
@@ -228,9 +228,9 @@ bool test_vec2D_creer(void)
 {
     Vec2D g = creer_vec2D();
 
-    if (g.tableau != NULL) return false;
-    if (g.decx != 0) return false;
-    if (g.capacite != 0) return false;
+    if (g._tableau != NULL) return false;
+    if (g._decx != 0) return false;
+    if (g._capacite != 0) return false;
 
     detruire_vec2D(g);
     return true;
@@ -253,9 +253,9 @@ bool test_vec2D_get_null(void)
     if (get(g, INT_MAX, INT_MIN) != NULL) return false;
 
     // le vecteur ne doit pas avoir changé
-    if (g.tableau != NULL) return false;
-    if (g.decx != 0) return false;
-    if (g.capacite != 0) return false;
+    if (g._tableau != NULL) return false;
+    if (g._decx != 0) return false;
+    if (g._capacite != 0) return false;
 
     detruire_vec2D(g);
     return true;
@@ -268,26 +268,26 @@ bool test_vec2D_set_get(void)
 
     // acces simple
     set(&g, t0, 0, 0);
-    if (g.tableau == NULL) return false;
-    if (g.capacite == 0) return false;
-    if (g.capacite != VEC2D_REALLOC_NB) return false;
-    if (g.decx != 0) return false;
+    if (g._tableau == NULL) return false;
+    if (g._capacite == 0) return false;
+    if (g._capacite != VEC2D_REALLOC_NB) return false;
+    if (g._decx != 0) return false;
 
-    if (g.tableau[0].tableau[0] != t0) return false;
+    if (g._tableau[0]._tableau[0] != t0) return false;
     if (get(g, 0, 0) != t0) return false;
 
     // acces complexes
     Tuile t1 = creer_tuile();
     set(&g, t1, -50, -50);
 
-    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
     if (get(g,   0,   0) != t0) return false;
     if (get(g, -50, -50) != t1) return false;
 
     Tuile t2 = creer_tuile();
     set(&g, t2, 50, -50);
 
-    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
     if (get(g,   0,   0) != t0) return false;
     if (get(g, -50, -50) != t1) return false;
     if (get(g,  50, -50) != t2) return false;
@@ -295,7 +295,7 @@ bool test_vec2D_set_get(void)
     Tuile t3 = creer_tuile();
     set(&g, t3, -50, 50);
 
-    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
     if (get(g,   0,   0) != t0) return false;
     if (get(g, -50, -50) != t1) return false;
     if (get(g,  50, -50) != t2) return false;
@@ -304,7 +304,7 @@ bool test_vec2D_set_get(void)
     Tuile t4 = creer_tuile();
     set(&g, t4, 50, 50);
 
-    if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
     if (get(g,   0,   0) != t0) return false;
     if (get(g, -50, -50) != t1) return false;
     if (get(g,  50, -50) != t2) return false;
@@ -313,14 +313,14 @@ bool test_vec2D_set_get(void)
 
     // verifier l'initialisation correcte des vecteurs vides
     for (int i = -49; i < 0; i++) {
-        if (g.tableau[i + g.decx].tableau != NULL) return false;
-        if (g.tableau[i + g.decx].capacite != 0) return false;
-        if (g.tableau[i + g.decx].decy != 0) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
     }
     for (int i = 1; i < 50; i++) {
-        if (g.tableau[i + g.decx].tableau != NULL) return false;
-        if (g.tableau[i + g.decx].capacite != 0) return false;
-        if (g.tableau[i + g.decx].decy != 0) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
     }
 
     // acces hors du tableau marchent encore

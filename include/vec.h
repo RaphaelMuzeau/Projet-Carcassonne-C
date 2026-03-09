@@ -10,11 +10,12 @@ _Static_assert(VEC_REALLOC_SIZE % sizeof(Tuile) == 0 , "VEC_REALLOC_SIZE doit et
 
 /* Tableau variable de Tuiles indexable de INT_MIN à INT_MAX,
  * toutes les cases sont à NULL par défaut.
+ * Un Vec ne doit être manipulé qu'à l'aide de vget() et vset().
  */
 typedef struct _Vec {
-    Tuile *tableau;
-    int capacite; // nombre de tuiles pouvant etre contenues
-    int decy;
+    Tuile *_tableau;
+    int _capacite; // nombre de tuiles pouvant etre contenues
+    int _decy;
 } Vec;
 
 Vec creer_vec(void);
@@ -29,9 +30,9 @@ _Static_assert(VEC_REALLOC_SIZE % sizeof(Vec) == 0 , "VEC_REALLOC_SIZE doit etre
  * est indexable par x et y.
  */
 typedef struct _Vec2D {
-    Vec *tableau;
-    int capacite;
-    int decx;
+    Vec *_tableau;
+    int _capacite;
+    int _decx;
 } Vec2D;
 
 Vec2D creer_vec2D(void);
