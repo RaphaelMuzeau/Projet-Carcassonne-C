@@ -19,11 +19,14 @@ enum Direction {
     D_NORD,
     D_EST,
     D_OUEST,
+    D_MILIEU
 };
 
 struct _Tuile {
     enum Zone milieu, nord, sud, est, ouest;
     char meeple;
+    enum Direction position_meeple;
+    bool is_verified;
 };
 typedef struct _Tuile *Tuile;
 
