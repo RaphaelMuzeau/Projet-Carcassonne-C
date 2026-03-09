@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "libca.h"
 #include <limits.h>
 #include "grille.h"
 #include "pile.h"
@@ -27,23 +26,9 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-bool test_init_pile(void)
-{
-    Pile p = creer_pile(10);
-
-    if (!pile_vide(p)) {
-        return false;
-    }
-
-    if (p.nb_element_max != 10)
-        return false;
-
-    return true;
-}
-
 bool test_tuile_creer(void)
 {
-    Tuile t = init_tuile();
+    Tuile t = creer_tuile();
 
     if (t->milieu != Z_PRE) return false;
     if (t->nord != Z_PRE)   return false;
@@ -58,8 +43,8 @@ bool test_tuile_creer(void)
 
 bool test_tuile_compatibilite(void)
 {
-    Tuile depart  = init_tuile();
-    Tuile arrivee = init_tuile();
+    Tuile depart  = creer_tuile();
+    Tuile arrivee = creer_tuile();
 
     depart->nord  = Z_ROUTE;
     depart->sud   = Z_PRE;
@@ -93,6 +78,51 @@ bool test_tuile_compatibilite(void)
 
     free(depart);
     free(arrivee);
+    return true;
+}
+
+bool test_pile_creer(void)
+{
+    Pile p = creer_pile(10);
+
+    if (!pile_vide(p)) return false;
+    if (p.nb_element_max != 10) return false;
+    if (p.nb_element != 0) return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_pile_inserer_tuile(void)
+{
+    Pile p = creer_pile(10);
+    Tuile t = NULL;
+
+    for (int i = 0; i < p.nb_element_max ; i++) {
+        t = creer_tuile();
+        if (!inserer_tuile(&p, t)) return false;
+        if (p.nb_element != i+1) return false;
+    }
+
+    if (p.nb_element != p.nb_element_max) return false;
+    if (inserer_tuile(&p, t)) return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_pile_recuperer_tuile(void)
+{
+    Pile p = creer_pile(5);
+    Tuile t = creer_tuile();
+
+    inserer_tuile(&p, t);
+    if (recup_tuile(&p) != t) return false;
+    if (p.nb_element != 0) return false;
+    if (recup_tuile(&p) != NULL) return false;
+
+    free(t);
+    detruire_pile(&p);
     return true;
 }
 
@@ -130,7 +160,7 @@ bool test_vec_get_null(void)
 bool test_vec_set_get(void)
 {
     Vec v = creer_vec();
-    Tuile t0 = init_tuile();
+    Tuile t0 = creer_tuile();
 
     // acces simple
     vset(&v, t0, 0);
@@ -143,7 +173,7 @@ bool test_vec_set_get(void)
     if (vget(v, 0) != t0) return false;
 
     // acces complexes
-    Tuile t1 = init_tuile();
+    Tuile t1 = creer_tuile();
     vset(&v, t1, -50);
 
     if (v.capacite % VEC_REALLOC_NB != 0) return false;
@@ -152,7 +182,7 @@ bool test_vec_set_get(void)
     if (vget(v,   0) != t0) return false;
     if (vget(v, -50) != t1) return false;
 
-    Tuile t2 = init_tuile();
+    Tuile t2 = creer_tuile();
     vset(&v, t2, 50);
 
     if (v.capacite % VEC_REALLOC_NB != 0) return false;
@@ -163,7 +193,7 @@ bool test_vec_set_get(void)
     if (vget(v, -50) != t1) return false;
     if (vget(v,  50) != t2) return false;
 
-    Tuile t3 = init_tuile();
+    Tuile t3 = creer_tuile();
     vset(&v, t3, -51);
 
     if (v.capacite % VEC_REALLOC_NB != 0) return false;
@@ -234,7 +264,7 @@ bool test_vec2D_get_null(void)
 bool test_vec2D_set_get(void)
 {
     Vec2D g = creer_vec2D();
-    Tuile t0 = init_tuile();
+    Tuile t0 = creer_tuile();
 
     // acces simple
     set(&g, t0, 0, 0);
@@ -247,14 +277,14 @@ bool test_vec2D_set_get(void)
     if (get(g, 0, 0) != t0) return false;
 
     // acces complexes
-    Tuile t1 = init_tuile();
+    Tuile t1 = creer_tuile();
     set(&g, t1, -50, -50);
 
     if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
     if (get(g,   0,   0) != t0) return false;
     if (get(g, -50, -50) != t1) return false;
 
-    Tuile t2 = init_tuile();
+    Tuile t2 = creer_tuile();
     set(&g, t2, 50, -50);
 
     if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
@@ -262,7 +292,7 @@ bool test_vec2D_set_get(void)
     if (get(g, -50, -50) != t1) return false;
     if (get(g,  50, -50) != t2) return false;
 
-    Tuile t3 = init_tuile();
+    Tuile t3 = creer_tuile();
     set(&g, t3, -50, 50);
 
     if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
@@ -271,7 +301,7 @@ bool test_vec2D_set_get(void)
     if (get(g,  50, -50) != t2) return false;
     if (get(g, -50,  50) != t3) return false;
 
-    Tuile t4 = init_tuile();
+    Tuile t4 = creer_tuile();
     set(&g, t4, 50, 50);
 
     if (g.capacite % VEC2D_REALLOC_NB != 0) return false;
@@ -306,7 +336,7 @@ bool test_vec2D_set_get(void)
 bool test_grille_placer_tuile(void)
 {
     Vec2D grille = creer_vec2D();
-    Tuile t = init_tuile();
+    Tuile t = creer_tuile();
 
     // placement sans connexion
     if (placer_tuile(grille, 1, 1, t)) return false;
@@ -326,25 +356,25 @@ bool test_grille_placer_tuile(void)
     if (placer_tuile(grille, 1, 1, t)) return false;
 
     // placement compatible
-    t = init_tuile();
+    t = creer_tuile();
     if (!placer_tuile(grille, 0, 1, t)) return false;
     if (get(grille, 0, 1)  != t) return false;
-    t = init_tuile();
+    t = creer_tuile();
     if (!placer_tuile(grille, 1, 0, t)) return false;
     if (get(grille, 1, 0)  != t) return false;
-    t = init_tuile();
+    t = creer_tuile();
     if (!placer_tuile(grille, 2, 1, t)) return false;
     if (get(grille, 2, 1) != t) return false;
-    t = init_tuile();
+    t = creer_tuile();
     if (!placer_tuile(grille, 1, 2, t)) return false;
     if (get(grille, 1, 2) != t) return false;
 
     // placement incompatible
-    t = init_tuile();
+    t = creer_tuile();
     t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
     set(&grille, t, 5, 5);
 
-    t = init_tuile();
+    t = creer_tuile();
     if (placer_tuile(grille, 0, 1, t)) return false;
     if (get(grille, 0, 1)  == t) return false;
     if (placer_tuile(grille, 1, 0, t)) return false;
@@ -357,54 +387,6 @@ bool test_grille_placer_tuile(void)
     free(t);
 
     detruire_vec2D(grille);
-    return true;
-}
-
-bool test_inserer_tuile(void)
-{
-    int i;
-    bool result_test = true;
-    Pile p = creer_pile(1);
-
-    Tuile t = ca_alloc(1, sizeof(struct _Tuile));
-    t->sud = Z_ABBAYE;
-    t->est = Z_ABBAYE;
-    t->nord = Z_ABBAYE;
-    t->milieu = Z_ABBAYE;
-    t->ouest = Z_ABBAYE;
-
-    for (i = 0; i < p.nb_element_max ; i++) {
-        if (!inserer_tuile(&p, t)) {
-            result_test = false;
-            break;
-        }
-    }
-
-    if (inserer_tuile(&p, t))
-        result_test = false;
-
-    detruire_pile(&p);
-
-    return result_test;
-}
-
-bool test_recup_tuile(void)
-{
-    Pile p = creer_pile(5);
-    Tuile t = ca_alloc(1, sizeof(struct _Tuile));
-    t->sud = Z_ABBAYE;
-    t->est = Z_ABBAYE;
-    t->nord = Z_ABBAYE;
-    t->milieu = Z_ABBAYE;
-    t->ouest = Z_ABBAYE;
-
-    inserer_tuile(&p, t);
-    if (recup_tuile(&p) != t || p.nb_element != 0)
-        return false;
-
-    if (recup_tuile(&p) != NULL)
-        return false;
-
     return true;
 }
 
@@ -514,7 +496,7 @@ bool test_csv_compter_lignes(void)
 bool test_csv_lecture_zone(void)
 {
     FILE *f = fopen("data/test/0_test.csv", "r");
-    Tuile t = init_tuile();
+    Tuile t = creer_tuile();
 
     lire_zone(&t->est, f);
     lire_zone(&t->nord, f);
@@ -529,6 +511,7 @@ bool test_csv_lecture_zone(void)
     if (t->milieu != Z_ABBAYE) return false;
 
     free(t);
+    fclose(f);
     return true;
 }
 
@@ -614,6 +597,9 @@ bool test_csv_fichier_invalide(void)
 Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_compatibilite),
+    TEST(test_pile_creer),
+    TEST(test_pile_inserer_tuile),
+    TEST(test_pile_recuperer_tuile),
     TEST(test_vec_creer),
     TEST(test_vec_get_null),
     TEST(test_vec_set_get),
@@ -621,9 +607,6 @@ Test unit_tests[] = {
     TEST(test_vec2D_get_null),
     TEST(test_vec2D_set_get),
     TEST(test_grille_placer_tuile),
-    TEST(test_init_pile),
-    TEST(test_inserer_tuile),
-    TEST(test_recup_tuile),
     TEST(test_varstring_ajout_char),
     TEST(test_varstring_ajout_chaine),
     TEST(test_varstring_vider),

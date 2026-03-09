@@ -27,7 +27,7 @@ struct _Tuile {
 };
 typedef struct _Tuile *Tuile;
 
-Tuile init_tuile(void);
+Tuile creer_tuile(void);
 /* pivot à droite */
 void pivot_90(Tuile piece);
 bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d);

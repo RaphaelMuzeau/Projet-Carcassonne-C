@@ -1,7 +1,7 @@
 #include "libca.h"
 #include "tuile.h"
 
-Tuile init_tuile(void)
+Tuile creer_tuile(void)
 {
     Tuile s;
     s = ca_alloc(1, sizeof(struct _Tuile));
