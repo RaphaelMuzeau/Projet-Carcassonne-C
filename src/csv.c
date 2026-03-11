@@ -77,12 +77,12 @@ Pile lire_tuiles_csv(char* nom_fichier)
     fclose(fichier);
     return p;
 
-    fichier_invalide:
-        fclose(fichier);
-        free(t);
-        detruire_pile(&p);
-        p = creer_pile(0);
-        return p;
+fichier_invalide:
+    fclose(fichier);
+    free(t);
+    detruire_pile(&p);
+    p = creer_pile(0);
+    return p;
 }
 
 int compter_lignes(FILE *f)

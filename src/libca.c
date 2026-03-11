@@ -29,6 +29,6 @@ void *ca_realloc(void *p, size_t n, size_t size)
     return np;
 
 ca_realloc_fail:
-        perror("carcassonne");
-        exit(EXIT_FAILURE);
+    perror("carcassonne");
+    exit(EXIT_FAILURE);
 }
