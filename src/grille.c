@@ -129,3 +129,33 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
     }
     return pts;
 }
+//TODO: TESTS / Attribution des pts / encapsulation de recherche / faire fonctionner les joueurs
+int max(int *nb_meeples, int taille)
+{
+    int maxi = nb_meeples[0];
+    for (int i = 0; i < taille; i++){
+        if (maxi < nb_meeples[i])
+            maxi = nb_meeples[i];
+    }
+    return maxi;
+}
+
+void attribution_pts (char *nb_meeples, int pts)
+{
+ // fonction trouver taille nb_meeple
+ // ensuite utiliser max puis egalité
+ // récuperer le tableau égalité
+ // et attribuer les pts au genre présent dans le tableau == 1
+ // Puis free le tableau égalité pour eviter memory leak
+    int maxi = max(nb_meeples,taille);
+    for (int i = 0; i < taille; i++){
+        if (nb_meeples[i] == maxi)
+            //ajouter les pts au joueurs ajout_pts(int pts, tableau_joueur, indice(quel joueur))
+    }
+    free(tableau_égalité);
+}
+
+void ajout_pts(int pts, int* tableau_joueur, int indice)
+{
+    return 0;
+}
