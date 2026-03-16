@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "test.h"
 #include "raylib.h"
 #include "page.h"
@@ -37,7 +38,8 @@ int main(void)
             prochaine_page = page_charger();
             break;
         case P_REGLES:
-            system("xdg-open rapport/analyse.pdf &"); // specifique à linux
+            if (system("xdg-open rapport/analyse.pdf &") == 127) // specifique à linux
+                fprintf(stderr, "carcassonne: l'ouverture des règles nécessite xdg-open");
             prochaine_page = P_TITRE;
             break;
         default:
