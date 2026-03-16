@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include "texte.h"
 
-Texte creer_texte(char *contenu, float x, float y)
+Texte creer_texte(float x, float y, char *contenu)
 {
     return (Texte) {
         .position = { x, y },

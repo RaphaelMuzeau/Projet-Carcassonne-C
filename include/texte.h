@@ -17,7 +17,7 @@ typedef struct _Texte {
 } Texte;
 
 // requiere le contexte OpenGL
-Texte creer_texte(char *contenu, float x, float y);
+Texte creer_texte(float x, float y, char *contenu);
 
 Vector2 mesurer_texte(Texte t);
 void dessiner_texte(Texte t);
