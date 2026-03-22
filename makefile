@@ -1,6 +1,17 @@
+# Configuration
+
+SRC_DIR   := src
+BIN_DIR   := bin
+BUILD_DIR := build
+
+EXE := $(BIN_DIR)/carcassonne
+DBG := $(EXE)_dbg
+TEST:= $(EXE)_test
+
 CC := gcc
 CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -fdiagnostics-color -Iinclude
-LDFLAGS := -lm -Llib -lraylib
+MKFLAGS := -MMD -MP
+LDFLAGS := -lm -Llib -l:libraylib.a # raylib est lié statiquement
 BEAR := $(shell command -v bear)
 
 SHELL:= bash
@@ -8,49 +19,14 @@ SHELL:= bash
 
 CPUS := $(shell nproc) # nombre de coeurs utilisé pour la compilation parallèle
 MAKEFLAGS += --no-print-directory
-ifneq ($(MAKELEVEL),0)
+ifneq (${MAKELEVEL},0)
 	MAKEFLAGS += -j $(CPUS) -l $(CPUS) -O
 endif
 
-EXE := bin/carcassonne
-DBG := $(EXE)_dbg
-TEST:= $(EXE)_test
+# Commmandes
 
-SOURCE      := $(wildcard src/*.c)
-OBJECTS	    := $(SOURCE:src/%.c=obj/%.o)
-DBG_OBJECTS := $(OBJECTS:.o=_dbg.o)
-TEST_OBJECTS:= $(OBJECTS:.o=_test.o)
-
-.PHONY: default
+.PHONY: default all release debug test run clean bear help
 default: debug
-
-$(EXE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(DBG): $(DBG_OBJECTS)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(TEST): $(TEST_OBJECTS)
-	$(CC) $(LDFLAGS) $^ -o $@
-
-$(OBJECTS): obj/%.o : src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -O2
-
-$(DBG_OBJECTS): obj/%_dbg.o : src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -g
-
-$(TEST_OBJECTS): obj/%_test.o : src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -g -DRUN_UNIT_TESTS
-
-compile_commands.json: $(SOURCE)
-	@printf "Generation de \x1b[94m$@\x1b[0m..\n"
-ifeq ($(strip $(BEAR)),)
-	@printf "\x1b[91merr: \x1b[0mpas d'executable 'bear' trouvé.\n"
-else
-	@$(BEAR) -- ${MAKE} -B debug | sed 's/^/  /'
-endif
-
-.PHONY: all release debug test run clean bear help
 
 all: debug release test
 release:
@@ -62,15 +38,15 @@ debug:
 test:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(TEST))...\n"
 	@${MAKE} $(TEST) | sed 's/^/  /'
-	@LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$${PWD}/lib $(TEST)
+	@$(TEST)
 
 run: debug
-	@printf "\x1b[95mexecution de debug:\x1b[0;0m\n"
-	LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$${PWD}/lib $(DBG)
+	@printf "\x1b[95mexecution de $<:\x1b[0;0m\n"
+	@$(DBG)
 
 clean:
-	@rm -f obj/*.o
-	@rm -f $(EXE) $(DBG) $(TEST)
+	@rm -rf $(BUILD_DIR)/*
+	@rm -f  $(BIN_DIR)/*
 
 bear: compile_commands.json
 
@@ -84,3 +60,49 @@ help:
 	@echo "  run     - Executer le programme (compile debug si besoin)"
 	@echo "  clean   - Supprimer les artefacts de compilation et les executables"
 	@echo "  help    - Afficher ce message d'aide"
+
+# Recherche des fichiers
+
+sources     := $(shell find $(SRC_DIR) -type f -name '*.c')
+objects	    := $(sources:$(SRC_DIR)/%.c=$(BUILD_DIR)/%.o)
+dbg_objects := $(objects:.o=_dbg.o)
+test_objects:= $(objects:.o=_test.o)
+
+depends     := $(objects:.o=.d)
+dbg_depends := $(dbg_objects:.o=.d)
+test_depends:= $(test_objects:.o=.d)
+
+# Compilation
+
+$(EXE): $(objects)
+	$(CC) $^ $(LDFLAGS) -o $@
+
+$(DBG): $(dbg_objects)
+	$(CC) $^ $(LDFLAGS) -o $@
+
+$(TEST): $(test_objects)
+	$(CC) $^ $(LDFLAGS) -o $@
+
+$(objects): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -O2
+
+$(dbg_objects): $(BUILD_DIR)/%_dbg.o : $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -g
+
+$(test_objects): $(BUILD_DIR)/%_test.o : $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -g -DRUN_UNIT_TESTS
+
+compile_commands.json: $(sources)
+	@printf "Generation de \x1b[94m$@\x1b[0m..\n"
+ifeq ($(strip $(BEAR)),)
+	@printf "\x1b[91merr: \x1b[0mpas d'executable 'bear' trouvé.\n"
+else
+	@$(BEAR) -- ${MAKE} -B debug | sed 's/^/  /'
+endif
+
+# Inclure les makefiles générés par le compilateur
+
+-include $(depends) $(dbg_depends) $(test_depends)
