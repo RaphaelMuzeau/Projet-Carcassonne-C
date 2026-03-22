@@ -15,8 +15,9 @@ ListeParties creer_listeparties(float y)
         // GetFileNameWithoutExt utilise une meme chaine statique ecrasé à chaque appel,
         // on doit donc faire une copie avant de la mettre dans un bouton.
         const char *nom = GetFileNameWithoutExt(parties.fichiers.paths[i]);
-        char *copy = ca_alloc(strlen(nom) + 1, sizeof(char));
-        strcpy(copy, nom);
+        int ln = strlen(nom) + 1;
+        char *copy = ca_alloc(ln, sizeof(char));
+        memcpy(copy, nom, ln);
 
         // creer un bouton par partie
         parties.boutons[i] = creer_bouton_adapte(0, y, copy);
