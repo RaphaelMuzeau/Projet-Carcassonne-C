@@ -8,6 +8,7 @@
 #include "vec.h"
 
 // Ajout en fin de liste
+
 void ajout_meeple_chaine(Joueur *joueur, L_meeple new)
 {
     L_meeple tmp;
@@ -32,9 +33,8 @@ void ajout_meeple_tuile(Joueur *joueur, Vec2D grille, int x, int y, enum Directi
         new->y = y;
         new->next = NULL;
         ajout_meeple_chaine(joueur,new);
-
         t->id_meeple = joueur->id;
-        // TODO : t->position_meeple = d;
+        // TODO : t->position_meeples = d;
 
         joueur->nb_meeple_restant -= 1;
     } else
@@ -45,11 +45,11 @@ void detruire_meeple(Joueur *joueur, int x, int y)
 {
     if (joueur->localisation_meeples == NULL)
         return;
-
     L_meeple tmp = joueur->localisation_meeples;
     if (tmp->x == x && tmp->y == y) {
         joueur->localisation_meeples = tmp->next;
         free(tmp);
+        joueur->nb_meeple_restant += 1;
         return;
     }
 
@@ -58,6 +58,7 @@ void detruire_meeple(Joueur *joueur, int x, int y)
         if (tmp2->x == x && tmp2->y == y) {
             tmp->next = tmp2->next;
             free(tmp2);
+            joueur->nb_meeple_restant += 1;
             return;
         }
         tmp = tmp->next;
