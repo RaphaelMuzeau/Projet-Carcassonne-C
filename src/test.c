@@ -35,7 +35,7 @@ bool test_tuile_creer(void)
     if (t->sud != Z_PRE)    return false;
     if (t->est != Z_PRE)    return false;
     if (t->ouest != Z_PRE)  return false;
-    if (t->meeple) return false;
+    if (t->id_meeple) return false;
 
     free(t);
     return true;
