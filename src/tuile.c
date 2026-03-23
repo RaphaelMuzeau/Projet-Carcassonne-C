@@ -18,10 +18,10 @@ void pivot_90(Tuile piece)
 {
     enum Zone tmp;
     tmp = piece->nord;
-    piece->nord = piece->est;
-    piece->est = piece->sud;
-    piece->sud = piece->ouest;
-    piece->ouest = tmp;
+    piece->nord = piece->ouest;
+    piece->ouest = piece->sud;
+    piece->sud = piece->est;
+    piece->est = tmp;
 }
 
 bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)

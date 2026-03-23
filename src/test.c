@@ -41,6 +41,28 @@ bool test_tuile_creer(void)
     return true;
 }
 
+bool test_tuile_pivot90(void)
+{
+    Tuile t = creer_tuile();
+
+    t->milieu = Z_ABBAYE;
+    t->nord = Z_VILLE;
+    t->sud = Z_PRE;
+    t->est = Z_ROUTE;
+    t->ouest = Z_BLASON;
+
+    pivot_90(t);
+
+    if (t->milieu != Z_ABBAYE) return false;
+    if (t->nord   != Z_BLASON) return false;
+    if (t->est    != Z_VILLE)  return false;
+    if (t->sud    != Z_ROUTE)  return false;
+    if (t->ouest  != Z_PRE)    return false;
+
+    free(t);
+    return true;
+}
+
 bool test_tuile_compatibilite(void)
 {
     Tuile depart  = creer_tuile();
@@ -596,6 +618,7 @@ bool test_csv_fichier_invalide(void)
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
+    TEST(test_tuile_pivot90),
     TEST(test_tuile_compatibilite),
     TEST(test_pile_creer),
     TEST(test_pile_inserer_tuile),
