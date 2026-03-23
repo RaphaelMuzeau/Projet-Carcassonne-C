@@ -390,7 +390,7 @@ bool test_grille_placer_tuile(void)
     return true;
 }
 
-bool test_varstring_ajout_char(void)
+bool test_varstring_ajouter_char(void)
 {
     VarString s = creer_varstring();
 
@@ -408,7 +408,30 @@ bool test_varstring_ajout_char(void)
     return true;
 }
 
-bool test_varstring_ajout_chaine(void)
+bool test_varstring_retirer_char(void)
+{
+    VarString s = creer_varstring();
+
+    ajouter_char(&s, 'h');
+    ajouter_char(&s, 'i');
+
+    retirer_char(&s);
+    if (strcmp(s.texte, "h")) return false;
+    if (s.len != 1) return false;
+
+    retirer_char(&s);
+    if (*s.texte != '\0') return false;
+    if (s.len != 0) return false;
+
+    retirer_char(&s);
+    if (*s.texte != '\0') return false;
+    if (s.len != 0) return false;
+
+    detruire_varstring(s);
+    return true;
+}
+
+bool test_varstring_ajouter_chaine(void)
 {
     VarString s = creer_varstring();
 
@@ -465,6 +488,7 @@ bool test_varstring_null(void)
 {
     // pourrait declencher un crash
     ajouter_char(NULL, '\0');
+    retirer_char(NULL);
     ajouter_chaine(NULL, NULL);
     vider_varstring(NULL);
     return true;
@@ -607,8 +631,9 @@ Test unit_tests[] = {
     TEST(test_vec2D_get_null),
     TEST(test_vec2D_set_get),
     TEST(test_grille_placer_tuile),
-    TEST(test_varstring_ajout_char),
-    TEST(test_varstring_ajout_chaine),
+    TEST(test_varstring_ajouter_char),
+    TEST(test_varstring_retirer_char),
+    TEST(test_varstring_ajouter_chaine),
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),

@@ -26,6 +26,7 @@ void detruire_varstring(VarString chaine);
 void vider_varstring(VarString *chaine);
 
 void ajouter_char(VarString *chaine, char c);
+void retirer_char(VarString *chaine);
 void ajouter_chaine(VarString *chaine, char *restrict autre); // fait une COPIE de autre
 
 #endif
