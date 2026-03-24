@@ -10,6 +10,7 @@ Tuile creer_tuile(void)
     s->sud    = Z_PRE;
     s->est    = Z_PRE;
     s->ouest  = Z_PRE;
+    s->id_meeple = -1;
 
     return s;
 }

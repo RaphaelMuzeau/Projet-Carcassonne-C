@@ -24,7 +24,7 @@ enum Direction {
 
 struct _Tuile {
     enum Zone milieu, nord, sud, est, ouest;
-    char meeple;
+    char id_meeple;
     enum Direction position_meeple;
     bool is_verified;
 };
