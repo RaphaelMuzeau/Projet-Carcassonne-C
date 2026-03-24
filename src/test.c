@@ -593,63 +593,73 @@ bool test_csv_fichier_invalide(void)
     detruire_pile(&p);
     return true;
 }
-bool test_ajout_meeple_tuile(void)
+
+bool test_ajouter_meeple(void)
 {
     Joueur first = { 0 };
     first.nb_meeple_restant = 2;
 
-    Vec2D grille;
-
-    grille = creer_vec2D();
+    Vec2D grille = creer_vec2D();
     Tuile t = creer_tuile();
     Tuile t2 = creer_tuile();
 
-    set(&grille,t2, 0, 1);
     set(&grille, t, 0, 0);
-    ajout_meeple_tuile(&first, grille, 0, 0, D_NORD);
-    ajout_meeple_tuile(&first, grille, 0, 1, D_SUD);
-    t = get(grille, 0, 0);
-    t2 = get(grille,0, 1);
+    set(&grille,t2, 0, 1);
+    ajouter_meeple(&first, grille, 0, 0, D_NORD);
+    ajouter_meeple(&first, grille, 0, 1, D_SUD);
 
     if (first.localisation_meeples->x != 0 && first.localisation_meeples->y != 0) return false;
+    if (first.localisation_meeples->d != D_NORD) return false;
     if (t->id_meeple != first.id) return false;
+    // if (t->position_meeples != D_NORD) return false;
 
     L_meeple tmp =  first.localisation_meeples;
     tmp =  tmp->next;
 
     if (tmp->x != 0 && tmp->y != 1) return false;
+    if (tmp->d != D_SUD) return false;
     if (t2->id_meeple != first.id) return false;
-    free(tmp);
+    // if (t2->position_meeples != D_SUD) return false;
+
+    detruire_joueur(first);
+    detruire_vec2D(grille);
     return true;
 }
-bool test_detruire_meeple(void)
+
+bool test_retirer_meeple(void)
 {
     Joueur first = { 0 };
     first.nb_meeple_restant = 2;
 
-    Vec2D grille;
+    Vec2D grille = creer_vec2D();
 
-    grille = creer_vec2D();
     Tuile t = creer_tuile();
-    Tuile t2 = creer_tuile();
-
-    set(&grille,t2, 0, 1);
     set(&grille, t, 0, 0);
-    ajout_meeple_tuile(&first, grille, 0, 0, D_NORD);
-    ajout_meeple_tuile(&first, grille, 0, 1, D_SUD);
-    t = get(grille, 0, 0);
-    t2 = get(grille,0, 1);
+    ajouter_meeple(&first, grille, 0, 0, D_NORD);
 
-    detruire_meeple(&first, 0, 0);
+    Tuile t2 = creer_tuile();
+    set(&grille, t2, 0, 1);
+    ajouter_meeple(&first, grille, 0, 1, D_SUD);
+
+    retirer_meeple(&first, grille, 0, 0);
     if (first.localisation_meeples == NULL) return false;
+    if (first.localisation_meeples->next != NULL) return false;
+    if (first.localisation_meeples->x != 0) return false;
+    if (first.localisation_meeples->y != 1) return false;
     if (first.nb_meeple_restant != 1) return false;
-    detruire_meeple(&first, 0, 1);
+    if (t->id_meeple != -1) return false;
+
+    retirer_meeple(&first, grille, 0, 1);
     if (first.localisation_meeples != NULL) return false;
     if (first.nb_meeple_restant != 2) return false;
+    if (t2->id_meeple != -1) return false;
+
+    detruire_joueur(first);
+    detruire_vec2D(grille);
     return true;
 }
-// ajout à la liste de tests à executer
 
+// ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_compatibilite),
@@ -674,8 +684,8 @@ Test unit_tests[] = {
     TEST(test_csv_fichier_vide),
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
-    TEST(test_ajout_meeple_tuile),
-    TEST(test_detruire_meeple),
+    TEST(test_ajouter_meeple),
+    TEST(test_retirer_meeple),
 };
 
 // ===========================
