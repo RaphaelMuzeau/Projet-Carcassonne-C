@@ -25,7 +25,7 @@ void ajouter_meeple(Joueur *joueur, Vec2D grille, int x, int y, enum Direction d
 { // TODO: si le placement est impossible, renvoyer faux.
     Tuile t = get(grille, x, y);
     assert(t->id_meeple == -1 && "Impossible de placer un meeple sur un meeple déjà existant");
-    assert(joueur->nb_meeple_restant > 0 && "Placement de meeple frauduleux")
+    assert(joueur->nb_meeple_restant > 0 && "Placement de meeple frauduleux");
 
     if (joueur->nb_meeple_restant != 0) {
         L_meeple new = ca_alloc(1, sizeof(struct _maillon));
