@@ -12,6 +12,7 @@ enum Page {
     P_JEUX,
     P_NORMAL,
     P_CUSTOM,
+    P_JOUEURS,
     P_CHARGER,
     P_REGLES,
     P_QUITTER,
@@ -20,6 +21,9 @@ enum Page {
 enum Page page_titre(void);
 // enum Page page_jeux(void);
 enum Page page_configuration(bool custom);
+enum Page page_joueurs(int nb_joueurs);
 enum Page page_charger(void);
+
+//TODO utiliser P_QUITTER pour casser les boucles
 
 #endif

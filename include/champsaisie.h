@@ -19,6 +19,7 @@ typedef struct _ChampSaisie {
 ChampSaisie creer_champsaisie(float x, float y, float largeur, float hauteur, bool est_numerique);
 void detruire_champsaisie(ChampSaisie cs);
 void update_champsaisie(ChampSaisie *cs);
+void update_champsaisie_camera(ChampSaisie *cs, Camera2D camera);
 void dessiner_champsaisie(ChampSaisie cs);
 
 #endif
