@@ -1,5 +1,3 @@
-#include <assert.h>
-
 #include "raylib.h"
 #include "raymath.h"
 #include "scrollbar.h"

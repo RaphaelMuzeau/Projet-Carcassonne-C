@@ -12,7 +12,7 @@ enum Page page_charger(void)
     enum Page prochaine_page = P_TITRE;
     bool doit_quitter = false;
 
-    SetExitKey(KEY_NULL); // echape retourne à l'ecran titre au lieu de ferme la fenetre
+    SetExitKey(KEY_NULL); // echape retourne à l'ecran titre au lieu de fermer la fenetre
 
     Camera2D camera = { 0 };
     camera.zoom = 1.0f;

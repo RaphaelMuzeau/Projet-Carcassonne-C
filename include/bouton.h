@@ -27,7 +27,7 @@ void adapter_bouton(Bouton *b);
 void centrer_texte(Bouton *b);
 
 // modifie l'apparence du bouton selon l'interaction du curseur.
-// renvoit vrai si le bouton a été cliqué/
+// renvoit vrai si le bouton a été cliqué.
 bool update_bouton(Bouton *b);
 // update un bouton present dans un espace 2D.
 // (par exemple un espace scrollable)

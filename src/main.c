@@ -30,9 +30,11 @@ int main(void)
             // prochaine_page = page_jeux();
             prochaine_page = P_TITRE;
             break;
+        case P_NORMAL:
+            prochaine_page = page_configuration(false);
+            break;
         case P_CUSTOM:
-            // prochaine_page = page_options();
-            prochaine_page = P_TITRE;
+            prochaine_page = page_configuration(true);
             break;
         case P_CHARGER:
             prochaine_page = page_charger();

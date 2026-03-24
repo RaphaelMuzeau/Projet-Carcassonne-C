@@ -3,8 +3,6 @@
 
 /* relation au texte */
 
-// adapte la taille du bouton et centre le texte
-// en laissant une marge de 10px sur chaque bord.
 void adapter_bouton(Bouton *b)
 {
     Vector2 taille_texte = mesurer_texte(b->texte);
@@ -14,8 +12,6 @@ void adapter_bouton(Bouton *b)
     b->texte.position.y = b->champ.y + 10.0f;
 }
 
-// centre le texte dans le bouton sans changer sa taille.
-// si le texte est trop grand, il depassera.
 void centrer_texte(Bouton *b)
 {
     Vector2 taille_texte = mesurer_texte(b->texte);

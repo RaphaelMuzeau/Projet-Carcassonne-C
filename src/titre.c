@@ -30,7 +30,7 @@ enum Page page_titre(void)
         hauteur_ecran = GetScreenHeight();
 
         if (update_bouton(&btn_nouvelle)) {
-            prochaine_page = P_JEUX;
+            prochaine_page = P_NORMAL;
             doit_quitter = true;
         }
         if (update_bouton(&btn_custom)) {
