@@ -6,4 +6,6 @@
 void *ca_alloc(size_t n, size_t size);
 void *ca_realloc(void *p, size_t n, size_t size);
 
+#define max(A, B) (((A) > (B)) ? (A) : (B))
+
 #endif

@@ -48,6 +48,14 @@ void ajouter_char(VarString *chaine, char c)
     chaine->texte[chaine->len]   = '\0';
 }
 
+void retirer_char(VarString *chaine)
+{
+    if (chaine == NULL) return;
+    if (chaine->len == 0) return;
+
+    chaine->texte[--chaine->len] = '\0';
+}
+
 void ajouter_chaine(VarString *chaine, char *restrict autre)
 {
     if (chaine == NULL) return;
