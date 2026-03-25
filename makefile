@@ -12,7 +12,13 @@ CC := gcc
 CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -fdiagnostics-color -Iinclude
 MKFLAGS := -MMD -MP
 LDFLAGS := -lm -Llib -l:libraylib.a # raylib est lié statiquement
+
 BEAR := $(shell command -v bear)
+
+VALGRIND := $(shell command -v valgrind)
+ifneq ($(strip $(VALGRIND)),)
+VGFLAGS := -q --leak-check=full --show-leak-kinds=all
+endif
 
 SHELL:= bash
 .SHELLFLAGS += -o pipefail
@@ -38,7 +44,7 @@ debug:
 test:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(TEST))...\n"
 	@${MAKE} $(TEST) | sed 's/^/  /'
-	@$(TEST)
+	$(VALGRIND) $(VGFLAGS) ./$(TEST)
 
 run: debug
 	@printf "\x1b[95mexecution de $<:\x1b[0;0m\n"
