@@ -24,6 +24,4 @@ enum Page page_configuration(bool custom);
 enum Page page_joueurs(int nb_joueurs);
 enum Page page_charger(void);
 
-//TODO utiliser P_QUITTER pour casser les boucles
-
 #endif

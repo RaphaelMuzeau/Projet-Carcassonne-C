@@ -9,8 +9,7 @@
 enum Page page_charger(void)
 {
     // Etat initial
-    enum Page prochaine_page = P_TITRE;
-    bool doit_quitter = false;
+    enum Page prochaine_page = P_CHARGER;
 
     SetExitKey(KEY_NULL); // echape retourne à l'ecran titre au lieu de fermer la fenetre
 
@@ -28,26 +27,23 @@ enum Page page_charger(void)
     ListeParties parties = creer_listeparties(120);
     char *partie_selectionne = NULL;
 
-    while (!doit_quitter) {
+    while (prochaine_page == P_CHARGER) {
         update_scrollbar(&scrollbar, parties.fin_liste);
 
-        if (update_bouton_camera(&retour, scrollbar.camera) || IsKeyPressed(KEY_ESCAPE)) {
+        if (update_bouton_camera(&retour, scrollbar.camera) || IsKeyPressed(KEY_ESCAPE))
             prochaine_page = P_TITRE;
-            doit_quitter = true;
-        }
-        if (WindowShouldClose()) {
+
+        if (WindowShouldClose())
             prochaine_page = P_QUITTER;
-            doit_quitter = true;
-        }
+
         if (update_bouton_camera(&rafraichir, scrollbar.camera)) {
             detruire_listeparties(parties);
             parties = creer_listeparties(120);
         }
-        if ((partie_selectionne = update_listeparties(parties, scrollbar.camera)) != NULL) {
+
+        if ((partie_selectionne = update_listeparties(parties, scrollbar.camera)) != NULL)
             // TODO charger la partie
             prochaine_page = P_JEUX;
-            doit_quitter = true;
-        }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);

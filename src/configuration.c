@@ -9,8 +9,7 @@
 enum Page page_configuration(bool custom)
 {
     // Etat initial
-    enum Page prochaine_page = P_TITRE;
-    bool doit_quitter = false;
+    enum Page prochaine_page = P_CUSTOM;
     int largeur_ecran = GetScreenWidth();
 
     SetExitKey(KEY_NULL); // echape retourne à l'ecran titre au lieu de fermer la fenetre
@@ -31,31 +30,27 @@ enum Page page_configuration(bool custom)
     float largeur_titre_nb_tuile = mesurer_texte(titre_nb_tuile).x;
     ChampSaisie champ_nb_tuile = creer_champsaisie(0, 390, 150, 40, true);
 
-    while (!doit_quitter) {
+    while (prochaine_page == P_CUSTOM) {
         largeur_ecran = GetScreenWidth();
 
-        if (WindowShouldClose()) {
+        if (WindowShouldClose())
                 prochaine_page = P_QUITTER;
-                doit_quitter = true;
-        }
 
-        if (update_bouton(&retour) || IsKeyPressed(KEY_ESCAPE)) {
+        if (update_bouton(&retour) || IsKeyPressed(KEY_ESCAPE))
                 prochaine_page = P_TITRE;
-                doit_quitter = true;
-        }
 
         if (update_bouton(&confirmer)) {
             // TODO creer une partie avec config
 
             // on appelle une sous-page pour recuperer les noms de joueurs
-            if (champ_nb_joueur.saisie.texte != NULL && *champ_nb_joueur.saisie.texte != '\0') {
+            if (champ_nb_joueur.saisie.texte != NULL && champ_nb_joueur.saisie.texte[0] != '\0') {
                 int nb_joueurs = 0;
                 sscanf(champ_nb_joueur.saisie.texte, "%d", &nb_joueurs);
                 prochaine_page = page_joueurs(nb_joueurs);
-                if (prochaine_page != P_CUSTOM) {
-                    doit_quitter = true;
-                    continue; // continue pour sauter le dessin de cette page
-                }
+
+                // continue pour sauter le dessin de cette page
+                if (prochaine_page != P_CUSTOM)
+                    continue;
             }
         }
 
@@ -106,8 +101,7 @@ enum Page page_configuration(bool custom)
 enum Page page_joueurs(int nb_joueurs)
 {
     // Etat initial
-    enum Page prochaine_page = P_TITRE;
-    bool doit_quitter = false;
+    enum Page prochaine_page = P_JOUEURS;
     int largeur_ecran = GetScreenWidth();
 
     Camera2D camera = { 0 };
@@ -131,24 +125,18 @@ enum Page page_joueurs(int nb_joueurs)
         fin_champs = champs[i].champ.y + 70.0f;
     }
 
-    while (!doit_quitter) {
+    while (prochaine_page == P_JOUEURS) {
         largeur_ecran = GetScreenWidth() - 20;
         update_scrollbar(&scrollbar, fin_champs);
 
-        if (WindowShouldClose()) {
-                prochaine_page = P_QUITTER;
-                doit_quitter = true;
-        }
+        if (WindowShouldClose())
+            prochaine_page = P_QUITTER;
 
-        if (update_bouton_camera(&retour, scrollbar.camera) || IsKeyPressed(KEY_ESCAPE)) {
-                prochaine_page = P_CUSTOM;
-                doit_quitter = true;
-        }
+        if (update_bouton_camera(&retour, scrollbar.camera) || IsKeyPressed(KEY_ESCAPE))
+            prochaine_page = P_CUSTOM;
 
-        if (update_bouton_camera(&confirmer, scrollbar.camera)) {
+        if (update_bouton_camera(&confirmer, scrollbar.camera))
             prochaine_page = P_JEUX;
-            doit_quitter = true;
-        }
 
         /* realigner le bouton de confirmation à droite */
         confirmer.champ.x = largeur_ecran - confirmer.champ.width - 10;

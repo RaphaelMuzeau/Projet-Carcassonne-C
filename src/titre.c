@@ -7,7 +7,6 @@ enum Page page_titre(void)
 {
     // Etat initial
     enum Page prochaine_page = P_TITRE;
-    bool doit_quitter = false;
 
     int largeur_ecran = 0;
     int hauteur_ecran = 0;
@@ -25,30 +24,15 @@ enum Page page_titre(void)
     Bouton btn_regles   = creer_bouton_adapte(50, 360, "Règles du Jeu");
     Bouton btn_quitter  = creer_bouton_adapte(50, 430, "Quitter Le Jeu");
 
-    while (!doit_quitter) {
+    while (prochaine_page == P_TITRE) {
         largeur_ecran = GetScreenWidth();
         hauteur_ecran = GetScreenHeight();
 
-        if (update_bouton(&btn_nouvelle)) {
-            prochaine_page = P_NORMAL;
-            doit_quitter = true;
-        }
-        if (update_bouton(&btn_custom)) {
-            prochaine_page = P_CUSTOM;
-            doit_quitter = true;
-        }
-        if (update_bouton(&btn_charger)) {
-            prochaine_page = P_CHARGER;
-            doit_quitter = true;
-        }
-        if (update_bouton(&btn_regles)) {
-            prochaine_page = P_REGLES;
-            doit_quitter = true;
-        }
-        if (update_bouton(&btn_quitter) || WindowShouldClose()) {
-            prochaine_page = P_QUITTER;
-            doit_quitter = true;
-        }
+        if (update_bouton(&btn_nouvelle)) prochaine_page = P_NORMAL;
+        if (update_bouton(&btn_custom))   prochaine_page = P_CUSTOM;
+        if (update_bouton(&btn_charger))  prochaine_page = P_CHARGER;
+        if (update_bouton(&btn_regles))   prochaine_page = P_REGLES;
+        if (update_bouton(&btn_quitter) || WindowShouldClose()) prochaine_page = P_QUITTER;
 
         echelle = max((float) largeur_ecran / fond.width, (float) hauteur_ecran / fond.height);
 
