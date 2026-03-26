@@ -5,11 +5,15 @@
 #include <stdio.h>
 #include "vec.h"
 #include "pile.h"
+#include "meeple.h"
 
 void sauvegarder_grille(Vec2D *g, FILE *f);
 Vec2D charger_grille(FILE *f);
 
 void sauvegarder_pile(Pile p, FILE *f);
 Pile charger_pile(FILE *f);
+
+void sauvegarder_joueur(Joueur *tab_joueur, int nb_joueurs, FILE *f);
+Joueur *charger_joueur(FILE *f);
 
 #endif

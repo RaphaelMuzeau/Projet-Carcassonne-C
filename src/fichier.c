@@ -5,6 +5,9 @@
 #include "tuile.h"
 #include "vec.h"
 #include "pile.h"
+#include "meeple.h"
+#include "libca.h"
+
 // TODO: Décider d'une version de format à écrire en haut du fichier.
 
 int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
@@ -99,5 +102,72 @@ Pile charger_pile(FILE *f)
 
 erreur_pile:
     fprintf(stderr, "carcassonne: fichier invalide (pile)\n");
+    exit(EXIT_FAILURE);
+}
+
+void sauvegarder_joueur(Joueur *tab_joueurs, int nb_joueurs, FILE *f)
+{
+
+    fwrite(&nb_joueurs, sizeof(int), 1, f);
+
+    for (int i = 0; i < nb_joueurs; i++) {
+        Joueur joueur_tmp = tab_joueurs[i];
+        joueur_tmp.localisation_meeples = NULL;
+        fwrite(&joueur_tmp, sizeof(Joueur), 1, f);
+
+
+        /* Sauvegarde la position pour nb_mepple_pose et prépare de l'espace*/
+        fpos_t pos_meeple_pose;
+        fgetpos(f, &pos_meeple_pose);
+        fseek(f, sizeof(int), SEEK_CUR);
+        int nb_meeple_pose = 0;
+
+        struct _Maillon tmp = *tab_joueurs[i].localisation_meeples;
+        do {
+            struct _Maillon tmp2 = tmp;
+            tmp2.next = NULL;
+            fwrite(&tmp2, sizeof(struct _Maillon), 1, f);
+            tmp = *tmp.next;
+            nb_meeple_pose++;
+        } while (tmp.next != NULL);
+        fwrite(&tmp, sizeof(struct _Maillon), 1, f);
+        nb_meeple_pose++;
+
+        /* Écrit au bon endroit nb_meeple_pose et revient à la fin */
+        fsetpos(f, &pos_meeple_pose);
+        fwrite(&nb_meeple_pose, sizeof(int), 1, f);
+        fseek(f, 0, SEEK_END);
+    }
+}
+
+Joueur *charger_joueur(FILE *f)
+{
+
+    int nb_joueurs = 0;
+    if (fread(&nb_joueurs, sizeof(int), 1, f) != 1)
+        goto erreur_joueur;
+
+    Joueur *tab_joueurs = ca_alloc(nb_joueurs, sizeof(Joueur));
+
+    for (int i = 0; i < nb_joueurs; i++) {
+        if (fread(&tab_joueurs[i], sizeof(Joueur), 1, f) != 1)
+            goto erreur_joueur;
+
+        int nb_meeple_pose = 0;
+        if (fread(&nb_meeple_pose, sizeof(int), 1, f) != 1)
+            goto erreur_joueur;
+        int cmpt = 0;
+        do {
+            L_meeple tmp = NULL;
+            if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
+                goto erreur_joueur;
+
+            ajout_meeple_chaine(&tab_joueurs[i], tmp);
+            cmpt++;
+        } while (cmpt <nb_meeple_pose);
+    }
+
+erreur_joueur:
+    fprintf(stderr, "carcassonne: fichier invalide (joueurs)\n");
     exit(EXIT_FAILURE);
 }

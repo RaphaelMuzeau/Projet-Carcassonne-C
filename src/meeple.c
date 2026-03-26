@@ -22,7 +22,7 @@ void detruire_liste_meeple(L_meeple liste)
     tmp = liste;
     tmp2 = tmp->next;
 
-    while(tmp2 != NULL){
+    while(tmp2 != NULL) {
         free(tmp);
         tmp = tmp2;
         tmp2 = tmp2->next;
