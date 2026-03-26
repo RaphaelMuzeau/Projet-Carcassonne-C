@@ -42,3 +42,21 @@ bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)
         return false;
     }
 }
+
+/* TODO:
+enum Zone generer_milieu()
+{
+    int aleatoire = rand()%100;
+
+
+}
+
+Tuile generer_tuile()
+{
+    Tuile t = creer_tuile();
+
+    t->milieu = generer_milieu();
+
+
+}
+*/

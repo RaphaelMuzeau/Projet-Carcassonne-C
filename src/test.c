@@ -105,11 +105,12 @@ bool test_tuile_compatibilite(void)
 
 bool test_pile_creer(void)
 {
-    Pile p = creer_pile(10);
+    Pile p = creer_pile(10, false);
 
-    if (!pile_vide(p)) return false;
+    if (!pile_vide(p))          return false;
     if (p.nb_element_max != 10) return false;
-    if (p.nb_element != 0) return false;
+    if (p.nb_element != 0)      return false;
+    if (p.gen_aleatoire)        return false;
 
     detruire_pile(&p);
     return true;
@@ -117,7 +118,7 @@ bool test_pile_creer(void)
 
 bool test_pile_inserer_tuile(void)
 {
-    Pile p = creer_pile(10);
+    Pile p = creer_pile(10, false);
     Tuile t = NULL;
 
     for (int i = 0; i < p.nb_element_max ; i++) {
@@ -135,7 +136,7 @@ bool test_pile_inserer_tuile(void)
 
 bool test_pile_recuperer_tuile(void)
 {
-    Pile p = creer_pile(5);
+    Pile p = creer_pile(5, false);
     Tuile t = creer_tuile();
 
     inserer_tuile(&p, t);
@@ -564,8 +565,7 @@ bool test_csv_lecture_zone(void)
 bool test_csv_lecture_fichier(void)
 {
     int i;
-    Pile p;
-    p = lire_tuiles_csv("data/test/1_test.csv");
+    Pile p = lire_tuiles_csv("data/test/1_test.csv");
 
     if (p.nb_element < p.nb_element_max) return false;
 
