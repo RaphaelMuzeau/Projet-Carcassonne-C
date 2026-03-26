@@ -6,6 +6,7 @@
 #include "meeple.h"
 #include "libca.h"
 #include "vec.h"
+#include "jeu.h"
 
 // Ajout en fin de liste
 void ajout_meeple_chaine(Joueur *joueur, L_meeple new)
@@ -41,7 +42,7 @@ void ajouter_meeple(Joueur *joueur, Vec2D grille, int x, int y, enum Direction d
     };
 }
 
-void retirer_meeple(Joueur *joueur, Vec2D grille, int x, int y)
+void retirer_meeple(Joueur *joueur, Vec2D grille, int x, int y) // ELPIS my blind hope
 {
     Tuile t = get(grille, x, y);
     t->id_meeple = -1;
@@ -68,6 +69,27 @@ void retirer_meeple(Joueur *joueur, Vec2D grille, int x, int y)
         tmp = tmp->next;
         tmp2 = tmp2->next;
     }
+}
+
+void retrait_meeple_liste(Joueur *joueur, Vec2D grille, L_meeple loc_meeple)
+{
+    L_meeple tmp, tmp2;
+    if (loc_meeple == NULL)
+        return;
+
+    tmp = loc_meeple;
+    tmp2 = tmp->next;
+
+    while(tmp2 != NULL){
+        retirer_meeple(joueur, grille, tmp->x, tmp->y);
+        free(tmp);
+        tmp = tmp2;
+        tmp2 = tmp2->next;
+    }
+    retirer_meeple(joueur, grille, tmp->x, tmp->y);
+    free(tmp);
+
+    return;
 }
 
 void detruire_joueur(Joueur joueur)

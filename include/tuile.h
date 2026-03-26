@@ -19,7 +19,7 @@ enum Direction {
     D_NORD,
     D_EST,
     D_OUEST,
-    D_MILIEU
+    D_MILIEU,
 };
 
 struct _Tuile {

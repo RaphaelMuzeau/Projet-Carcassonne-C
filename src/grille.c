@@ -3,6 +3,9 @@
 #include <stdbool.h>
 #include "tuile.h"
 #include "vec.h"
+#include "jeu.h"
+#include "libca.h"
+#include "meeple.h"
 
 bool est_vide(Vec2D grille, int x, int y)
 {
@@ -48,9 +51,28 @@ bool verification_tuile_zone(Tuile t, enum Zone z, enum Direction d)
         exit(EXIT_FAILURE);
     }
 }
-
-int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum Direction d)
+enum Zone zone_tuile(Tuile t, enum Direction d)
 {
+    switch (d){
+    case D_NORD:
+        return t->nord;
+    case D_SUD:
+        return t->sud;
+    case D_EST:
+        return t->est;
+    case D_OUEST:
+        return t->ouest;
+    case D_MILIEU:
+        return t->milieu;
+    default:
+        fprintf(stderr, "Carcassonne zone invalide\n");
+        exit(EXIT_FAILURE);
+    }
+
+}
+int recherche(Vec2D grille, int* nb_meeples, L_meeple loc_meeple_all, int x, int y, enum Zone z, enum Direction d)
+{
+    // TODO NOUVELLE IMPLEMENTATION AJOUT LOC_MEEPLE_ALL liste chainé de loc de meeple indexé par id joueur
     Tuile t = get(grille, x, y);
     int pts = 1;
     int tmp = 0;
@@ -63,7 +85,8 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
     t->is_verified = true;
 
     if (t->id_meeple != -1 && verification_tuile_zone(t, z, d))
-            nb_meeples[(int)t->id_meeple] += 1;
+            nb_meeples[(int)t->id_meeple] += 1; // ajoute a la liste du nb de meeple indexé par joueur
+
 
     if (verification_tuile_zone(t, z, D_MILIEU)) {
 
@@ -79,7 +102,7 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
             Tuile t2 = get(grille, x, y - 1);
             if (!compatibilite_tuile(t, t2, D_NORD))
                 return -1;
-            tmp = recherche(grille, x, y - 1, nb_meeples, z, D_SUD);
+            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y - 1 , z, D_SUD);
             if (tmp == -1)
                 return -1;
             pts += tmp;
@@ -93,7 +116,7 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
             Tuile t2 = get(grille, x, y + 1);
             if (!compatibilite_tuile(t, t2, D_SUD))
                 return -1;
-            tmp = recherche(grille, x, y + 1, nb_meeples, z, D_NORD);
+            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y + 1, z, D_NORD);
             if (tmp == -1)
                 return -1;
             pts += tmp;
@@ -107,7 +130,7 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
             Tuile t2 = get(grille, x + 1, y);
             if (!compatibilite_tuile(t, t2, D_EST))
                 return -1;
-            tmp = recherche(grille, x + 1, y, nb_meeples, z, D_OUEST);
+            tmp = recherche(grille, nb_meeples,loc_meeple_all, x + 1, y, z, D_OUEST);
             if (tmp == -1)
                 return -1;
             pts += tmp;
@@ -121,7 +144,7 @@ int recherche(Vec2D grille, int x, int y, char nb_meeples[], enum Zone z, enum D
             Tuile t2 = get(grille, x - 1, y);
             if (!compatibilite_tuile(t, t2, D_OUEST))
                 return -1;
-            tmp += recherche(grille, x - 1, y, nb_meeples, z, D_EST);
+            tmp += recherche(grille, nb_meeples, loc_meeple_all, x - 1, y, z, D_EST);
             if (tmp == -1)
                 return -1;
             pts += tmp;
@@ -144,12 +167,52 @@ void recherche_is_verified(Vec2D grille, int x, int y)
 }
 
 //TODO: TESTS / Attribution des pts / encapsulation de recherche / faire fonctionner les joueurs
-int max(int *nb_meeples, int taille)
+int maximal(int* nb_meeples, int nb_joueur)
 {
     int maxi = nb_meeples[0];
-    for (int i = 0; i < taille; i++){
+    for (int i = 0; i < nb_joueur; i++){
         if (maxi < nb_meeples[i])
             maxi = nb_meeples[i];
     }
     return maxi;
+}
+bool attribution_point(L_meeple loc_meeple_all, int* nb_meeples, Jeu *jeu, int pts)
+{
+    if (pts != -1)
+        return false;
+
+    int maxi = maximal(nb_meeples,jeu->listejoueurs.nb_joueur);
+
+    for (int i = 0; i < jeu->listejoueurs.nb_joueur ; i++){
+        if (nb_meeples[i] == maxi)
+            jeu->listejoueurs.tableau[i].pts += pts;
+    }
+    for (int i = 0; i < jeu->listejoueurs.nb_joueur; i++){
+        retrait_meeple_liste((&jeu->listejoueurs.tableau[i]),jeu->grille, loc_meeple_all
+    );
+    }
+    return true;
+}
+
+void round_encapsuler(Jeu *jeu, int id_joueur, int x, int y, Tuile tuile, enum Direction d)
+{
+    int pts;
+    int* nb_meeples;
+    enum Zone zone_recherche;
+    zone_recherche = zone_tuile(tuile,d);
+
+    nb_meeples = ca_alloc(jeu->listejoueurs.nb_joueur,sizeof(int));
+    L_meeple loc_meeple_all = ca_alloc(jeu->listejoueurs.nb_joueur,sizeof(L_meeple));
+
+    if(id_joueur != -1){
+        ajouter_meeple((&jeu->listejoueurs.tableau[id_joueur]),jeu->grille, x, y, d);
+    }
+
+
+    placer_tuile(jeu->grille, x, y, tuile);
+    pts = recherche(jeu->grille, nb_meeples, loc_meeple_all, x, y, zone_recherche, d);
+    attribution_point(loc_meeple_all, nb_meeples, jeu, pts);
+
+    free(nb_meeples);
+    free(loc_meeple_all);
 }
