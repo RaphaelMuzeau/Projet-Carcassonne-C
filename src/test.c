@@ -340,11 +340,11 @@ bool test_grille_placer_tuile(void)
     Tuile t = creer_tuile();
 
     // placement sans connexion
-    if (placer_tuile(grille, 1, 1, t)) return false;
-    if (placer_tuile(grille, 1, 0, t)) return false;
-    if (placer_tuile(grille, 0, 1, t)) return false;
-    if (placer_tuile(grille, 1, 9, t)) return false;
-    if (placer_tuile(grille, 9, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 0, t)) return false;
+    if (placer_tuile(&grille, 0, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 9, t)) return false;
+    if (placer_tuile(&grille, 9, 1, t)) return false;
     if (get(grille, 1, 1) == t) return false;
     if (get(grille, 1, 0) == t) return false;
     if (get(grille, 0, 1) == t) return false;
@@ -354,20 +354,20 @@ bool test_grille_placer_tuile(void)
     set(&grille, t, 1, 1);
 
     // tuile occupée
-    if (placer_tuile(grille, 1, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 1, t)) return false;
 
     // placement compatible
     t = creer_tuile();
-    if (!placer_tuile(grille, 0, 1, t)) return false;
+    if (!placer_tuile(&grille, 0, 1, t)) return false;
     if (get(grille, 0, 1)  != t) return false;
     t = creer_tuile();
-    if (!placer_tuile(grille, 1, 0, t)) return false;
+    if (!placer_tuile(&grille, 1, 0, t)) return false;
     if (get(grille, 1, 0)  != t) return false;
     t = creer_tuile();
-    if (!placer_tuile(grille, 2, 1, t)) return false;
+    if (!placer_tuile(&grille, 2, 1, t)) return false;
     if (get(grille, 2, 1) != t) return false;
     t = creer_tuile();
-    if (!placer_tuile(grille, 1, 2, t)) return false;
+    if (!placer_tuile(&grille, 1, 2, t)) return false;
     if (get(grille, 1, 2) != t) return false;
 
     // placement incompatible
@@ -376,13 +376,13 @@ bool test_grille_placer_tuile(void)
     set(&grille, t, 5, 5);
 
     t = creer_tuile();
-    if (placer_tuile(grille, 0, 1, t)) return false;
+    if (placer_tuile(&grille, 0, 1, t)) return false;
     if (get(grille, 0, 1)  == t) return false;
-    if (placer_tuile(grille, 1, 0, t)) return false;
+    if (placer_tuile(&grille, 1, 0, t)) return false;
     if (get(grille, 1, 0)  == t) return false;
-    if (placer_tuile(grille, 2, 1, t)) return false;
+    if (placer_tuile(&grille, 2, 1, t)) return false;
     if (get(grille, 2, 1)  == t) return false;
-    if (placer_tuile(grille, 1, 2, t)) return false;
+    if (placer_tuile(&grille, 1, 2, t)) return false;
     if (get(grille, 1, 2) == t) return false;
 
     free(t);

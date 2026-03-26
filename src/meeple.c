@@ -6,7 +6,6 @@
 #include "meeple.h"
 #include "libca.h"
 #include "vec.h"
-#include "jeu.h"
 
 // Ajout en fin de liste
 void ajout_meeple_chaine(Joueur *joueur, L_meeple new)
@@ -34,9 +33,9 @@ void ajouter_meeple(Joueur *joueur, Vec2D grille, int x, int y, enum Direction d
         new->x = x;
         new->y = y;
         new->next = NULL;
-        ajout_meeple_chaine(joueur,new);
+        ajout_meeple_chaine(joueur, new);
         t->id_meeple = joueur->id;
-        // TODO : t->position_meeples = d;
+        t->position_meeple = d;
 
         joueur->nb_meeple_restant -= 1;
     };

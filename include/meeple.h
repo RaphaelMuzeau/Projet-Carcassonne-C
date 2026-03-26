@@ -13,7 +13,7 @@ struct _maillon {
 typedef struct _maillon *L_meeple;
 
 typedef struct _Joueur {
-    char id;
+    int id;
     int pts;
     int nb_meeple_restant;
     L_meeple localisation_meeples;
