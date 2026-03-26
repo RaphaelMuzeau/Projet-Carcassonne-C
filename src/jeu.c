@@ -4,6 +4,20 @@
 #include "meeple.h"
 
 //TODO: TESTS
+Jeu init_jeu(int nb_joueur, int nb_meeple, int taille_pile)
+{
+    Jeu jeu;
+    jeu.listejoueurs.nb_joueur = nb_joueur;
+    jeu.listejoueurs.tableau = ca_alloc(nb_joueur, sizeof(Joueur));
+    for(int i = 0; i < nb_joueur; i++){
+        jeu.listejoueurs.tableau[i].id = i;
+        jeu.listejoueurs.tableau[i].nb_meeple_restant = nb_meeple;
+    }
+    jeu.pile = creer_pile(taille_pile);
+    jeu.grille = creer_vec2D();
+    return jeu;
+}
+
 int maximal(int *nb_meeples, int nb_joueur)
 {
     int maxi = nb_meeples[0];
