@@ -13,7 +13,7 @@ Pile creer_pile(int max_element, bool gen)
         p.nb_element = max_element;
         p.tab = NULL;
     } else {
-        p.nb_element = 0;
+        p.nb_element = max_element;
         p.tab = ca_alloc(max_element, sizeof(Tuile));
     }
 
@@ -35,10 +35,10 @@ Tuile recup_tuile(Pile *p)
     if (pile_vide(*p))
         return NULL;
 
-    // if (p->gen_aleatoire) {
-    //     p->nb_element--;
-    //     return generer_tuile();
-    // }
+    if (p->gen_aleatoire) {
+        p->nb_element--;
+        return generer_tuile();
+    }
 
     Tuile tmp;
     int id;

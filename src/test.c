@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 #include "grille.h"
 #include "pile.h"
 #include "tuile.h"
@@ -639,6 +640,45 @@ bool test_csv_fichier_invalide(void)
     return true;
 }
 
+bool test_generer_tuile(void)
+{
+    srand(time(NULL));
+
+    for (int i = 0; i < 10; i++) {
+        Tuile tmp = generer_tuile();
+
+        if (tmp->est == Z_VILLAGE)   return false;
+        if (tmp->sud == Z_VILLAGE)   return false;
+        if (tmp->nord == Z_VILLAGE)  return false;
+        if (tmp->ouest == Z_VILLAGE) return false;
+
+        if (tmp->est == Z_ABBAYE)    return false;
+        if (tmp->sud == Z_ABBAYE)    return false;
+        if (tmp->nord == Z_ABBAYE)   return false;
+        if (tmp->ouest == Z_ABBAYE)  return false;
+
+        if (tmp->milieu == Z_ABBAYE) {
+            if (tmp->est != Z_ROUTE && tmp->est != Z_PRE)     return false;
+            if (tmp->sud != Z_ROUTE && tmp->sud != Z_PRE)     return false;
+            if (tmp->nord != Z_ROUTE && tmp->nord != Z_PRE)   return false;
+            if (tmp->ouest != Z_ROUTE && tmp->ouest != Z_PRE) return false;
+        }
+
+        if (tmp->milieu == Z_ROUTE || tmp->milieu == Z_VILLE) {
+            int cmpt = 0;
+            if (tmp->est == tmp->milieu) cmpt++;
+            if (tmp->sud == tmp->milieu) cmpt++;
+            if (tmp->nord == tmp->milieu) cmpt++;
+            if (tmp->ouest == tmp->milieu) cmpt++;
+
+            if(cmpt < 2) return false;
+        }
+
+        free(tmp);
+    }
+    return true;
+}
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -666,6 +706,7 @@ Test unit_tests[] = {
     TEST(test_csv_fichier_vide),
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
+    TEST(test_generer_tuile),
 };
 
 // ===========================
