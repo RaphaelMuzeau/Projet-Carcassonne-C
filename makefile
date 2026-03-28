@@ -11,7 +11,7 @@ TEST:= $(EXE)_test
 CC := gcc
 CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -fdiagnostics-color -Iinclude
 MKFLAGS := -MMD -MP
-LDFLAGS := -lm -Llib -l:libraylib.a # raylib est lié statiquement
+LDFLAGS := -Llib -l:libraylib.a -lm # raylib est lié statiquement
 
 BEAR := $(shell command -v bear)
 

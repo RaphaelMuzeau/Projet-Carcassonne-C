@@ -1,0 +1,19 @@
+name: Test d'integration
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-24.04
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: release
+      run: make release
+    - name: test
+      run: make test
