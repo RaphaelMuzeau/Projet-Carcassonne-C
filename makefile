@@ -80,13 +80,16 @@ test_depends:= $(test_objects:.o=.d)
 
 # Compilation
 
-$(EXE): $(objects)
+$(BIN_DIR):
+	@mkdir -p $(BIN_DIR)
+
+$(EXE): $(objects) | $(BIN_DIR)
 	$(CC) $^ $(LDFLAGS) -o $@
 
-$(DBG): $(dbg_objects)
+$(DBG): $(dbg_objects) | $(BIN_DIR)
 	$(CC) $^ $(LDFLAGS) -o $@
 
-$(TEST): $(test_objects)
+$(TEST): $(test_objects) | $(BIN_DIR)
 	$(CC) $^ $(LDFLAGS) -o $@
 
 $(objects): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
