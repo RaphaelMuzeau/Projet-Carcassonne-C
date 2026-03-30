@@ -104,7 +104,7 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
-bool test_generer_tuile(void)
+bool test_tuile_generer(void)
 {
     srand(time(NULL));
 
@@ -719,7 +719,7 @@ Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_pivot90),
     TEST(test_tuile_compatibilite),
-    TEST(test_generer_tuile),
+    TEST(test_tuile_generer),
     TEST(test_pile_creer),
     TEST(test_pile_creer_aleatoire),
     TEST(test_pile_inserer_tuile),
