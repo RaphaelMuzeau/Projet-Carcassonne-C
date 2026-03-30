@@ -104,6 +104,45 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
+bool test_generer_tuile(void)
+{
+    srand(time(NULL));
+
+    for (int i = 0; i < 10; i++) {
+        Tuile tmp = generer_tuile();
+
+        if (tmp->est == Z_VILLAGE)   return false;
+        if (tmp->sud == Z_VILLAGE)   return false;
+        if (tmp->nord == Z_VILLAGE)  return false;
+        if (tmp->ouest == Z_VILLAGE) return false;
+
+        if (tmp->est == Z_ABBAYE)    return false;
+        if (tmp->sud == Z_ABBAYE)    return false;
+        if (tmp->nord == Z_ABBAYE)   return false;
+        if (tmp->ouest == Z_ABBAYE)  return false;
+
+        if (tmp->milieu == Z_ABBAYE) {
+            if (tmp->est != Z_ROUTE && tmp->est != Z_PRE)     return false;
+            if (tmp->sud != Z_ROUTE && tmp->sud != Z_PRE)     return false;
+            if (tmp->nord != Z_ROUTE && tmp->nord != Z_PRE)   return false;
+            if (tmp->ouest != Z_ROUTE && tmp->ouest != Z_PRE) return false;
+        }
+
+        if (tmp->milieu == Z_ROUTE || tmp->milieu == Z_VILLE) {
+            int cmpt = 0;
+            if (tmp->est == tmp->milieu) cmpt++;
+            if (tmp->sud == tmp->milieu) cmpt++;
+            if (tmp->nord == tmp->milieu) cmpt++;
+            if (tmp->ouest == tmp->milieu) cmpt++;
+
+            if(cmpt < 2) return false;
+        }
+
+        free(tmp);
+    }
+    return true;
+}
+
 bool test_pile_creer(void)
 {
     Pile p = creer_pile(10, false);
@@ -135,7 +174,7 @@ bool test_pile_inserer_tuile(void)
     return true;
 }
 
-bool test_pile_recuperer_tuile(void)
+bool test_pile_recuperer_tuile_non_aleatoire(void)
 {
     Pile p = creer_pile(5, false);
     Tuile t = creer_tuile();
@@ -147,6 +186,26 @@ bool test_pile_recuperer_tuile(void)
 
     free(t);
     detruire_pile(&p);
+    return true;
+}
+
+bool test_pile_recuperer_tuile_aleatoire(void)
+{
+    int i = 10;
+    Pile p = creer_pile(10, true);
+
+    if (p.nb_element_max != i) return false;
+    if (!p.gen_aleatoire)      return false;
+    if (p.nb_element != i)     return false;
+
+    while (i != 0) {
+        Tuile t = recup_tuile(&p);
+        free(t);
+        i--;
+        if (p.nb_element != i) return false;
+    }
+
+    if (p.nb_element != 0) return false;
     return true;
 }
 
@@ -640,53 +699,16 @@ bool test_csv_fichier_invalide(void)
     return true;
 }
 
-bool test_generer_tuile(void)
-{
-    srand(time(NULL));
-
-    for (int i = 0; i < 10; i++) {
-        Tuile tmp = generer_tuile();
-
-        if (tmp->est == Z_VILLAGE)   return false;
-        if (tmp->sud == Z_VILLAGE)   return false;
-        if (tmp->nord == Z_VILLAGE)  return false;
-        if (tmp->ouest == Z_VILLAGE) return false;
-
-        if (tmp->est == Z_ABBAYE)    return false;
-        if (tmp->sud == Z_ABBAYE)    return false;
-        if (tmp->nord == Z_ABBAYE)   return false;
-        if (tmp->ouest == Z_ABBAYE)  return false;
-
-        if (tmp->milieu == Z_ABBAYE) {
-            if (tmp->est != Z_ROUTE && tmp->est != Z_PRE)     return false;
-            if (tmp->sud != Z_ROUTE && tmp->sud != Z_PRE)     return false;
-            if (tmp->nord != Z_ROUTE && tmp->nord != Z_PRE)   return false;
-            if (tmp->ouest != Z_ROUTE && tmp->ouest != Z_PRE) return false;
-        }
-
-        if (tmp->milieu == Z_ROUTE || tmp->milieu == Z_VILLE) {
-            int cmpt = 0;
-            if (tmp->est == tmp->milieu) cmpt++;
-            if (tmp->sud == tmp->milieu) cmpt++;
-            if (tmp->nord == tmp->milieu) cmpt++;
-            if (tmp->ouest == tmp->milieu) cmpt++;
-
-            if(cmpt < 2) return false;
-        }
-
-        free(tmp);
-    }
-    return true;
-}
-
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_pivot90),
     TEST(test_tuile_compatibilite),
+    TEST(test_generer_tuile),
     TEST(test_pile_creer),
     TEST(test_pile_inserer_tuile),
-    TEST(test_pile_recuperer_tuile),
+    TEST(test_pile_recuperer_tuile_non_aleatoire),
+    TEST(test_pile_recuperer_tuile_aleatoire),
     TEST(test_vec_creer),
     TEST(test_vec_get_null),
     TEST(test_vec_set_get),
@@ -706,7 +728,6 @@ Test unit_tests[] = {
     TEST(test_csv_fichier_vide),
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
-    TEST(test_generer_tuile),
 };
 
 // ===========================

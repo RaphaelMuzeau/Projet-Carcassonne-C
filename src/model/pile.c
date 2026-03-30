@@ -13,7 +13,7 @@ Pile creer_pile(int max_element, bool gen)
         p.nb_element = max_element;
         p.tab = NULL;
     } else {
-        p.nb_element = max_element;
+        p.nb_element = 0;
         p.tab = ca_alloc(max_element, sizeof(Tuile));
     }
 
