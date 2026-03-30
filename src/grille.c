@@ -3,6 +3,7 @@
 #include "grille.h"
 #include "tuile.h"
 #include "meeple.h"
+#include "joueur.h"
 
 bool est_vide(Vec2D grille, int x, int y)
 {
@@ -30,6 +31,8 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
 
     return false;
 }
+
+/* recherche */
 
 int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d)
 {
@@ -126,3 +129,32 @@ void recherche_is_verified(Vec2D grille, int x, int y)
     recherche_is_verified(grille, x, y-1);
 }
 
+/* placement de meeple */
+
+bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
+{
+    Tuile t = get(grille, x, y);
+
+    if (t == NULL) return false;
+    if (t->id_meeple != -1) return false;
+    if (joueur->nb_meeple_restant <= 0) return false;
+
+    L_meeple new = creer_liste_meeple(x, y, d);
+    ajouter_liste_meeple(&joueur->localisation_meeples, new);
+    t->id_meeple = joueur->id;
+    t->position_meeple = d;
+
+    joueur->nb_meeple_restant -= 1;
+
+    return true;
+}
+
+void retirer_meeple(Vec2D grille, ListeJoueurs listejoueurs, int x, int y)
+{
+    Tuile t = get(grille, x, y);
+    if (t == NULL) return;
+
+    listejoueurs.tableau[t->id_meeple].nb_meeple_restant += 1;
+    retirer_liste_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeples, x, y);
+    t->id_meeple = -1;
+}

@@ -2,7 +2,6 @@
 #define meeple_h
 
 #include "tuile.h"
-#include "vec.h"
 
 struct _maillon {
     struct _maillon *next;
@@ -12,21 +11,10 @@ struct _maillon {
 };
 typedef struct _maillon *L_meeple;
 
-typedef struct _Joueur {
-    int id;
-    int pts;
-    int nb_meeple_restant;
-    L_meeple localisation_meeples;
-} Joueur;
+L_meeple creer_liste_meeple(int x, int y, enum Direction d);
+void detruire_liste_meeple(L_meeple liste);
 
-typedef struct _ListeJoueur {
-    int nb_joueur;
-    Joueur *tableau;
-} ListeJoueurs;
-
-void ajouter_meeple(Joueur *joueur, Vec2D grille, int x, int y, enum Direction d);
-void retirer_meeple(Joueur *joueur, Vec2D grille, int x, int y);
-void retrait_meeple_liste(Joueur *joueur, Vec2D grille, L_meeple loc_meeple);
-void detruire_joueur(Joueur joueur);
+void ajouter_liste_meeple(L_meeple *liste, L_meeple new);
+void retirer_liste_meeple(L_meeple *liste, int x, int y);
 
 #endif

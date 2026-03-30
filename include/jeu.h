@@ -1,10 +1,10 @@
 #ifndef jeu_h
 #define jeu_h
 
-#include "tuile.h"
+#include "joueur.h"
 #include "pile.h"
 #include "vec.h"
-#include "meeple.h"
+#include "tuile.h"
 
 typedef struct _Jeu {
     ListeJoueurs listejoueurs;
