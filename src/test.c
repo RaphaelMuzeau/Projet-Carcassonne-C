@@ -156,6 +156,20 @@ bool test_pile_creer(void)
     return true;
 }
 
+bool test_pile_creer_aleatoire(void)
+{
+    Pile p = creer_pile(10, true);
+
+    if(!pile_pleine(p))          return false;
+    if (p.nb_element != 10)      return false;
+    if (p.nb_element_max != 10)  return false;
+    if (!p.gen_aleatoire)        return false;
+    if (p.tab != NULL)           return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
 bool test_pile_inserer_tuile(void)
 {
     Pile p = creer_pile(10, false);
@@ -206,6 +220,7 @@ bool test_pile_recuperer_tuile_aleatoire(void)
     }
 
     if (p.nb_element != 0) return false;
+    detruire_pile(&p);
     return true;
 }
 
@@ -706,6 +721,7 @@ Test unit_tests[] = {
     TEST(test_tuile_compatibilite),
     TEST(test_generer_tuile),
     TEST(test_pile_creer),
+    TEST(test_pile_creer_aleatoire),
     TEST(test_pile_inserer_tuile),
     TEST(test_pile_recuperer_tuile_non_aleatoire),
     TEST(test_pile_recuperer_tuile_aleatoire),
