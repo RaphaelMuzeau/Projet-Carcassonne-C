@@ -54,7 +54,7 @@ Tuile recup_tuile(Pile *p)
 bool inserer_tuile(Pile *p, Tuile t)
 {
     if (p->gen_aleatoire) {
-        fprintf(stderr, "Caracsonne : Essaie d'insérer en mode aléatoire\n");
+        fprintf(stderr, "carcassonne : insertion dans une pile en mode aléatoire\n");
         exit(EXIT_FAILURE);
     }
 
