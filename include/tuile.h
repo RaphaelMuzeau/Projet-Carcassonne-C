@@ -15,7 +15,7 @@ enum Zone {
 };
 
 enum Direction {
-    D_SUD,
+    D_SUD = 0,
     D_NORD,
     D_EST,
     D_OUEST,

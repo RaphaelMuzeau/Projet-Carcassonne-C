@@ -799,6 +799,7 @@ bool test_grille_retirer_meeple(void)
     return true;
 }
 
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),

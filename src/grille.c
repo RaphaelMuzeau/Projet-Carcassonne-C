@@ -48,6 +48,11 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
         return 0;
     t->is_verified = true;
 
+    if(z == Z_VILLE)
+        pts+=1;
+    if(z == Z_BLASON)
+        pts+=3;
+
     if (t->id_meeple != -1 && zone_tuile(t, d) == z)
         nb_meeples[t->id_meeple] += 1; // ajoute a la liste du nb de meeple indexé par joueur
 
