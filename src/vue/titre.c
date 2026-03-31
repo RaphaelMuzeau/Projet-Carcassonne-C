@@ -28,7 +28,7 @@ enum Page page_titre(void)
         largeur_ecran = GetScreenWidth();
         hauteur_ecran = GetScreenHeight();
 
-        if (update_bouton(&btn_nouvelle)) prochaine_page = P_NORMAL;
+        if (update_bouton(&btn_nouvelle)) prochaine_page = P_JEU; // FIXME
         if (update_bouton(&btn_custom))   prochaine_page = P_CUSTOM;
         if (update_bouton(&btn_charger))  prochaine_page = P_CHARGER;
         if (update_bouton(&btn_regles))   prochaine_page = P_REGLES;

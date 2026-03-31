@@ -9,7 +9,7 @@
  */
 enum Page {
     P_TITRE,
-    P_JEUX,
+    P_JEU,
     P_NORMAL,
     P_CUSTOM,
     P_JOUEURS,
@@ -19,7 +19,7 @@ enum Page {
 };
 
 enum Page page_titre(void);
-// enum Page page_jeux(void);
+enum Page page_jeu(void);
 enum Page page_configuration(bool custom);
 enum Page page_joueurs(int nb_joueurs);
 enum Page page_charger(void);

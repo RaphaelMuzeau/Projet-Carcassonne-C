@@ -137,7 +137,7 @@ enum Page page_joueurs(int nb_joueurs)
             prochaine_page = P_CUSTOM;
 
         if (update_bouton_camera(&confirmer, scrollbar.vue))
-            prochaine_page = P_JEUX;
+            prochaine_page = P_JEU;
 
         /* realigner le bouton de confirmation à droite */
         confirmer.champ.x = ecran.width - SCROLL_DEFAULT_WIDTH - confirmer.champ.width - 10;

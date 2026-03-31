@@ -26,9 +26,8 @@ int main(void)
         case P_TITRE:
             prochaine_page = page_titre();
             break;
-        case P_JEUX:
-            // prochaine_page = page_jeux();
-            prochaine_page = P_TITRE;
+        case P_JEU:
+            prochaine_page = page_jeu();
             break;
         case P_NORMAL:
             prochaine_page = page_configuration(false);

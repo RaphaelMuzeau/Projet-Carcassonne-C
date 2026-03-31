@@ -47,7 +47,7 @@ enum Page page_charger(void)
 
         if ((partie_selectionne = update_listeparties(parties, scrollbar.vue)) != NULL)
             // TODO charger la partie
-            prochaine_page = P_JEUX;
+            prochaine_page = P_JEU;
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
