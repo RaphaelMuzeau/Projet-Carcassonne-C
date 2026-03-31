@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include "libca.h"
 #include "listeparties.h"
+#include "scrollbar.h"
 #include "bouton.h"
 
 ListeParties creer_listeparties(float y)
@@ -39,7 +40,7 @@ void detruire_listeparties(ListeParties parties)
 
 char *update_listeparties(ListeParties parties, Camera2D camera)
 {
-    int largeur_ecran = GetScreenWidth();
+    int largeur_ecran = GetScreenWidth() - SCROLL_DEFAULT_WIDTH;
     for (unsigned int i = 0; i < parties.fichiers.count; i++) {
         parties.boutons[i].champ.width = largeur_ecran * 0.8f;
         parties.boutons[i].champ.x     = largeur_ecran * 0.1f;

@@ -102,13 +102,13 @@ enum Page page_joueurs(int nb_joueurs)
 {
     // Etat initial
     enum Page prochaine_page = P_JOUEURS;
-    int largeur_ecran = GetScreenWidth();
 
+    Rectangle ecran = { 0 };
     Camera2D camera = { 0 };
     camera.zoom = 1.0f;
 
     // Elements de la page
-    ScrollBar scrollbar = creer_scrollbar(camera, 20);
+    ScrollBar scrollbar = creer_scrollbar(camera);
 
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
     Bouton confirmer = creer_bouton_adapte(0, 10, "confirmer ->");
@@ -118,41 +118,42 @@ enum Page page_joueurs(int nb_joueurs)
     int fin_champs = 0;
 
     for (int i = 0; i < nb_joueurs; i++) {
-        char *titre_i = ca_alloc(24, sizeof(char));
-        sprintf(titre_i, "Nom de joueur n°%d:", i);
+        char *titre_i = ca_alloc(27, sizeof(char));
+        snprintf(titre_i, 27, "Nom de joueur n°%d:", i);
         titres[i] = creer_texte(0, 100 + i*130, titre_i);
         champs[i] = creer_champsaisie(0, 130 + i*130, 400, 50, false);
         fin_champs = champs[i].champ.y + 70.0f;
     }
 
     while (prochaine_page == P_JOUEURS) {
-        largeur_ecran = GetScreenWidth() - 20;
-        update_scrollbar(&scrollbar, fin_champs);
+        ecran.height = GetScreenHeight();
+        ecran.width = GetScreenWidth();
+        update_scrollbar(&scrollbar, ecran, fin_champs);
 
         if (WindowShouldClose())
             prochaine_page = P_QUITTER;
 
-        if (update_bouton_camera(&retour, scrollbar.camera) || IsKeyPressed(KEY_ESCAPE))
+        if (update_bouton_camera(&retour, scrollbar.vue) || IsKeyPressed(KEY_ESCAPE))
             prochaine_page = P_CUSTOM;
 
-        if (update_bouton_camera(&confirmer, scrollbar.camera))
+        if (update_bouton_camera(&confirmer, scrollbar.vue))
             prochaine_page = P_JEUX;
 
         /* realigner le bouton de confirmation à droite */
-        confirmer.champ.x = largeur_ecran - confirmer.champ.width - 10;
+        confirmer.champ.x = ecran.width - SCROLL_DEFAULT_WIDTH - confirmer.champ.width - 10;
         adapter_bouton(&confirmer); // recentre le texte après le decalage
 
         /* centrer les champs et leurs titres */
         for (int i = 0; i < nb_joueurs; i++) {
-            champs[i].champ.x = (float) largeur_ecran/2 - champs[i].champ.width/2;
+            champs[i].champ.x = (float) (ecran.width - SCROLL_DEFAULT_WIDTH)/2 - champs[i].champ.width/2;
             titres[i].position.x = champs[i].champ.x;
-            update_champsaisie_camera(&champs[i], scrollbar.camera);
+            update_champsaisie_camera(&champs[i], scrollbar.vue);
         }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
-            BeginMode2D(scrollbar.camera);
+            BeginMode2D(scrollbar.vue);
                 dessiner_bouton(retour);
                 dessiner_bouton(confirmer);
 
@@ -162,7 +163,7 @@ enum Page page_joueurs(int nb_joueurs)
                 }
             EndMode2D();
 
-            dessiner_scrollbar(scrollbar);
+            dessiner_scrollbar(scrollbar, ecran);
         EndDrawing();
     }
     for (int i = 0; i < nb_joueurs; i++) {
