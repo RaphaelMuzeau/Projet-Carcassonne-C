@@ -121,11 +121,11 @@ bool test_tuile_generer(void)
         if (tmp->nord == Z_ABBAYE)   return false;
         if (tmp->ouest == Z_ABBAYE)  return false;
 
-        if (tmp->milieu == Z_ABBAYE) {
-            if (tmp->est != Z_ROUTE && tmp->est != Z_PRE)     return false;
-            if (tmp->sud != Z_ROUTE && tmp->sud != Z_PRE)     return false;
-            if (tmp->nord != Z_ROUTE && tmp->nord != Z_PRE)   return false;
-            if (tmp->ouest != Z_ROUTE && tmp->ouest != Z_PRE) return false;
+        if (tmp->milieu == Z_PRE) {
+            if (tmp->est == Z_ROUTE)   return false;
+            if (tmp->sud == Z_ROUTE)   return false;
+            if (tmp->nord == Z_ROUTE)  return false;
+            if (tmp->ouest == Z_ROUTE) return false;
         }
 
         if (tmp->milieu == Z_ROUTE || tmp->milieu == Z_VILLE) {
@@ -137,7 +137,6 @@ bool test_tuile_generer(void)
 
             if(cmpt < 2) return false;
         }
-
         free(tmp);
     }
     return true;
