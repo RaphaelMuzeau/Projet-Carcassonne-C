@@ -139,8 +139,8 @@ bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
     if (t->id_meeple != -1) return false;
     if (joueur->nb_meeple_restant <= 0) return false;
 
-    L_meeple new = creer_liste_meeple(x, y, d);
-    ajouter_liste_meeple(&joueur->localisation_meeples, new);
+    L_meeple new = creer_maillon_meeple(x, y, d);
+    ajouter_maillon_meeple(&joueur->localisation_meeples, new);
     t->id_meeple = joueur->id;
     t->position_meeple = d;
 
@@ -155,6 +155,6 @@ void retirer_meeple(Vec2D grille, ListeJoueurs listejoueurs, int x, int y)
     if (t == NULL) return;
 
     listejoueurs.tableau[t->id_meeple].nb_meeple_restant += 1;
-    retirer_liste_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeples, x, y);
+    retirer_maillon_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeples, x, y);
     t->id_meeple = -1;
 }

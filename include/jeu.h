@@ -12,6 +12,6 @@ typedef struct _Jeu {
     Vec2D grille;
 } Jeu;
 
-void round_encapsuler(Jeu *jeu, int id_joueur, int x, int y, Tuile tuile, enum Direction d);
+bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple);
 
 #endif

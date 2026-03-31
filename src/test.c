@@ -554,7 +554,7 @@ bool test_joueur_creer(void)
 
 bool test_liste_meeple_creer(void)
 {
-    L_meeple liste = creer_liste_meeple(1, 5, D_EST);
+    L_meeple liste = creer_maillon_meeple(1, 5, D_EST);
 
     if (liste->x != 1)       return false;
     if (liste->y != 5)       return false;
@@ -569,8 +569,8 @@ bool test_liste_meeple_ajouter(void)
 {
     L_meeple liste = NULL;
 
-    L_meeple maillon1 = creer_liste_meeple(1, 1, D_MILIEU);
-    ajouter_liste_meeple(&liste, maillon1);
+    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
+    ajouter_maillon_meeple(&liste, maillon1);
 
     if (liste != maillon1)    return false;
     if (liste->x != 1)        return false;
@@ -578,8 +578,8 @@ bool test_liste_meeple_ajouter(void)
     if (liste->d != D_MILIEU) return false;
     if (liste->next != NULL)  return false;
 
-    L_meeple maillon2 = creer_liste_meeple(2, 2, D_SUD);
-    ajouter_liste_meeple(&liste, maillon2);
+    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
+    ajouter_maillon_meeple(&liste, maillon2);
 
     if (liste != maillon2)       return false;
     if (liste->x != 2)           return false;
@@ -596,34 +596,34 @@ bool test_liste_meeple_retirer(void)
     L_meeple liste = NULL;
 
     // retrait sur liste vide
-    retirer_liste_meeple(&liste, 0, 0);
+    retirer_maillon_meeple(&liste, 0, 0);
     if (liste != NULL) return false;
 
-    L_meeple maillon1 = creer_liste_meeple(1, 1, D_MILIEU);
-    L_meeple maillon2 = creer_liste_meeple(2, 2, D_SUD);
-    ajouter_liste_meeple(&liste, maillon1);
-    ajouter_liste_meeple(&liste, maillon2);
+    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
+    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
+    ajouter_maillon_meeple(&liste, maillon1);
+    ajouter_maillon_meeple(&liste, maillon2);
 
     // retrait de meeple non present
-    retirer_liste_meeple(&liste, 0, 0);
+    retirer_maillon_meeple(&liste, 0, 0);
     if (liste != maillon2) return false;
     if (liste->next != maillon1) return false;
 
     // retrait de meeple en milieu de chaine
-    retirer_liste_meeple(&liste, 2, 2);
+    retirer_maillon_meeple(&liste, 2, 2);
     if (liste != maillon1) return false;
     if (liste->next != NULL) return false;
 
     // retrait de meeple en fin de chaine
-    L_meeple maillon3 = creer_liste_meeple(3, 3, D_NORD);
-    ajouter_liste_meeple(&liste, maillon3);
+    L_meeple maillon3 = creer_maillon_meeple(3, 3, D_NORD);
+    ajouter_maillon_meeple(&liste, maillon3);
 
-    retirer_liste_meeple(&liste, 1, 1);
+    retirer_maillon_meeple(&liste, 1, 1);
     if (liste != maillon3) return false;
     if (liste->next != NULL) return false;
 
     // retrait de tous les meeple
-    retirer_liste_meeple(&liste, 3, 3);
+    retirer_maillon_meeple(&liste, 3, 3);
     if (liste != NULL) return false;
 
     return true;
