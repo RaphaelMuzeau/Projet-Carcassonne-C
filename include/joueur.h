@@ -4,6 +4,7 @@
 #include "meeple.h"
 
 typedef struct _Joueur {
+    char *nom;
     int id;
     int pts;
     int nb_meeple_restant;

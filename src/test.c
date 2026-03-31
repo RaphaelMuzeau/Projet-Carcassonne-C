@@ -542,6 +542,7 @@ bool test_joueur_creer(void)
 {
     Joueur joueur = creer_joueur(2, 5);
 
+    if (joueur.nom != NULL) return false;
     if (joueur.id != 2)  return false;
     if (joueur.pts != 0) return false;
     if (joueur.nb_meeple_restant != 5) return false;
