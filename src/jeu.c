@@ -19,15 +19,15 @@ bool attribution_point(Jeu *jeu, L_meeple loc_meeple_all, int *nb_meeples, int p
     if (pts == -1)
         return false;
 
-    int maxi = maximal(nb_meeples, jeu->listejoueurs.nb_joueur);
+    int maxi = maximal(nb_meeples, jeu->joueurs.nb_joueurs);
 
-    for (int i = 0; i < jeu->listejoueurs.nb_joueur; i++)
+    for (int i = 0; i < jeu->joueurs.nb_joueurs; i++)
         if (nb_meeples[i] == maxi)
-            jeu->listejoueurs.tableau[i].pts += pts;
+            jeu->joueurs.tableau[i].pts += pts;
 
     L_meeple tmp = loc_meeple_all;
     while (tmp != NULL) {
-        retirer_meeple(jeu->grille, jeu->listejoueurs, tmp->x,tmp->y);
+        retirer_meeple(jeu->grille, jeu->joueurs, tmp->x,tmp->y);
         tmp = tmp->next;
     }
 
@@ -40,7 +40,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         return false;
 
     // preparation des arguments pour la recherche
-    int *nb_meeples = ca_alloc(jeu->listejoueurs.nb_joueur, sizeof(int));
+    int *nb_meeples = ca_alloc(jeu->joueurs.nb_joueurs, sizeof(int));
     L_meeple loc_meeple_all = NULL;
 
     enum Zone zone = Z_PRE;
@@ -54,7 +54,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         recherche_is_verified(jeu->grille, x, y);
 
         // si d'autres meeple ont été trouvés, annuler le placement et renvoyer faux
-        for (int i = 0; i < jeu->listejoueurs.nb_joueur; i++) {
+        for (int i = 0; i < jeu->joueurs.nb_joueurs; i++) {
             if (nb_meeples[i] != 0) {
                 set((&jeu->grille), NULL, x, y);
                 free(nb_meeples);
@@ -64,7 +64,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         }
 
         // sinon, on peut retroactivement ajouter le meeple et attribuer les points
-        placer_meeple(jeu->grille, &jeu->listejoueurs.tableau[id_meeple], x , y , position_meeple);
+        placer_meeple(jeu->grille, &jeu->joueurs.tableau[id_meeple], x , y , position_meeple);
         nb_meeples[id_meeple] += 1;
 
         attribution_point(jeu, loc_meeple_all, nb_meeples, pts);
@@ -76,7 +76,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
             continue; // on a deja fait cette recherche
 
         // on réinitialise les listes utilisées par recherche()
-        for (int i = 0; i < jeu->listejoueurs.nb_joueur; i++) {
+        for (int i = 0; i < jeu->joueurs.nb_joueurs; i++) {
             nb_meeples[i] = 0;
             detruire_liste_meeple(loc_meeple_all);
             loc_meeple_all = NULL;

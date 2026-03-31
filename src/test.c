@@ -9,7 +9,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
-#include "libca.h"
 #include "grille.h"
 #include "pile.h"
 #include "tuile.h"
@@ -552,6 +551,24 @@ bool test_joueur_creer(void)
     return true;
 }
 
+bool test_listejoueurs_creer(void)
+{
+    ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
+
+    if (joueurs.nb_joueurs != 3) return false;
+    if (joueurs.tableau == NULL) return false;
+
+    if (joueurs.tableau[0].id != 0) return false;
+    if (joueurs.tableau[1].id != 1) return false;
+    if (joueurs.tableau[2].id != 2) return false;
+    if (joueurs.tableau[0].nb_meeple_restant != 5) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 5) return false;
+    if (joueurs.tableau[2].nb_meeple_restant != 5) return false;
+
+    detruire_listejoueurs(joueurs);
+    return true;
+}
+
 bool test_liste_meeple_creer(void)
 {
     L_meeple liste = creer_maillon_meeple(1, 5, D_EST);
@@ -759,13 +776,7 @@ bool test_grille_placer_meeple(void)
 bool test_grille_retirer_meeple(void)
 {
     Vec2D grille = creer_vec2D();
-
-    // TODO utiliser une fonction tierce pour initialiser cette liste
-    ListeJoueurs joueurs = { 0 };
-    joueurs.nb_joueur  = 2;
-    joueurs.tableau    = ca_alloc(2, sizeof(Joueur));
-    joueurs.tableau[0] = creer_joueur(0, 2);
-    joueurs.tableau[1] = creer_joueur(1, 2);
+    ListeJoueurs joueurs = creer_listejoueurs(2, 2);
 
     // retrait sur tuile vide
     retirer_meeple(grille, joueurs, 0, 0);
@@ -782,7 +793,7 @@ bool test_grille_retirer_meeple(void)
     if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
     if (t1->id_meeple != -1) return false;
 
-    free(joueurs.tableau);
+    detruire_listejoueurs(joueurs);
     detruire_vec2D(grille);
     return true;
 }
@@ -812,6 +823,7 @@ Test unit_tests[] = {
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
     TEST(test_joueur_creer),
+    TEST(test_listejoueurs_creer),
     TEST(test_liste_meeple_creer),
     TEST(test_liste_meeple_ajouter),
     TEST(test_liste_meeple_retirer),

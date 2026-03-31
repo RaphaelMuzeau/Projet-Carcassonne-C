@@ -7,7 +7,7 @@
 #include "tuile.h"
 
 typedef struct _Jeu {
-    ListeJoueurs listejoueurs;
+    ListeJoueurs joueurs;
     Pile pile;
     Vec2D grille;
 } Jeu;
