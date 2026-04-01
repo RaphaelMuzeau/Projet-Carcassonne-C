@@ -34,46 +34,57 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
 
 /* recherche */
 
-int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d)
+int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
 {
     // TODO NOUVELLE IMPLEMENTATION AJOUT LOC_MEEPLE_ALL liste chainé de loc de meeple indexé par id joueur
     Tuile t = get(grille, x, y);
-    int pts = 1;
+    int pts = 0;
     int tmp = 0;
-
-    if (t == NULL)
-        return -1;
-
-    if (t->is_verified)
-        return 0;
+    if (!fin) {
+        if (t == NULL) // Lors de la recherche classique si on tombe sur une tuile vide on renvoie -1 ce qui équivaut a une zone non fini
+            return -1;
+    }
+    else {
+        if( t == NULL) // Lors de la recherche de fin si on tombe sur une tuile vide on donne renvoie tout les pts
+            return pts;
+    }
+    if (t->is_verified) // a chaque etape de la recherche chaque case parcouru est marqué is_verified == 1 dans pour ne pas ensuite
+        return 0;       // retomber sur la case si is_verified est a 1 on renvoie 0 pour ne pas effectuer la recherche sur cette case.
     t->is_verified = true;
 
-    if(z == Z_VILLE)
-        pts+=1;
-    if(z == Z_BLASON)
-        pts+=3;
+    if (zone_tuile(t,d) == Z_VILLE) // Si ma zone z recherché est une blason il faut vérifier
+        pts += 2;                   // a la main si une partie de ma case est une ville
+                                    // car blason et ville sont compatible donc compatibilité tuile ne crash psa
 
+    else if (zone_tuile(t,d) == Z_BLASON) // Si ma zone z recherché est une ville il faut vérifier
+        pts += 4;                         // a la main si une partie de ma case est un blason
+                                          // car blason et ville sont compatible donc compatibilité tuile ne crash pas
+    else pts += 1;
     if (t->id_meeple != -1 && zone_tuile(t, d) == z)
         nb_meeples[t->id_meeple] += 1; // ajoute a la liste du nb de meeple indexé par joueur
 
-    if (zone_tuile(t, D_MILIEU) == z) {
-
-        if (t->id_meeple != -1 && t->position_meeple == D_MILIEU)
-            nb_meeples[t->id_meeple] += 1;
+    if (zone_tuile(t, D_MILIEU) == z) { // si le milieu de notre tuile correspond a a notre zone cherché on continue la recherche
+                                        // sur les côtés de la tuile ou la zone est la même que celle cherchée
+        if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) // on compte chaque meeple de chaque joueur avec une liste
+            nb_meeples[t->id_meeple] += 1;                        // la liste est indexé par l'id du joueur (id_meeple)
         // FIN CHECK MILIEU
 
-        if (zone_tuile(t, D_NORD) == z && d != D_NORD) {
+        if (zone_tuile(t, D_NORD) == z && d != D_NORD) { // on continue la recherche sur les 4 cotés ici nord
 
             if (t->id_meeple != -1 && t->position_meeple == D_NORD)
                 nb_meeples[t->id_meeple] += 1;
 
             Tuile t2 = get(grille, x, y - 1);
-            if (!compatibilite_tuile(t, t2, D_NORD))
-                return -1;
-            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y - 1 , z, D_SUD);
-            if (tmp == -1)
-                return -1;
-            pts += tmp;
+            if (!fin) {                                 // si notre booléen fin est a 0, cela veut dire que nous effectuons
+                if (!compatibilite_tuile(t, t2, D_NORD))// une recherche classique et donc que si notre compatibilité tuile
+                    return -1;                          // ne fonctionne pas on ne sera pas apte a accorder les pts donc return -1
+            }
+            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y - 1 , z, D_SUD, fin); // on effectue la recherche récursive
+            if (!fin) {  // si notre booléen fin est a 0 et que notre recherche nous renvoie -1     // sur la case au nord
+                if (tmp == -1)
+                    return -1; // cela veut dire que notre ville / route est incomplète
+            }
+            pts += tmp; // et dans le cas ou c'est correct on ajoute nos pts a pts et on renvoie les pts a la fin du programme
         } // FIN CHECK NORD
 
         if (zone_tuile(t, D_SUD) == z && d != D_SUD) {
@@ -82,11 +93,15 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
                 nb_meeples[t->id_meeple] += 1;
 
             Tuile t2 = get(grille, x, y + 1);
-            if (!compatibilite_tuile(t, t2, D_SUD))
-                return -1;
-            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y + 1, z, D_NORD);
-            if (tmp == -1)
-                return -1;
+            if (!fin) {                                                 // idem au sud
+                if (!compatibilite_tuile(t, t2, D_NORD))
+                    return -1;
+            }
+            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y + 1, z, D_NORD, fin);
+            if (!fin) {
+                if (tmp == -1)
+                    return -1;
+            }
             pts += tmp;
         } // FIN CHECK SUD
 
@@ -96,11 +111,15 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
                 nb_meeples[t->id_meeple] += 1;
 
             Tuile t2 = get(grille, x + 1, y);
-            if (!compatibilite_tuile(t, t2, D_EST))
-                return -1;
-            tmp = recherche(grille, nb_meeples,loc_meeple_all, x + 1, y, z, D_OUEST);
-            if (tmp == -1)
-                return -1;
+            if (!fin) {                                                 // idem a l'est
+                if (!compatibilite_tuile(t, t2, D_NORD))
+                    return -1;
+            }
+            tmp = recherche(grille, nb_meeples,loc_meeple_all, x + 1, y, z, D_OUEST, fin);
+            if (!fin) {
+                if (tmp == -1)
+                    return -1;
+            }
             pts += tmp;
         } // FIN CHECK EST
 
@@ -110,15 +129,20 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
                 nb_meeples[t->id_meeple] += 1;
 
             Tuile t2 = get(grille, x - 1, y);
-            if (!compatibilite_tuile(t, t2, D_OUEST))
-                return -1;
-            tmp += recherche(grille, nb_meeples, loc_meeple_all, x - 1, y, z, D_EST);
-            if (tmp == -1)
-                return -1;
+            if (!fin) {                                                 // idem a l'ouest
+                if (!compatibilite_tuile(t, t2, D_NORD))
+                    return -1;
+            }
+            tmp += recherche(grille, nb_meeples, loc_meeple_all, x - 1, y, z, D_EST, fin);
+            if (!fin) {
+                if (tmp == -1)
+                    return -1;
+            }
             pts += tmp;
         } // FIN CHECK OUEST
     }
-    return pts;
+    return pts; // a la fin de notre recherche on renvoie les pts totaux (-1 si notre ville ou route est imcomplète)
+                // dans le cas de la recherche classique / dans la recherche de fin on donnera tout les points qu'on a trouvé
 }
 
 void recherche_is_verified(Vec2D grille, int x, int y)

@@ -12,6 +12,6 @@ typedef struct _Jeu {
     Vec2D grille;
 } Jeu;
 
-bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple);
+bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple, bool fin);
 
 #endif

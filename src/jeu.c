@@ -75,7 +75,7 @@ bool verification_abbaye(Jeu *jeu, int x, int y){
     }
     return false;
 }
-bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple)
+bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple, bool fin)
 {
     if (!placer_tuile(&jeu->grille, x, y, tuile))
         return false;
@@ -91,7 +91,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
     if (id_meeple != -1) {
         // on lance la recherche à partir de la zone où sera placé le meeple
         zone = zone_tuile(tuile, position_meeple);
-        pts = recherche(jeu->grille, nb_meeples, &loc_meeple_all, x, y, zone, position_meeple);
+        pts = recherche(jeu->grille, nb_meeples, &loc_meeple_all, x, y, zone, position_meeple, fin);
         recherche_is_verified(jeu->grille, x, y);
 
         // si d'autres meeple ont été trouvés, annuler le placement et renvoyer faux
@@ -123,7 +123,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
             loc_meeple_all = NULL;
         }
 
-        pts = recherche(jeu->grille, nb_meeples, &loc_meeple_all, x, y, zone_tuile(tuile, d), d);
+        pts = recherche(jeu->grille, nb_meeples, &loc_meeple_all, x, y, zone_tuile(tuile, d), d, fin);
         recherche_is_verified(jeu->grille, x, y);
         attribution_point(jeu, loc_meeple_all, nb_meeples, pts);
     }
