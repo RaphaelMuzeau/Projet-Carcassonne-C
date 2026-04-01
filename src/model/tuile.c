@@ -89,7 +89,11 @@ Tuile generer_tuile(void)
         t->nord = generer_cote(rand()%67);
         t->ouest = generer_cote(rand()%67);
     }
-
+    /*
+     * Si une route ou une ville apparaît au milieu, c'est qu'elle
+     * fait le lien entre deux zones, donc au moins deux autres
+     * villes ou routes doivent être présentes sur la tuile
+     */
     if (t->milieu == Z_ROUTE || t->milieu == Z_VILLE) {
         int cmpt = 0;
         do {
