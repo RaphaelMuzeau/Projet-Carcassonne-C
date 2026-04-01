@@ -51,11 +51,26 @@ bool lire_zone(enum Zone *z, FILE *f)
     return true;
 }
 
+int compter_lignes(FILE *f)
+{
+    if (f == NULL) return 0;
+
+    int valeur;
+    int nb_lignes = 0;
+
+    while ((valeur = fgetc(f)) != EOF) {
+        if (valeur == '\n')
+            nb_lignes++;
+    }
+
+    return nb_lignes;
+}
+
 Pile lire_tuiles_csv(char* nom_fichier)
 {
     FILE *fichier = fopen(nom_fichier, "r");
     int max_element = compter_lignes(fichier);
-    Pile p = creer_pile(max_element);
+    Pile p = creer_pile(max_element, false);
     if (fichier == NULL) return p;
 
     Tuile t;
@@ -81,21 +96,7 @@ fichier_invalide:
     fclose(fichier);
     free(t);
     detruire_pile(&p);
-    p = creer_pile(0);
+    p = creer_pile(0, false);
     return p;
 }
 
-int compter_lignes(FILE *f)
-{
-    if (f == NULL) return 0;
-
-    int valeur;
-    int nb_lignes = 0;
-
-    while ((valeur = fgetc(f)) != EOF) {
-        if (valeur == '\n')
-            nb_lignes++;
-    }
-
-    return nb_lignes;
-}

@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <limits.h>
+#include <time.h>
 #include "grille.h"
 #include "pile.h"
 #include "tuile.h"
@@ -103,13 +104,66 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
+bool test_tuile_generer(void)
+{
+    srand(time(NULL));
+
+    for (int i = 0; i < 10; i++) {
+        Tuile tmp = generer_tuile();
+
+        if (tmp->est == Z_VILLAGE)   return false;
+        if (tmp->sud == Z_VILLAGE)   return false;
+        if (tmp->nord == Z_VILLAGE)  return false;
+        if (tmp->ouest == Z_VILLAGE) return false;
+
+        if (tmp->est == Z_ABBAYE)    return false;
+        if (tmp->sud == Z_ABBAYE)    return false;
+        if (tmp->nord == Z_ABBAYE)   return false;
+        if (tmp->ouest == Z_ABBAYE)  return false;
+
+        if (tmp->milieu == Z_PRE) {
+            if (tmp->est == Z_ROUTE)   return false;
+            if (tmp->sud == Z_ROUTE)   return false;
+            if (tmp->nord == Z_ROUTE)  return false;
+            if (tmp->ouest == Z_ROUTE) return false;
+        }
+
+        if (tmp->milieu == Z_ROUTE || tmp->milieu == Z_VILLE) {
+            int cmpt = 0;
+            if (tmp->est == tmp->milieu) cmpt++;
+            if (tmp->sud == tmp->milieu) cmpt++;
+            if (tmp->nord == tmp->milieu) cmpt++;
+            if (tmp->ouest == tmp->milieu) cmpt++;
+
+            if(cmpt < 2) return false;
+        }
+        free(tmp);
+    }
+    return true;
+}
+
 bool test_pile_creer(void)
 {
-    Pile p = creer_pile(10);
+    Pile p = creer_pile(10, false);
 
-    if (!pile_vide(p)) return false;
+    if (!pile_vide(p))          return false;
     if (p.nb_element_max != 10) return false;
-    if (p.nb_element != 0) return false;
+    if (p.nb_element != 0)      return false;
+    if (p.gen_aleatoire)        return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_pile_creer_aleatoire(void)
+{
+    Pile p = creer_pile(10, true);
+
+    if(!pile_pleine(p))          return false;
+    if (p.nb_element != 10)      return false;
+    if (p.nb_element_max != 10)  return false;
+    if (!p.gen_aleatoire)        return false;
+    if (p.tab != NULL)           return false;
 
     detruire_pile(&p);
     return true;
@@ -117,7 +171,7 @@ bool test_pile_creer(void)
 
 bool test_pile_inserer_tuile(void)
 {
-    Pile p = creer_pile(10);
+    Pile p = creer_pile(10, false);
     Tuile t = NULL;
 
     for (int i = 0; i < p.nb_element_max ; i++) {
@@ -133,9 +187,9 @@ bool test_pile_inserer_tuile(void)
     return true;
 }
 
-bool test_pile_recuperer_tuile(void)
+bool test_pile_recuperer_tuile_non_aleatoire(void)
 {
-    Pile p = creer_pile(5);
+    Pile p = creer_pile(5, false);
     Tuile t = creer_tuile();
 
     inserer_tuile(&p, t);
@@ -144,6 +198,27 @@ bool test_pile_recuperer_tuile(void)
     if (recup_tuile(&p) != NULL) return false;
 
     free(t);
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_pile_recuperer_tuile_aleatoire(void)
+{
+    int i = 10;
+    Pile p = creer_pile(10, true);
+
+    if (p.nb_element_max != i) return false;
+    if (!p.gen_aleatoire)      return false;
+    if (p.nb_element != i)     return false;
+
+    while (i != 0) {
+        Tuile t = recup_tuile(&p);
+        free(t);
+        i--;
+        if (p.nb_element != i) return false;
+    }
+
+    if (p.nb_element != 0) return false;
     detruire_pile(&p);
     return true;
 }
@@ -564,8 +639,7 @@ bool test_csv_lecture_zone(void)
 bool test_csv_lecture_fichier(void)
 {
     int i;
-    Pile p;
-    p = lire_tuiles_csv("data/test/1_test.csv");
+    Pile p = lire_tuiles_csv("data/test/1_test.csv");
 
     if (p.nb_element < p.nb_element_max) return false;
 
@@ -644,9 +718,12 @@ Test unit_tests[] = {
     TEST(test_tuile_creer),
     TEST(test_tuile_pivot90),
     TEST(test_tuile_compatibilite),
+    TEST(test_tuile_generer),
     TEST(test_pile_creer),
+    TEST(test_pile_creer_aleatoire),
     TEST(test_pile_inserer_tuile),
-    TEST(test_pile_recuperer_tuile),
+    TEST(test_pile_recuperer_tuile_non_aleatoire),
+    TEST(test_pile_recuperer_tuile_aleatoire),
     TEST(test_vec_creer),
     TEST(test_vec_get_null),
     TEST(test_vec_set_get),

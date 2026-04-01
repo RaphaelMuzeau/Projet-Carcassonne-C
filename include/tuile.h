@@ -31,5 +31,7 @@ Tuile creer_tuile(void);
 /* pivot à droite */
 void pivot_90(Tuile piece);
 bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d);
-
+enum Zone generer_milieu(void);
+enum Zone generer_cote(int aleatoire);
+Tuile generer_tuile(void);
 #endif
