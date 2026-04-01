@@ -67,3 +67,10 @@ void ajouter_chaine(VarString *chaine, char *restrict autre)
     strcpy(&chaine->texte[chaine->len], autre);
     chaine->len = new_len;
 }
+
+char *dupliquer_chaine(VarString *chaine)
+{
+    char *dup = ca_alloc(chaine->len, sizeof(char));
+    memcpy(dup, chaine->texte, chaine->len);
+    return dup;
+}
