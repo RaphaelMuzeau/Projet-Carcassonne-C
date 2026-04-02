@@ -11,6 +11,7 @@ typedef struct _ScrollBar {
     Camera2D vue; // espace que la barre est responsable de scroller
     Bouton bouton;
     bool est_tire; // l'utilisateur tire-t-il le bouton ?
+    float offset_tire; // la position du curseur dans le bouton
 } ScrollBar;
 
 // requiere le contexte OpenGL.

@@ -24,29 +24,31 @@ void update_scrollbar(ScrollBar *barre, Rectangle ecran, float hauteur_espace)
         barre->vue.target.y -= GetMouseWheelMoveV().y * 50.0f;
 
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-        if (CheckCollisionPointRec(GetMousePosition(), barre->bouton.champ))
+        if (CheckCollisionPointRec(GetMousePosition(), barre->bouton.champ) && !barre->est_tire) {
             barre->est_tire = true;
-    } else {
+            barre->offset_tire = GetMouseY() - barre->bouton.champ.y;
+        }
+    } else
         barre->est_tire = false;
-    }
+
 
     if (barre->est_tire)
-        barre->vue.target.y = (GetMouseY() - barre->bouton.champ.height/2) * (hauteur_espace / ecran.height);
+        barre->vue.target.y += (GetMouseY() - barre->bouton.champ.y - barre->offset_tire) * (hauteur_espace / ecran.height);
 
     // garde la camera entre le debut et la fin de la page sans depasser
     if (hauteur_espace < ecran.height)
-        barre->vue.target.y = ecran.x; // Clamp privilegie la borne superieure
+        barre->vue.target.y = 0; // Clamp privilegie la borne superieure
     else
-        barre->vue.target.y = Clamp(barre->vue.target.y, ecran.x, hauteur_espace - ecran.height);
+        barre->vue.target.y = Clamp(barre->vue.target.y, 0, hauteur_espace - ecran.height);
 
     // adapte la hauteur du bouton à la hauteur scrollable
     barre->bouton.champ.height = ecran.height * (ecran.height / hauteur_espace);
 
     // place le bouton au niveau actuel dans la page proportionellement à l'ecran
-    barre->bouton.champ.y = ecran.height * (barre->vue.target.y / hauteur_espace);
+    barre->bouton.champ.y = ecran.y + ecran.height * (barre->vue.target.y / hauteur_espace);
 
     // replace la barre à droite
-    barre->bouton.champ.x = ecran.width - barre->bouton.champ.width;
+    barre->bouton.champ.x = ecran.x + ecran.width - barre->bouton.champ.width;
 
     update_bouton(&barre->bouton); // cliquer ne fait rien
 }
