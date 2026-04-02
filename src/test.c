@@ -17,6 +17,7 @@
 #include "csv.h"
 #include "meeple.h"
 #include "joueur.h"
+#include "fichier.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -799,6 +800,98 @@ bool test_grille_retirer_meeple(void)
     return true;
 }
 
+bool test_fichier_sauvegarder_grille(void)
+{
+    Vec2D grille = creer_vec2D();
+
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
+            Tuile tmp = creer_tuile();
+            set(&grille, tmp, i, j);
+        }
+    }
+
+    FILE *f = fopen("data/test/fichier_test_grille.bin", "w");
+    sauvegarder_grille(&grille, f);
+
+
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
+            Tuile tmp = get(grille, i, j);
+            // si la tuile n'est pas marqué comme vérifié, l'écriture a échouée.
+            if (tmp->is_verified != 1)
+                return false;
+        }
+    }
+
+    fclose(f);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_fichier_charger_grille(void)
+{
+    FILE *f = fopen("data/test/fichier_test_grille.bin", "r");
+    Vec2D grille = charger_grille(f);
+
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
+            Tuile tmp = get(grille, i, j);
+            if (tmp->sud != Z_PRE) return false;
+            if (tmp->nord != Z_PRE) return false;
+            if (tmp->milieu != Z_PRE) return false;
+            if (tmp->est != Z_PRE) return false;
+            if (tmp->ouest != Z_PRE) return false;
+        }
+    }
+
+    fclose(f);
+    detruire_vec2D(grille);
+
+    remove("data/test/fichier_test_grille.bin");
+    return true;
+}
+
+bool test_fichier_sauvegarder_charger_pile(void)
+{
+    // sauvegarder
+    int nb_tuiles = 56;
+
+    Pile p = creer_pile(nb_tuiles);
+
+    for (int i = 0; i < p.nb_element_max; i++) {
+        Tuile tmp = creer_tuile();
+        if (!inserer_tuile(&p, tmp)) return false;
+    }
+
+    FILE *f = fopen("data/test/fichier_test_pile.bin", "w");
+
+    sauvegarder_pile(p, f);
+
+    fclose(f);
+    detruire_pile(&p);
+
+    // charger
+    FILE *f_read = fopen("data/test/fichier_test_pile.bin", "r");
+    Pile p2 = charger_pile(f_read);
+
+    if (p2.nb_element_max != nb_tuiles || p2.nb_element != nb_tuiles) {
+        return false;
+    }
+
+    for (int i = 0; i < nb_tuiles; i++) {
+        if (p2.tab[i]->sud != Z_PRE) return false;
+        if (p2.tab[i]->milieu != Z_PRE) return false;
+        if (p2.tab[i]->nord != Z_PRE) return false;
+        if (p2.tab[i]->est != Z_PRE) return false;
+        if (p2.tab[i]->ouest != Z_PRE) return false;
+    }
+
+    fclose(f_read);
+    detruire_pile(&p2);
+    remove("data/test/fichier_test_pile.bin");
+    return true;
+}
 
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
@@ -832,6 +925,9 @@ Test unit_tests[] = {
     TEST(test_grille_placer_tuile),
     TEST(test_grille_placer_meeple),
     TEST(test_grille_retirer_meeple),
+    TEST(test_fichier_sauvegarder_grille),
+    TEST(test_fichier_charger_grille),
+    TEST(test_fichier_sauvegarder_charger_pile),
 };
 
 // ===========================
