@@ -47,34 +47,7 @@ bool attribution_point(Jeu *jeu, L_meeple loc_meeple_all, int *nb_meeples, int p
 
     return true;
 }
-bool recherche_abbaye(Jeu *jeu, int x, int y){
-    int pts = 1;
-    Tuile t = get(jeu->grille,x,y);
-    int id_joueur = t->id_meeple;
-    for(int i = -1; i < 2; i++){
-        for (int j = -1; j < 2; j++){
-            t = get(jeu->grille,x+i,y+j);
-            pts +=1;
-            if (t == NULL) return false;
-        }
-    }
-    jeu->joueurs.tableau[id_joueur].pts += pts;
-    return true;
 
-}
-bool verification_abbaye(Jeu *jeu, int x, int y){
-    for(int i = -1; i < 2; i++){
-        for (int j = -1; j < 2; j++){
-            Tuile t = get(jeu->grille,x+i,y+j);
-            if (t->milieu == Z_ABBAYE) {
-                recherche_abbaye(jeu, x+i,y+j);
-                return true;
-
-            }
-        }
-    }
-    return false;
-}
 bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple, bool fin)
 {
     if (!placer_tuile(&jeu->grille, x, y, tuile))
@@ -127,8 +100,9 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         recherche_is_verified(jeu->grille, x, y);
         attribution_point(jeu, loc_meeple_all, nb_meeples, pts);
     }
+
     // ici recherche abbaye
-    verification_abbaye(jeu, x, y);
+    verification_abbaye(jeu->grille, jeu->joueurs, x, y);
     free(nb_meeples);
     detruire_liste_meeple(loc_meeple_all);
     return true;
