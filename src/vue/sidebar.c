@@ -83,7 +83,7 @@ void detruire_cartejoueur(CarteJoueur carte)
     free(carte.texte_pts.contenu);
 }
 
-void update_cartejoueur(CarteJoueur *carte)
+void rafraichir_cartejoueur(CarteJoueur *carte)
 {
     snprintf(carte->texte_meeple.contenu, 16, "meeple : %d", carte->joueur->nb_meeple_restant);
     snprintf(carte->texte_pts.contenu, 16, "points : %d", carte->joueur->pts);
@@ -91,6 +91,7 @@ void update_cartejoueur(CarteJoueur *carte)
 
 void dessiner_cartejoueur(CarteJoueur carte, bool tour)
 {
+    DrawRectangleRounded(carte.champ, 0.30f, 1, RAYWHITE);
     DrawRectangleRoundedLinesEx(carte.champ, 0.30f, 1, 4, tour ? carte.couleur : BLACK);
     DrawLineEx((Vector2) {carte.champ.x, carte.champ.y + 30},
                (Vector2) {carte.champ.x + carte.champ.width, carte.champ.y + 30},
@@ -98,4 +99,65 @@ void dessiner_cartejoueur(CarteJoueur carte, bool tour)
     dessiner_texte(carte.texte_nom);
     dessiner_texte(carte.texte_pts);
     dessiner_texte(carte.texte_meeple);
+}
+
+/* BarreJoueur */
+
+BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs, Rectangle ecran)
+{
+    BarreJoueurs barre = { 0 };
+    barre.joueurs = joueurs;
+
+    Camera2D vue = { 0 };
+    vue.zoom = 1.0f;
+    barre.scrollbar = creer_scrollbar(vue);
+
+    float y = ecran.y + 10.0f;
+    barre.cartes = ca_alloc(joueurs.nb_joueurs, sizeof(CarteJoueur));
+    for (int i = 0; i < joueurs.nb_joueurs; i++) {
+        barre.cartes[i] = creer_cartejoueur(0, y, &barre.joueurs.tableau[i], RED);
+        y += CARTEJOUEUR_HEIGHT + 20.0f;
+    }
+    barre.fin_liste = y - CARTEJOUEUR_HEIGHT;
+
+    return barre;
+}
+
+void detruire_barrejoueurs(BarreJoueurs barre)
+{
+    for (int i = 0; i < barre.joueurs.nb_joueurs; i++) {
+        detruire_cartejoueur(barre.cartes[i]);
+        free(barre.cartes[i].joueur->nom);
+    }
+    free(barre.cartes);
+}
+
+void dessiner_barrejoueurs(BarreJoueurs barre, Rectangle ecran, int id_tour)
+{
+    DrawRectangleRec(ecran, LIGHTGRAY);
+    BeginMode2D(barre.scrollbar.vue);
+        for (int i = 0; i < barre.joueurs.nb_joueurs; i++)
+            dessiner_cartejoueur(barre.cartes[i], i == id_tour);
+    EndMode2D();
+    dessiner_scrollbar(barre.scrollbar, ecran);
+}
+
+void update_barrejoueurs(BarreJoueurs *barre, Rectangle ecran)
+{
+    update_scrollbar(&barre->scrollbar, ecran, barre->fin_liste);
+
+    for (int i = 0; i < barre->joueurs.nb_joueurs; i++) {
+        float dec = (ecran.x + (ecran.width - SCROLL_DEFAULT_WIDTH)/2) - CARTEJOUEUR_WIDTH/2 - barre->cartes[i].champ.x;
+        barre->cartes[i].champ.x += dec;
+        barre->cartes[i].texte_nom.position.x += dec;
+        barre->cartes[i].texte_pts.position.x += dec;
+        barre->cartes[i].texte_meeple.position.x += dec;
+    }
+}
+
+// met à jour le compteur de points et de meeple de chaque joueur
+void rafraichir_barrejoueurs(BarreJoueurs *barre)
+{
+    for (int i = 0; i < barre->joueurs.nb_joueurs; i++)
+        rafraichir_cartejoueur(&barre->cartes[i]);
 }

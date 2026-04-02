@@ -17,7 +17,6 @@ enum Page page_charger(void)
     Camera2D vue = { 0 };
     vue.zoom = 1.0f;
 
-
     // Elements de la page
     ScrollBar scrollbar = creer_scrollbar(vue);
 
