@@ -15,7 +15,6 @@ Joueur creer_joueur(int id, int nb_meeple)
 
 void detruire_joueur(Joueur joueur)
 {
-    free(joueur.nom);
     detruire_liste_meeple(joueur.localisation_meeples);
 }
 

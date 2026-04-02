@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdbool.h>
+#include "libca.h"
 #include "fichier.h"
+#include "joueur.h"
+#include "meeple.h"
 #include "tuile.h"
 #include "vec.h"
 #include "pile.h"
-#include "meeple.h"
-#include "libca.h"
 
 // TODO: Décider d'une version de format à écrire en haut du fichier.
 
@@ -105,69 +107,107 @@ erreur_pile:
     exit(EXIT_FAILURE);
 }
 
-void sauvegarder_joueur(Joueur *tab_joueurs, int nb_joueurs, FILE *f)
+void sauvegarder_liste_joueurs(ListeJoueurs tab, FILE *f)
 {
+    fwrite(&tab.nb_joueurs, sizeof(int), 1, f);
+    for (int i = 0; i < tab.nb_joueurs; i++) {
+        sauvegarder_joueur(tab.tableau[i], f);
+    }
+}
 
-    fwrite(&nb_joueurs, sizeof(int), 1, f);
+ListeJoueurs charger_liste_joueurs(FILE *f)
+{
+    int nb_joueurs = 0;
+    if (fread(&nb_joueurs, sizeof(int), 1, f) != 1)
+        goto erreur_liste_joueurs;
 
-    for (int i = 0; i < nb_joueurs; i++) {
-        Joueur joueur_tmp = tab_joueurs[i];
-        joueur_tmp.localisation_meeples = NULL;
-        fwrite(&joueur_tmp, sizeof(Joueur), 1, f);
+    ListeJoueurs joueurs = creer_listejoueurs(nb_joueurs, 0);
+    joueurs.nb_joueurs = nb_joueurs;
+    joueurs.tableau = ca_alloc(nb_joueurs, sizeof(Joueur));
 
+    for (int i = 0; i < joueurs.nb_joueurs; i++)
+        joueurs.tableau[i] = charger_joueur(f);
 
-        /* Sauvegarde la position pour nb_mepple_pose et prépare de l'espace*/
-        fpos_t pos_meeple_pose;
-        fgetpos(f, &pos_meeple_pose);
-        fseek(f, sizeof(int), SEEK_CUR);
-        int nb_meeple_pose = 0;
+    return joueurs;
 
-        struct _Maillon tmp = *tab_joueurs[i].localisation_meeples;
+erreur_liste_joueurs:
+fprintf(stderr, "carcassonne: fichier invalide (liste_joueurs)\n");
+exit(EXIT_FAILURE);
+}
+
+void sauvegarder_joueur(Joueur joueur, FILE *f)
+{
+    Joueur joueur_tmp = joueur;
+    joueur_tmp.localisation_meeples = NULL;
+    joueur_tmp.nom= NULL;
+    fwrite(&joueur_tmp, sizeof(Joueur), 1, f);
+
+    size_t taille_nom = strlen(joueur.nom) + 1; // +1 pour le \0
+    fwrite(&taille_nom, sizeof(size_t), 1, f);
+    fwrite(joueur.nom, sizeof(char), taille_nom, f);
+
+    // Sauvegarde la position pour nb_meeple_pose et prépare de l'espace
+    fpos_t pos_meeple_pose = { 0 };
+    fgetpos(f, &pos_meeple_pose);
+    fseek(f, sizeof(int), SEEK_CUR);
+    int nb_meeple_pose = 0;
+
+    /*
+     * Se fait via des structures privés pour changer
+     * la variable tmp2 sans modifier tmp */
+    if (joueur.localisation_meeples != NULL) {
+        struct _Maillon tmp = *joueur.localisation_meeples;
         do {
             struct _Maillon tmp2 = tmp;
             tmp2.next = NULL;
             fwrite(&tmp2, sizeof(struct _Maillon), 1, f);
-            tmp = *tmp.next;
+            if (tmp.next != NULL)
+                tmp = *tmp.next;
             nb_meeple_pose++;
         } while (tmp.next != NULL);
         fwrite(&tmp, sizeof(struct _Maillon), 1, f);
         nb_meeple_pose++;
-
-        /* Écrit au bon endroit nb_meeple_pose et revient à la fin */
-        fsetpos(f, &pos_meeple_pose);
-        fwrite(&nb_meeple_pose, sizeof(int), 1, f);
-        fseek(f, 0, SEEK_END);
     }
+
+    // Écrit au bon endroit nb_meeple_pose et revient à la fin
+    fsetpos(f, &pos_meeple_pose);
+    fwrite(&nb_meeple_pose, sizeof(int), 1, f);
+    fseek(f, 0, SEEK_END);
 }
 
-Joueur *charger_joueur(FILE *f)
+Joueur charger_joueur(FILE *f)
 {
-
-    int nb_joueurs = 0;
-    if (fread(&nb_joueurs, sizeof(int), 1, f) != 1)
+    Joueur j;
+    if (fread(&j, sizeof(Joueur), 1, f) != 1)
         goto erreur_joueur;
 
-    Joueur *tab_joueurs = ca_alloc(nb_joueurs, sizeof(Joueur));
+    size_t taille_nom = 0;
+    if (fread(&taille_nom, sizeof(size_t), 1, f) != 1)
+        goto erreur_joueur;
 
-    for (int i = 0; i < nb_joueurs; i++) {
-        if (fread(&tab_joueurs[i], sizeof(Joueur), 1, f) != 1)
-            goto erreur_joueur;
+    j.nom = ca_alloc(taille_nom, sizeof(char));
+    size_t tmp = fread(j.nom, sizeof(char), taille_nom, f);
 
-        int nb_meeple_pose = 0;
-        if (fread(&nb_meeple_pose, sizeof(int), 1, f) != 1)
-            goto erreur_joueur;
+    if (tmp != taille_nom)
+        goto erreur_joueur;
+
+    int nb_meeple_pose = 0;
+    if (fread(&nb_meeple_pose, sizeof(int), 1, f) != 1)
+        goto erreur_joueur;
+
+    if (nb_meeple_pose) {
         int cmpt = 0;
         do {
-            L_meeple tmp = NULL;
+            L_meeple tmp = creer_maillon_meeple(0, 0, 0);
             if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
                 goto erreur_joueur;
-
-            ajout_meeple_chaine(&tab_joueurs[i], tmp);
+            ajouter_maillon_meeple(&j.localisation_meeples, tmp);
             cmpt++;
         } while (cmpt <nb_meeple_pose);
     }
+    return j;
 
 erreur_joueur:
-    fprintf(stderr, "carcassonne: fichier invalide (joueurs)\n");
+    fprintf(stderr, "carcassonne: fichier invalide (joueur)\n");
     exit(EXIT_FAILURE);
 }
