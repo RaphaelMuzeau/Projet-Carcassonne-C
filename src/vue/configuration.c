@@ -63,11 +63,10 @@ enum Page page_configuration(Jeu *jeu, bool custom)
             sscanf(champ_nb_meeple.saisie.texte, "%d", &nb_meeple);
             sscanf(champ_nb_tuiles.saisie.texte, "%d", &nb_tuiles);
 
-            detruire_jeu(*jeu);
-            *jeu = creer_jeu(nb_joueur, nb_meeple, nb_tuiles);
-
-            // on appelle une sous-page pour recuperer les noms de joueurs
-            if (champ_nb_joueur.saisie.len != 0) {
+            if (nb_joueur != 0 && nb_meeple != 0 && nb_tuiles != 0) {
+                detruire_jeu(*jeu);
+                *jeu = creer_jeu(nb_joueur, nb_meeple, nb_tuiles);
+                // on appelle une sous-page pour recuperer les noms de joueurs
                 prochaine_page = page_joueurs(jeu->joueurs);
 
                 // continue pour sauter le dessin de cette page
@@ -145,7 +144,6 @@ enum Page page_joueurs(ListeJoueurs joueurs)
         titres[i] = creer_texte(0, 100 + i*130, titre_i);
 
         champs[i] = creer_champsaisie(0, 130 + i*130, 400, 50, false);
-        ajouter_chaine(&champs[i].saisie, joueurs.tableau[i].nom);
 
         fin_champs = champs[i].champ.y + 70.0f;
     }
@@ -159,10 +157,10 @@ enum Page page_joueurs(ListeJoueurs joueurs)
             prochaine_page = P_QUITTER;
 
         if (update_bouton_camera(&retour, scrollbar.vue) || IsKeyPressed(KEY_ESCAPE)) {
-            // sauvegarder les donnees actuellement saisies
-            for (int i = 0; i < joueurs.nb_joueurs; i++) {
+            // on abandone la saisie, donc les noms actuellement chargés doivent etre liberés
+            for (int i = 0; i < joueurs.nb_joueurs && champs[i].saisie.len != 0; i++) {
                 free(joueurs.tableau[i].nom);
-                joueurs.tableau[i].nom = dupliquer_chaine(&champs[i].saisie);
+                joueurs.tableau[i].nom = NULL;
             }
             prochaine_page = P_CUSTOM;
         }

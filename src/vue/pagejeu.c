@@ -39,6 +39,7 @@ enum Page page_jeu(Jeu jeu)
         EndDrawing();
     }
 
+    detruire_barrejoueurs(barrejoueurs);
     detruire_jeu(jeu);
     return prochaine_page;
 }
