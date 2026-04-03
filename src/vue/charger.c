@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include "raylib.h"
 #include "fichier.h"
+#include "csv.h"
 #include "page.h"
 #include "scrollbar.h"
 #include "listeparties.h"
@@ -44,7 +44,10 @@ enum Page page_charger(Jeu *jeu)
         }
 
         if ((partie_selectionne = update_listeparties(parties, scrollbar.vue)) != NULL) {
-            if (charger_partie(jeu, partie_selectionne))
+            if (IsFileExtension(partie_selectionne, ".csv")) {
+                jeu->pile = lire_tuiles_csv(partie_selectionne);
+                prochaine_page = P_CONF_CSV;
+            } else if (charger_partie(jeu, partie_selectionne))
                 prochaine_page = P_JEU;
         }
 

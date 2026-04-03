@@ -14,15 +14,9 @@ ListeParties creer_listeparties(float y)
     parties.boutons  = ca_alloc(parties.fichiers.count, sizeof(Bouton));
 
     for (unsigned int i = 0; i < parties.fichiers.count; i++) {
-        // GetFileNameWithoutExt utilise une meme chaine statique ecrasé à chaque appel,
-        // on doit donc faire une copie avant de la mettre dans un bouton.
-        const char *nom = GetFileNameWithoutExt(parties.fichiers.paths[i]);
-        int ln = strlen(nom) + 1;
-        char *copy = ca_alloc(ln, sizeof(char));
-        memcpy(copy, nom, ln);
-
+        const char *nom = GetFileName(parties.fichiers.paths[i]);
         // creer un bouton par partie
-        parties.boutons[i] = creer_bouton_adapte(0, y, copy);
+        parties.boutons[i] = creer_bouton_adapte(0, y, (char *) nom);
         y += parties.boutons[i].champ.height + LISTEPARTIES_SPACING;
     }
     parties.fin_liste = y;
@@ -32,9 +26,6 @@ ListeParties creer_listeparties(float y)
 
 void detruire_listeparties(ListeParties parties)
 {
-    for (unsigned int i = 0; i < parties.fichiers.count; i++) {
-        free(parties.boutons[i].texte.contenu);
-    }
     free(parties.boutons);
     UnloadDirectoryFiles(parties.fichiers);
 }

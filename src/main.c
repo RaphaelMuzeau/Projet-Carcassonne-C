@@ -31,11 +31,14 @@ int main(void)
         case P_JEU:
             prochaine_page = page_jeu(&jeu);
             break;
-        case P_NORMAL:
-            prochaine_page = page_configuration(&jeu, false);
+        case P_CONF_NORMAL:
+            prochaine_page = page_configuration(&jeu, C_NORMAL);
             break;
-        case P_CUSTOM:
-            prochaine_page = page_configuration(&jeu, true);
+        case P_CONF_CUSTOM:
+            prochaine_page = page_configuration(&jeu, C_CUSTOM);
+            break;
+        case P_CONF_CSV:
+            prochaine_page = page_configuration(&jeu, C_CSV);
             break;
         case P_CHARGER:
             prochaine_page = page_charger(&jeu);
