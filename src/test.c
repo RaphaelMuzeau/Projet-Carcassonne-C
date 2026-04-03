@@ -17,6 +17,7 @@
 #include "csv.h"
 #include "meeple.h"
 #include "joueur.h"
+#include "jeu.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -798,7 +799,19 @@ bool test_grille_retirer_meeple(void)
     detruire_vec2D(grille);
     return true;
 }
-
+bool test_maximal(void)
+{
+    int nb_joueur = 3;
+    int nb_meeple[3];
+    nb_meeple[0] = 2;
+    nb_meeple[1] = 1;
+    nb_meeple[2] = 3;
+    if (maximal(nb_meeple, nb_joueur) != 3) return false;
+    nb_joueur = 1;
+    nb_meeple[0] = 1;
+    if (maximal(nb_meeple,nb_joueur) != 1) return false;
+    return true;
+}
 
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
@@ -832,6 +845,7 @@ Test unit_tests[] = {
     TEST(test_grille_placer_tuile),
     TEST(test_grille_placer_meeple),
     TEST(test_grille_retirer_meeple),
+    TEST(test_maximal),
 };
 
 // ===========================

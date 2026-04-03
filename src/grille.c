@@ -31,9 +31,26 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
     return true;
 }
 
+int recherche_suite(Vec2D grille, L_meeple loc_meeple_all, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
+{
+    int pts = 0;
+    if (zone_tuile(t, d_depart) & z && d_depart != d_arrive) {
+        if (t->id_meeple != -1 && t->position_meeple == d_depart) {
+            nb_meeples[t->id_meeple] += 1;
+            L_meeple maillon = creer_maillon_meeple(x, y, d_depart);
+            ajouter_maillon_meeple(&loc_meeple_all, maillon);
+        }
+        if (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y - 1, z, D_SUD, fin); // on effectue la recherche récursive
+        if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y + 1, z, D_NORD, fin);
+        if (d_depart == D_EST)   pts = recherche(grille, nb_meeples, loc_meeple_all, x + 1,     y, z, D_OUEST, fin);
+        if (d_depart == D_OUEST) pts = recherche(grille, nb_meeples, loc_meeple_all, x - 1,     y, z, D_EST, fin);
+    }
+    return pts;
+}
+
 /* recherche */
 
-int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
+int recherche(Vec2D grille, int *nb_meeples, L_meeple loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
 {
     Tuile t = get(grille, x, y);
     int pts = 0;
@@ -58,7 +75,7 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
         // ajoute le meeple à la liste du nombre de meeple trouvés indexé par joueur
         nb_meeples[t->id_meeple] += 1;
         L_meeple maillon = creer_maillon_meeple(x, y, d);
-        ajouter_maillon_meeple(loc_meeple_all, maillon);
+        ajouter_maillon_meeple(&loc_meeple_all, maillon);
     }
 
     /* Si le milieu de notre tuile correspond à notre zone cherché on continue la recherche
@@ -68,65 +85,24 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
         if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
             nb_meeples[t->id_meeple] += 1;
             L_meeple maillon = creer_maillon_meeple(x, y, D_MILIEU);
-            ajouter_maillon_meeple(loc_meeple_all, maillon);
-        }
-        // FIN CHECK MILIEU
+            ajouter_maillon_meeple(&loc_meeple_all, maillon);
+        } // FIN CHECK MILIEU
 
-        if (zone_tuile(t, D_NORD) & z && d != D_NORD) {
+        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_SUD, t, nb_meeples, x, y, fin);
+        if(tmp == -1) return -1;
+        pts += tmp;
 
-            if (t->id_meeple != -1 && t->position_meeple == D_NORD) {
-                nb_meeples[t->id_meeple] += 1;
-                L_meeple maillon = creer_maillon_meeple(x, y, D_NORD);
-                ajouter_maillon_meeple(loc_meeple_all, maillon);
-            }
+        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_NORD, t, nb_meeples, x, y, fin);
+        if(tmp == -1) return -1;
+        pts += tmp;
 
-            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y - 1 , z, D_SUD, fin); // on effectue la recherche récursive
-            if (!fin && tmp == -1)
-                    return -1;
-            pts += tmp;
-        } // FIN CHECK NORD
+        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_OUEST, t, nb_meeples, x, y, fin);
+        if(tmp == -1) return -1;
+        pts += tmp;
 
-        if (zone_tuile(t, D_SUD) & z && d != D_SUD) {
-
-            if (t->id_meeple != -1 && t->position_meeple == D_SUD) {
-                nb_meeples[t->id_meeple] += 1;
-                L_meeple maillon = creer_maillon_meeple(x, y, D_SUD);
-                ajouter_maillon_meeple(loc_meeple_all, maillon);
-            }
-
-            tmp = recherche(grille, nb_meeples, loc_meeple_all, x, y + 1, z, D_NORD, fin);
-            if (!fin && tmp == -1)
-                    return -1;
-            pts += tmp;
-        } // FIN CHECK SUD
-
-        if (zone_tuile(t, D_EST) & z && d != D_EST) {
-
-            if (t->id_meeple != -1 && t->position_meeple == D_EST) {
-                nb_meeples[t->id_meeple] += 1;
-                L_meeple maillon = creer_maillon_meeple(x, y, D_EST);
-                ajouter_maillon_meeple(loc_meeple_all, maillon);
-            }
-
-            tmp = recherche(grille, nb_meeples,loc_meeple_all, x + 1, y, z, D_OUEST, fin);
-            if (!fin && tmp == -1)
-                    return -1;
-            pts += tmp;
-        } // FIN CHECK EST
-
-        if (zone_tuile(t, D_OUEST) & z && d != D_OUEST) {
-
-            if (t->id_meeple != -1 && t->position_meeple == D_OUEST) {
-                nb_meeples[t->id_meeple] += 1;
-                L_meeple maillon = creer_maillon_meeple(x, y, D_OUEST);
-                ajouter_maillon_meeple(loc_meeple_all, maillon);
-            }
-
-            tmp += recherche(grille, nb_meeples, loc_meeple_all, x - 1, y, z, D_EST, fin);
-            if (!fin && tmp == -1)
-                    return -1;
-            pts += tmp;
-        } // FIN CHECK OUEST
+        tmp += recherche_suite(grille, loc_meeple_all, z, d, D_EST, t, nb_meeples, x, y, fin);
+        if(tmp == -1) return -1;
+        pts += tmp;
     }
 
     return pts;
