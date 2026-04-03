@@ -966,7 +966,8 @@ bool test_fichier_charger_pile(void)
     FILE *f_read = fopen("data/test/fichier_test_pile.bin", "r");
     Pile p2 = charger_pile(f_read);
 
-    if (p2.nb_element_max != 56 || p2.nb_element != 56) return false;
+    if (p2.nb_element_max != 56) return false;
+    if (p2.nb_element != 56) return false;
     if (p2.gen_aleatoire) return false;
 
     for (int i = 0; i < 56; i++) {
@@ -980,6 +981,22 @@ bool test_fichier_charger_pile(void)
     fclose(f_read);
     detruire_pile(&p2);
     remove("data/test/fichier_test_pile.bin");
+    return true;
+}
+
+bool test_fichier_charger_pile_aleatoire(void)
+{
+    generer_fichier_pile_aleatoire();
+    FILE *f = fopen("data/test/fichier_test_pile_aleatoire.bin", "r");
+
+    Pile p = charger_pile(f);
+    if (p.nb_element != 32) return false;
+    if (p.nb_element_max != 32) return false;
+    if (!p.gen_aleatoire) return false;
+    if (p.tab != NULL) return false;
+
+    fclose(f);
+    remove("data/test/fichier_test_pile_aleatoire.bin");
     return true;
 }
 
@@ -1016,20 +1033,6 @@ bool test_fichier_charger_joueur(void)
     return true;
 }
 
-bool test_fichier_charger_pile_aleatoire(void)
-{
-    generer_fichier_pile_aleatoire();
-    FILE *f = fopen("data/test/fichier_test_pile_aleatoire.bin", "r");
-
-    Pile p = charger_pile(f);
-    if (p.nb_element != 32 || p.nb_element_max != 32) return false;
-    if (!p.gen_aleatoire) return false;
-    if (p.tab != NULL) return false;
-
-    fclose(f);
-    remove("data/test/fichier_test_pile_aleatoire.bin");
-    return true;
-}
 
 bool test_fichier_charger_joueur_liste_vide(void)
 {
