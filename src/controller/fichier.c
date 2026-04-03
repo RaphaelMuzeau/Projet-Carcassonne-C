@@ -38,9 +38,10 @@ bool charger_partie(Jeu *partie, char *fname)
         return false;
     }
 
-    char *version = ca_alloc(LEN_VER, sizeof(char));
-    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER) {
+    char version[LEN_VER] = { 0 };
+    if (fgets(version, LEN_VER, f) == NULL || strcmp(version, "SV0.1")) {
         perror("carcassonne");
+        fclose(f);
         return false;
     }
 
