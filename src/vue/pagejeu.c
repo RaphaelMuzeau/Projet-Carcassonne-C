@@ -6,8 +6,6 @@
 #include "sidebar.h"
 #include "champsaisie.h"
 
-#define CHEMIN_PARTIES "data/parties/"
-
 enum Page page_jeu(Jeu *jeu)
 {
     // Etat initial

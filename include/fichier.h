@@ -8,6 +8,8 @@
 #include "jeu.h"
 #include "joueur.h"
 
+#define CHEMIN_PARTIES "data/parties/"
+
 void sauvegarder_grille(Vec2D g, FILE *f);
 Vec2D charger_grille(FILE *f);
 

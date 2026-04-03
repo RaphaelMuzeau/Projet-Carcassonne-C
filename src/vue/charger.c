@@ -1,12 +1,11 @@
 #include <stdlib.h>
 #include "raylib.h"
+#include "fichier.h"
 #include "page.h"
 #include "scrollbar.h"
 #include "listeparties.h"
 
-// devra prendre en argument des pointeurs vers les structures
-// du modèle à charger.
-enum Page page_charger(void)
+enum Page page_charger(Jeu *jeu)
 {
     // Etat initial
     enum Page prochaine_page = P_CHARGER;
@@ -44,9 +43,10 @@ enum Page page_charger(void)
             parties = creer_listeparties(120);
         }
 
-        if ((partie_selectionne = update_listeparties(parties, scrollbar.vue)) != NULL)
-            // TODO charger la partie
-            prochaine_page = P_JEU;
+        if ((partie_selectionne = update_listeparties(parties, scrollbar.vue)) != NULL) {
+            if (charger_partie(jeu, partie_selectionne))
+                prochaine_page = P_JEU;
+        }
 
         BeginDrawing();
             ClearBackground(RAYWHITE);

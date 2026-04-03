@@ -38,7 +38,7 @@ int main(void)
             prochaine_page = page_configuration(&jeu, true);
             break;
         case P_CHARGER:
-            prochaine_page = page_charger();
+            prochaine_page = page_charger(&jeu);
             break;
         case P_REGLES:
             if (system("xdg-open rapport/analyse.pdf &") == 127) // specifique à linux

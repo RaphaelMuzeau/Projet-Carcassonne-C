@@ -2,6 +2,7 @@
 #include <string.h>
 #include "raylib.h"
 #include "libca.h"
+#include "fichier.h"
 #include "listeparties.h"
 #include "scrollbar.h"
 #include "bouton.h"
@@ -9,7 +10,7 @@
 ListeParties creer_listeparties(float y)
 {
     ListeParties parties = { 0 };
-    parties.fichiers = LoadDirectoryFiles("data/parties");
+    parties.fichiers = LoadDirectoryFiles(CHEMIN_PARTIES);
     parties.boutons  = ca_alloc(parties.fichiers.count, sizeof(Bouton));
 
     for (unsigned int i = 0; i < parties.fichiers.count; i++) {
