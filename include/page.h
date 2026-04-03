@@ -20,7 +20,7 @@ enum Page {
 };
 
 enum Page page_titre(void);
-enum Page page_jeu(Jeu jeu);
+enum Page page_jeu(Jeu *jeu);
 enum Page page_configuration(Jeu *jeu, bool custom);
 enum Page page_joueurs(ListeJoueurs joueurs);
 enum Page page_charger(void);

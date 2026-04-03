@@ -103,7 +103,7 @@ void dessiner_cartejoueur(CarteJoueur carte, bool tour)
 
 /* BarreJoueur */
 
-BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs, Rectangle ecran)
+BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs)
 {
     BarreJoueurs barre = { 0 };
     barre.joueurs = joueurs;
@@ -112,7 +112,12 @@ BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs, Rectangle ecran)
     vue.zoom = 1.0f;
     barre.scrollbar = creer_scrollbar(vue);
 
-    float y = ecran.y + 10.0f;
+    barre.champ.x = GetScreenWidth() - SIDEBAR_WIDTH;
+    barre.champ.y = CONTROLES_HEIGHT;
+    barre.champ.width = SIDEBAR_WIDTH;
+    barre.champ.height = GetScreenHeight() - CONTROLES_HEIGHT;
+
+    float y = barre.champ.y + 10.0f;
     barre.cartes = ca_alloc(joueurs.nb_joueurs, sizeof(CarteJoueur));
     for (int i = 0; i < joueurs.nb_joueurs; i++) {
         barre.cartes[i] = creer_cartejoueur(0, y, &barre.joueurs.tableau[i], RED);
@@ -132,22 +137,25 @@ void detruire_barrejoueurs(BarreJoueurs barre)
     free(barre.cartes);
 }
 
-void dessiner_barrejoueurs(BarreJoueurs barre, Rectangle ecran, int id_tour)
+void dessiner_barrejoueurs(BarreJoueurs barre, int id_tour)
 {
-    DrawRectangleRec(ecran, LIGHTGRAY);
+    DrawRectangleRec(barre.champ, LIGHTGRAY);
     BeginMode2D(barre.scrollbar.vue);
         for (int i = 0; i < barre.joueurs.nb_joueurs; i++)
             dessiner_cartejoueur(barre.cartes[i], i == id_tour);
     EndMode2D();
-    dessiner_scrollbar(barre.scrollbar, ecran);
+    dessiner_scrollbar(barre.scrollbar, barre.champ);
 }
 
-void update_barrejoueurs(BarreJoueurs *barre, Rectangle ecran)
+void update_barrejoueurs(BarreJoueurs *barre)
 {
-    update_scrollbar(&barre->scrollbar, ecran, barre->fin_liste);
+    update_scrollbar(&barre->scrollbar, barre->champ, barre->fin_liste);
+
+    barre->champ.x = GetScreenWidth() - SIDEBAR_WIDTH;
+    barre->champ.height = GetScreenHeight() - CONTROLES_HEIGHT;
 
     for (int i = 0; i < barre->joueurs.nb_joueurs; i++) {
-        float dec = (ecran.x + (ecran.width - SCROLL_DEFAULT_WIDTH)/2) - CARTEJOUEUR_WIDTH/2 - barre->cartes[i].champ.x;
+        float dec = (barre->champ.x + (barre->champ.width - SCROLL_DEFAULT_WIDTH)/2) - CARTEJOUEUR_WIDTH/2 - barre->cartes[i].champ.x;
         barre->cartes[i].champ.x += dec;
         barre->cartes[i].texte_nom.position.x += dec;
         barre->cartes[i].texte_pts.position.x += dec;

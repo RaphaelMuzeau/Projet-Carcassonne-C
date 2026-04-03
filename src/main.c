@@ -29,7 +29,7 @@ int main(void)
             prochaine_page = page_titre();
             break;
         case P_JEU:
-            prochaine_page = page_jeu(jeu);
+            prochaine_page = page_jeu(&jeu);
             break;
         case P_NORMAL:
             prochaine_page = page_configuration(&jeu, false);
