@@ -7,7 +7,7 @@
 #include "joueur.h"
 #include "meeple.h"
 #include "tuile.h"
-#include "vec.h"
+#include "grille.h"
 #include "pile.h"
 
 #define VERSION "SV0.1"
@@ -82,10 +82,11 @@ void sauvegarder_grille(Vec2D g, FILE *f)
     fseek(f, sizeof(int), SEEK_CUR); // Prépare de la place pour nb_tuiles
 
     int nb_tuiles = ecrire_grille(g, 0, 0, f);
+    recherche_is_verified(g, 0, 0);
 
     fsetpos(f, &pos_nb_tuiles);  // Retour arrière pour écrire nb_tuiles
     fwrite(&nb_tuiles, sizeof(int), 1, f);
-    fseek(f, 1, SEEK_END);      // Retourne à la fin du fichier
+    fseek(f, 0, SEEK_END);      // Retourne à la fin du fichier
 }
 
 Vec2D charger_grille(FILE *f)
