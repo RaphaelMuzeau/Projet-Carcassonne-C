@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -Wunused-result -fdiagnostics-color -Iinclude
+CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -D_FORTIFY_SOURCE=3 -fdiagnostics-color -Iinclude
 LDFLAGS := -lm -Llib -lraylib
 BEAR := $(shell command -v bear)
 
@@ -37,10 +37,10 @@ $(OBJECTS): obj/%.o : src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -O2
 
 $(DBG_OBJECTS): obj/%_dbg.o : src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -g
+	$(CC) $(CFLAGS) -c $< -o $@ -O1 -g
 
 $(TEST_OBJECTS): obj/%_test.o : src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@ -g -DRUN_UNIT_TESTS
+	$(CC) $(CFLAGS) -c $< -o $@ -O1 -g -DRUN_UNIT_TESTS
 
 compile_commands.json: $(SOURCE)
 	@printf "Generation de \x1b[94m$@\x1b[0m..\n"

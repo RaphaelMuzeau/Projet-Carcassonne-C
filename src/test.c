@@ -18,6 +18,8 @@
 #include "meeple.h"
 #include "joueur.h"
 #include "jeu.h"
+#include "fichier.h"
+#include "gentest.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -799,6 +801,7 @@ bool test_grille_retirer_meeple(void)
     detruire_vec2D(grille);
     return true;
 }
+
 bool test_maximal(void)
 {
     int nb_joueur = 3;
@@ -810,6 +813,161 @@ bool test_maximal(void)
     nb_joueur = 1;
     nb_meeple[0] = 1;
     if (maximal(nb_meeple,nb_joueur) != 1) return false;
+
+    return true;
+}
+
+bool test_fichier_charger_grille(void)
+{
+    generer_fichier_grille();
+    FILE *f = fopen("data/test/fichier_test_grille.bin", "r");
+    Vec2D grille = charger_grille(f);
+
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 16; j++) {
+            Tuile tmp = get(grille, i, j);
+            if (tmp->sud != Z_PRE) return false;
+            if (tmp->nord != Z_PRE) return false;
+            if (tmp->milieu != Z_PRE) return false;
+            if (tmp->est != Z_PRE) return false;
+            if (tmp->ouest != Z_PRE) return false;
+        }
+    }
+
+    fclose(f);
+    detruire_vec2D(grille);
+    remove("data/test/fichier_test_grille.bin");
+    return true;
+}
+
+bool test_fichier_charger_pile(void)
+{
+    generer_fichier_pile();
+    FILE *f_read = fopen("data/test/fichier_test_pile.bin", "r");
+    Pile p2 = charger_pile(f_read);
+
+    if (p2.nb_element_max != 56 || p2.nb_element != 56) {
+        return false;
+    }
+
+    for (int i = 0; i < 56; i++) {
+        if (p2.tab[i]->sud != Z_PRE) return false;
+        if (p2.tab[i]->milieu != Z_PRE) return false;
+        if (p2.tab[i]->nord != Z_PRE) return false;
+        if (p2.tab[i]->est != Z_PRE) return false;
+        if (p2.tab[i]->ouest != Z_PRE) return false;
+    }
+
+    fclose(f_read);
+    detruire_pile(&p2);
+    remove("data/test/fichier_test_pile.bin");
+    return true;
+}
+
+bool test_fichier_charger_joueur(void)
+{
+    generer_fichier_joueur();
+    FILE *f_read = fopen("data/test/fichier_test_joueur.bin", "r");
+    Joueur test_read = charger_joueur(f_read);
+
+    if (strcmp(test_read.nom, "Damien")) return false;
+    if (test_read.pts != 300)            return false;
+
+    L_meeple meeple = test_read.localisation_meeples;
+    if (meeple->x != 0)      return false;
+    if (meeple->y != 0)      return false;
+    if (meeple->d != D_SUD)  return false;
+
+    meeple = meeple->next;
+    if (meeple->x != 0)      return false;
+    if (meeple->y != 12)     return false;
+    if (meeple->d != D_NORD) return false;
+
+    meeple = meeple->next;
+    if (meeple->x != -4)     return false;
+    if (meeple->y != -8)     return false;
+    if (meeple->d != D_EST)  return false;
+
+    if (meeple->next != NULL)    return false;
+
+    fclose(f_read);
+    detruire_joueur(test_read);
+    free(test_read.nom);
+    remove("data/test/fichier_test_joueur.bin");
+    return true;
+}
+
+bool test_fichier_charger_joueur_liste_vide(void)
+{
+    generer_fichier_joueur_vide();
+    FILE *f_read = fopen("data/test/fichier_test_joueur_vide.bin", "r");
+    Joueur test_read = charger_joueur(f_read);
+
+    if (strcmp(test_read.nom, "Damien")) return false;
+    if (test_read.pts != 300)            return false;
+    if (test_read.localisation_meeples)  return false;
+
+    free(test_read.nom);
+    detruire_joueur(test_read);
+    fclose(f_read);
+    remove("data/test/fichier_test_joueur_vide.bin");
+    return true;
+}
+
+bool test_fichier_sauvegarder_liste_joueurs(void)
+{
+    generer_fichier_liste_joueurs();
+    FILE* f_read = fopen("data/test/fichier_test_liste_joueurs.bin", "r");
+    ListeJoueurs tab = charger_liste_joueurs(f_read);
+    if (tab.nb_joueurs != 3) return false;
+
+    if (strcmp(tab.tableau[0].nom, "Damien")) return false;
+    if (tab.tableau[0].id != 0) return false;
+    if (tab.tableau[0].nb_meeple_restant != 1) return false;
+    if (tab.tableau[0].pts != 300) return false;
+
+    L_meeple meeple = tab.tableau[0].localisation_meeples;
+    if (meeple->x != 0)       return false;
+    if (meeple->y != 0)       return false;
+    if (meeple->d != D_SUD)   return false;
+
+    meeple = meeple->next;
+    if (meeple->x != 0)       return false;
+    if (meeple->y != 12)      return false;
+    if (meeple->d != D_NORD)  return false;
+
+    meeple = meeple->next;
+    if (meeple->x != -4)      return false;
+    if (meeple->y != -8)      return false;
+    if (meeple->d != D_EST)   return false;
+
+    if (meeple->next != NULL) return false;
+
+    if (strcmp(tab.tableau[1].nom, "Léo")) return false;
+    if (tab.tableau[1].id != 1) return false;
+    if (tab.tableau[1].nb_meeple_restant != 4) return false;
+    if (tab.tableau[1].pts != 22) return false;
+
+    if (tab.tableau[1].localisation_meeples != NULL) return false;
+
+    if (strcmp(tab.tableau[2].nom, "Seth")) return false;
+    if (tab.tableau[2].id != 2) return false;
+    if (tab.tableau[2].nb_meeple_restant != 3) return false;
+    if (tab.tableau[2].pts != 777) return false;
+
+    meeple = tab.tableau[2].localisation_meeples;
+
+    if (meeple->x != 7) return false;
+    if (meeple->y != 6) return false;
+    if (meeple->d != D_OUEST) return false;
+
+    fclose(f_read);
+    free(tab.tableau[0].nom);
+    free(tab.tableau[1].nom);
+    free(tab.tableau[2].nom);
+    detruire_listejoueurs(tab);
+    remove("data/test/fichier_test_liste_joueurs.bin");
+
     return true;
 }
 
@@ -846,6 +1004,11 @@ Test unit_tests[] = {
     TEST(test_grille_placer_meeple),
     TEST(test_grille_retirer_meeple),
     TEST(test_maximal),
+    TEST(test_fichier_charger_grille),
+    TEST(test_fichier_charger_pile),
+    TEST(test_fichier_charger_joueur),
+    TEST(test_fichier_charger_joueur_liste_vide),
+    TEST(test_fichier_sauvegarder_liste_joueurs),
 };
 
 // ===========================
