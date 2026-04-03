@@ -39,7 +39,7 @@ bool charger_partie(Jeu *partie, char *fname)
     }
 
     char version[LEN_VER] = { 0 };
-    if (fgets(version, LEN_VER, f) == NULL || strcmp(version, "SV0.1")) {
+    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.1")) {
         perror("carcassonne");
         fclose(f);
         return false;
@@ -67,11 +67,10 @@ int ecrire_grille(Vec2D g, int x, int y, FILE *f)
     fwrite(&x, sizeof(int), 1, f);
     fwrite(&y, sizeof(int), 1, f);
 
-    cur->is_verified = 1;
+    cur->is_verified = true;
 
     return ecrire_grille(g, x+1, y, f) + ecrire_grille(g, x-1, y, f) + // EST & OUEST
            ecrire_grille(g, x, y+1, f) + ecrire_grille(g, x, y-1, f) + 1; // NORD & SUD
-
 }
 
 void sauvegarder_grille(Vec2D g, FILE *f)
