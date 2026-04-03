@@ -876,6 +876,7 @@ bool test_fichier_charger_joueur(void)
 
     fclose(f_read);
     detruire_joueur(test_read);
+    free(test_read.nom);
     remove("data/test/fichier_test_joueur.bin");
     return true;
 }
@@ -890,6 +891,7 @@ bool test_fichier_charger_joueur_liste_vide(void)
     if (test_read.pts != 300)            return false;
     if (test_read.localisation_meeples)  return false;
 
+    free(test_read.nom);
     detruire_joueur(test_read);
     fclose(f_read);
     remove("data/test/fichier_test_joueur_vide.bin");
@@ -944,6 +946,10 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     if (meeple->d != D_OUEST) return false;
 
     fclose(f_read);
+    free(tab.tableau[0].nom);
+    free(tab.tableau[1].nom);
+    free(tab.tableau[2].nom);
+    detruire_listejoueurs(tab);
     remove("data/test/fichier_test_liste_joueurs.bin");
     return true;
 }

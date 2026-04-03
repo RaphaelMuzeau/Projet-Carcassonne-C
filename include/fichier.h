@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "vec.h"
 #include "pile.h"
+#include "jeu.h"
 #include "joueur.h"
 
 void sauvegarder_grille(Vec2D *g, FILE *f);
@@ -18,5 +19,8 @@ ListeJoueurs charger_liste_joueurs(FILE *f);
 
 void sauvegarder_joueur(Joueur joueur, FILE *f);
 Joueur charger_joueur(FILE *f);
+
+bool sauvegarder(Jeu partie, char *fname);
+bool charger(char *fname);
 
 #endif

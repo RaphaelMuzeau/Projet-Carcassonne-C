@@ -348,7 +348,7 @@ void generer_fichier_liste_joueurs(void)
 
     joueurs.tableau[1].nom = "Léo";
     joueurs.tableau[1].pts = 22;
-    // Léo n'a pas de meeple
+    // Léo n'a pas de meeple+
 
     joueurs.tableau[2].nom  = "Seth";
     joueurs.tableau[2].pts = 777;

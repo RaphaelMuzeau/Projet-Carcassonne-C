@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "libca.h"
 #include "joueur.h"
 
@@ -33,7 +34,8 @@ ListeJoueurs creer_listejoueurs(int nb_joueurs, int nb_meeple)
 
 void detruire_listejoueurs(ListeJoueurs joueurs)
 {
-    for (int i = 0; i < joueurs.nb_joueurs; i++)
+    for (int i = 0; i < joueurs.nb_joueurs; i++) {
         detruire_joueur(joueurs.tableau[i]);
+    }
     free(joueurs.tableau);
 }

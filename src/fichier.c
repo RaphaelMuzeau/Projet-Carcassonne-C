@@ -10,8 +10,46 @@
 #include "vec.h"
 #include "pile.h"
 
-// TODO: Décider d'une version de format à écrire en haut du fichier.
+#define VERSION "SV0.1"
+#define LEN_VER 6
 
+bool sauvegarder_partie(Jeu partie, char *fname)
+{
+    FILE *f = fopen(fname, "w");
+    if (f == NULL) {
+        perror("carcassonne\n");
+        return false;
+    }
+
+    fwrite(VERSION, sizeof(char), LEN_VER, f);
+    sauvegarder_grille(&partie.grille, f);
+    sauvegarder_pile(partie.pile, f);
+    sauvegarder_liste_joueurs(partie.joueurs, f);
+
+    fclose(f);
+    return true;
+}
+
+Jeu charger_partie(char *fname)
+{
+    FILE *f = fopen(fname, "w");
+    if (f == NULL) {
+        perror("carcassonne\n");
+    }
+
+    char *version = ca_alloc(LEN_VER, sizeof(char));
+    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER) {
+        perror("caracssonne\n");
+    }
+
+    Jeu partie = { 0 };
+    partie.grille = charger_grille(f);
+    partie.pile = charger_pile(f);
+    partie.joueurs = charger_liste_joueurs(f);
+
+    fclose(f);
+    return partie;
+}
 int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
 {
     Tuile cur = get(*g, x, y);
