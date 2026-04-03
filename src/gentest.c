@@ -296,6 +296,17 @@ void generer_fichier_pile(void)
     detruire_pile(&p);
 }
 
+void generer_fichier_pile_aleatoire(void)
+{
+    Pile p = creer_pile(32, true);
+    FILE *f = fopen("data/test/fichier_test_pile_aleatoire.bin", "w");
+
+    sauvegarder_pile(p, f);
+
+    fclose(f);
+    detruire_pile(&p);
+}
+
 void generer_fichier_joueur(void)
 {
     Joueur test = creer_joueur(1, 7);
@@ -326,7 +337,7 @@ void generer_fichier_joueur_vide(void)
 
     FILE *f = fopen("data/test/fichier_test_joueur_vide.bin", "w");
     sauvegarder_joueur(test, f);
-    detruire_joueur(test); // ne marche pas ?
+    detruire_joueur(test);
     fclose(f);
 }
 

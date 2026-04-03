@@ -11,7 +11,7 @@
 #include "pile.h"
 
 #define VERSION "SV0.1"
-#define LEN_VER 6
+#define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)
 {
@@ -32,7 +32,7 @@ bool sauvegarder_partie(Jeu partie, char *fname)
 
 bool charger_partie(Jeu *partie, char *fname)
 {
-    FILE *f = fopen(fname, "w");
+    FILE *f = fopen(fname, "r");
     if (f == NULL) {
         perror("carcassonne");
         return false;
@@ -40,7 +40,7 @@ bool charger_partie(Jeu *partie, char *fname)
 
     char *version = ca_alloc(LEN_VER, sizeof(char));
     if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER) {
-        perror("caracssonne");
+        perror("carcassonne");
         return false;
     }
 
@@ -51,6 +51,7 @@ bool charger_partie(Jeu *partie, char *fname)
     fclose(f);
     return true;
 }
+
 int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
 {
     Tuile cur = get(*g, x, y);
@@ -118,27 +119,36 @@ erreur_grille:
 void sauvegarder_pile(Pile p, FILE *f)
 {
     fwrite(&p.nb_element, sizeof(int), 1, f);
+    fwrite(&p.gen_aleatoire, sizeof(bool), 1, f);
 
-    for (int i = 0; i < p.nb_element; i++) {
-        fwrite(p.tab[i], sizeof(struct _Tuile), 1, f);
+    if (!p.gen_aleatoire) {
+        for (int i = 0; i < p.nb_element; i++) {
+            fwrite(p.tab[i], sizeof(struct _Tuile), 1, f);
+        }
     }
 }
 
 Pile charger_pile(FILE *f)
 {
+
     int nb_element;
+    bool aleatoire;
     if (fread(&nb_element, sizeof(int), 1, f) != 1)
         goto erreur_pile;
 
-    Pile p = creer_pile(nb_element, false);
+    if (fread(&aleatoire, sizeof(bool), 1, f) != 1)
+        goto erreur_pile;
 
-    for (int i = 0; i < p.nb_element_max; i++) {
-        Tuile tmp = creer_tuile();
-        if (fread(tmp, sizeof(struct _Tuile), 1, f) != 1)
-            goto erreur_pile;
-        inserer_tuile(&p, tmp);
+    Pile p = creer_pile(nb_element, aleatoire);
+
+    if (!p.gen_aleatoire) {
+        for (int i = 0; i < p.nb_element_max; i++) {
+            Tuile tmp = creer_tuile();
+            if (fread(tmp, sizeof(struct _Tuile), 1, f) != 1)
+                goto erreur_pile;
+            inserer_tuile(&p, tmp);
+        }
     }
-
     return p;
 
 erreur_pile:
