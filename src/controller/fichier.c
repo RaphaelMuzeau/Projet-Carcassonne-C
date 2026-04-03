@@ -11,7 +11,7 @@
 #include "pile.h"
 
 #define VERSION "SV0.1"
-#define LEN_VER 6
+#define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)
 {
@@ -32,7 +32,7 @@ bool sauvegarder_partie(Jeu partie, char *fname)
 
 bool charger_partie(Jeu *partie, char *fname)
 {
-    FILE *f = fopen(fname, "w");
+    FILE *f = fopen(fname, "r");
     if (f == NULL) {
         perror("carcassonne");
         return false;
@@ -40,7 +40,7 @@ bool charger_partie(Jeu *partie, char *fname)
 
     char *version = ca_alloc(LEN_VER, sizeof(char));
     if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER) {
-        perror("caracssonne");
+        perror("carcassonne");
         return false;
     }
 
@@ -51,6 +51,7 @@ bool charger_partie(Jeu *partie, char *fname)
     fclose(f);
     return true;
 }
+
 int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
 {
     Tuile cur = get(*g, x, y);
@@ -129,11 +130,12 @@ void sauvegarder_pile(Pile p, FILE *f)
 
 Pile charger_pile(FILE *f)
 {
+
     int nb_element;
+    bool aleatoire;
     if (fread(&nb_element, sizeof(int), 1, f) != 1)
         goto erreur_pile;
 
-    bool aleatoire;
     if (fread(&aleatoire, sizeof(bool), 1, f) != 1)
         goto erreur_pile;
 
@@ -147,7 +149,6 @@ Pile charger_pile(FILE *f)
             inserer_tuile(&p, tmp);
         }
     }
-
     return p;
 
 erreur_pile:
