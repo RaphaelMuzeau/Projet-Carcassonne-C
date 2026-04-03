@@ -20,7 +20,7 @@ ListeJoueurs charger_liste_joueurs(FILE *f);
 void sauvegarder_joueur(Joueur joueur, FILE *f);
 Joueur charger_joueur(FILE *f);
 
-bool sauvegarder(Jeu partie, char *fname);
-bool charger(char *fname);
+bool sauvegarder_partie(Jeu partie, char *fname);
+bool charger_partie(Jeu *partie, char *fname);
 
 #endif

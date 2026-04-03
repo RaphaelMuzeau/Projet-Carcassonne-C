@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "joueur.h"
 #include "meeple.h"
 #include "vec.h"

@@ -17,7 +17,7 @@ bool sauvegarder_partie(Jeu partie, char *fname)
 {
     FILE *f = fopen(fname, "w");
     if (f == NULL) {
-        perror("carcassonne\n");
+        perror("carcassonne");
         return false;
     }
 
@@ -30,25 +30,26 @@ bool sauvegarder_partie(Jeu partie, char *fname)
     return true;
 }
 
-Jeu charger_partie(char *fname)
+bool charger_partie(Jeu *partie, char *fname)
 {
     FILE *f = fopen(fname, "w");
     if (f == NULL) {
-        perror("carcassonne\n");
+        perror("carcassonne");
+        return false;
     }
 
     char *version = ca_alloc(LEN_VER, sizeof(char));
     if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER) {
-        perror("caracssonne\n");
+        perror("caracssonne");
+        return false;
     }
 
-    Jeu partie = { 0 };
-    partie.grille = charger_grille(f);
-    partie.pile = charger_pile(f);
-    partie.joueurs = charger_liste_joueurs(f);
+    partie->grille = charger_grille(f);
+    partie->pile = charger_pile(f);
+    partie->joueurs = charger_liste_joueurs(f);
 
     fclose(f);
-    return partie;
+    return true;
 }
 int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
 {
@@ -160,8 +161,6 @@ ListeJoueurs charger_liste_joueurs(FILE *f)
         goto erreur_liste_joueurs;
 
     ListeJoueurs joueurs = creer_listejoueurs(nb_joueurs, 0);
-    joueurs.nb_joueurs = nb_joueurs;
-    joueurs.tableau = ca_alloc(nb_joueurs, sizeof(Joueur));
 
     for (int i = 0; i < joueurs.nb_joueurs; i++)
         joueurs.tableau[i] = charger_joueur(f);
