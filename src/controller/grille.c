@@ -111,7 +111,8 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple loc_meeple_all, int x, int
 void recherche_is_verified(Vec2D grille, int x, int y)
 {
     Tuile t = get(grille, x , y);
-    if (!t->is_verified)
+
+    if (t == NULL || !t->is_verified)
         return;
 
     t->is_verified = false;
