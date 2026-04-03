@@ -272,7 +272,7 @@ void generer_fichier_grille(void)
     }
 
     FILE *f = fopen("data/test/fichier_test_grille.bin", "w");
-    sauvegarder_grille(&grille, f);
+    sauvegarder_grille(grille, f);
     detruire_vec2D(grille);
     fclose(f);
 }

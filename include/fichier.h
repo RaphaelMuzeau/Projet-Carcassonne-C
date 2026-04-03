@@ -8,7 +8,7 @@
 #include "jeu.h"
 #include "joueur.h"
 
-void sauvegarder_grille(Vec2D *g, FILE *f);
+void sauvegarder_grille(Vec2D g, FILE *f);
 Vec2D charger_grille(FILE *f);
 
 void sauvegarder_pile(Pile p, FILE *f);

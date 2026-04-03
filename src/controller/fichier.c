@@ -22,7 +22,7 @@ bool sauvegarder_partie(Jeu partie, char *fname)
     }
 
     fwrite(VERSION, sizeof(char), LEN_VER, f);
-    sauvegarder_grille(&partie.grille, f);
+    sauvegarder_grille(partie.grille, f);
     sauvegarder_pile(partie.pile, f);
     sauvegarder_liste_joueurs(partie.joueurs, f);
 
@@ -53,9 +53,9 @@ bool charger_partie(Jeu *partie, char *fname)
     return true;
 }
 
-int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
+int ecrire_grille(Vec2D g, int x, int y, FILE *f)
 {
-    Tuile cur = get(*g, x, y);
+    Tuile cur = get(g, x, y);
 
     if (!cur)
         return 0;
@@ -74,7 +74,7 @@ int ecrire_grille(Vec2D *g, int x, int y, FILE *f)
 
 }
 
-void sauvegarder_grille(Vec2D *g, FILE *f)
+void sauvegarder_grille(Vec2D g, FILE *f)
 {
     fpos_t pos_nb_tuiles;     // Sauvegarde l'endroit où le nb_tuiles sera écrit
     fgetpos(f, &pos_nb_tuiles);
