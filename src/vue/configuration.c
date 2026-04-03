@@ -51,6 +51,7 @@ enum Page page_configuration(Jeu *jeu, bool custom)
 
         if (update_bouton(&retour) || IsKeyPressed(KEY_ESCAPE)) {
                 detruire_jeu(*jeu);
+                *jeu = (Jeu) { 0 };
                 prochaine_page = P_TITRE;
         }
 
