@@ -15,21 +15,25 @@ enum Zone {
 };
 
 enum Direction {
-    D_SUD,
+    D_SUD = 0,
     D_NORD,
     D_EST,
     D_OUEST,
+    D_MILIEU,
 };
 
 struct _Tuile {
     enum Zone milieu, nord, sud, est, ouest;
-    char meeple;
+    int id_meeple;
+    enum Direction position_meeple;
+    bool is_verified;
 };
 typedef struct _Tuile *Tuile;
 
 Tuile creer_tuile(void);
 /* pivot à droite */
 void pivot_90(Tuile piece);
+enum Zone zone_tuile(Tuile t, enum Direction d);
 bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d);
 enum Zone generer_milieu(void);
 enum Zone generer_cote(int aleatoire);

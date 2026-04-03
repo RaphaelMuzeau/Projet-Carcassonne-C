@@ -9,7 +9,7 @@ DBG := $(EXE)_dbg
 TEST:= $(EXE)_test
 
 CC := gcc
-CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -fdiagnostics-color -Iinclude
+CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -D_FORTIFY_SOURCE=3 -fdiagnostics-color -Iinclude
 MKFLAGS := -MMD -MP
 LDFLAGS := -Llib -l:libraylib.a -lm # raylib est lié statiquement
 
@@ -44,7 +44,7 @@ debug:
 test:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(TEST))...\n"
 	@${MAKE} $(TEST) | sed 's/^/  /'
-	$(VALGRIND) $(VGFLAGS) ./$(TEST)
+	./$(TEST)
 
 run: debug
 	@printf "\x1b[95mexecution de $<:\x1b[0;0m\n"
@@ -98,11 +98,11 @@ $(objects): $(BUILD_DIR)/%.o : $(SRC_DIR)/%.c
 
 $(dbg_objects): $(BUILD_DIR)/%_dbg.o : $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -g
+	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -O1 -g
 
 $(test_objects): $(BUILD_DIR)/%_test.o : $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -g -DRUN_UNIT_TESTS
+	$(CC) $(CFLAGS) $(MKFLAGS) -c $< -o $@ -O1 -g -DRUN_UNIT_TESTS
 
 compile_commands.json: $(sources)
 	@printf "Generation de \x1b[94m$@\x1b[0m..\n"

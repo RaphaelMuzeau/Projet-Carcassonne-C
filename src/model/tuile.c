@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "libca.h"
 #include "tuile.h"
 
@@ -11,8 +12,28 @@ Tuile creer_tuile(void)
     s->sud    = Z_PRE;
     s->est    = Z_PRE;
     s->ouest  = Z_PRE;
+    s->id_meeple = -1;
 
     return s;
+}
+
+enum Zone zone_tuile(Tuile t, enum Direction d)
+{
+    switch (d){
+    case D_NORD:
+        return t->nord;
+    case D_SUD:
+        return t->sud;
+    case D_EST:
+        return t->est;
+    case D_OUEST:
+        return t->ouest;
+    case D_MILIEU:
+        return t->milieu;
+    default:
+        fprintf(stderr, "carcassonne: direction invalide\n");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void pivot_90(Tuile piece)
