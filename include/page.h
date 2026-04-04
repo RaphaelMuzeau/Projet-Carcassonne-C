@@ -2,6 +2,7 @@
 #define page_h
 
 #include <stdbool.h>
+#include "jeu.h"
 
 /* Denomme les differentes pages constituant l'interface graphique.
  * Chaque page a une fonction associé qui modifie l'etat du jeux et renvoit
@@ -9,7 +10,7 @@
  */
 enum Page {
     P_TITRE,
-    P_JEUX,
+    P_JEU,
     P_NORMAL,
     P_CUSTOM,
     P_JOUEURS,
@@ -19,9 +20,9 @@ enum Page {
 };
 
 enum Page page_titre(void);
-// enum Page page_jeux(void);
-enum Page page_configuration(bool custom);
-enum Page page_joueurs(int nb_joueurs);
+enum Page page_jeu(Jeu jeu);
+enum Page page_configuration(Jeu *jeu, bool custom);
+enum Page page_joueurs(ListeJoueurs joueurs);
 enum Page page_charger(void);
 
 #endif

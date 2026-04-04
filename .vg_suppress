@@ -1,0 +1,36 @@
+{
+    <dl>
+    Memcheck:Leak
+    ...
+    fun:dl_*
+}
+{
+    <dl>
+    Memcheck:Leak
+    ...
+    fun:_dl*
+}
+{
+    <glfwInit>
+    Memcheck:Leak
+    ...
+    fun:glfwInit
+}
+{
+    <_glfwInitX11>
+    Memcheck:Leak
+    ...
+    fun:_glfwInitX11
+}
+{
+    <_glfwTerminate>
+    Memcheck:Leak
+    ...
+    fun:glfwTerminate
+}
+{
+    <glXSwapBuffers>
+    Memcheck:Leak
+    ...
+    fun:glXSwapBuffers
+}

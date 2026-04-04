@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "test.h"
 #include "raylib.h"
+#include "jeu.h"
 #include "page.h"
 
 int main(void)
@@ -15,6 +16,7 @@ int main(void)
     // SetTraceLogLevel();
     int largeur_ecran = 640;
     int hauteur_ecran = 480;
+    Jeu jeu = { 0 };
 
     // Etat initial
     InitWindow(largeur_ecran, hauteur_ecran, "Carcassonne");
@@ -26,15 +28,14 @@ int main(void)
         case P_TITRE:
             prochaine_page = page_titre();
             break;
-        case P_JEUX:
-            // prochaine_page = page_jeux();
-            prochaine_page = P_TITRE;
+        case P_JEU:
+            prochaine_page = page_jeu(jeu);
             break;
         case P_NORMAL:
-            prochaine_page = page_configuration(false);
+            prochaine_page = page_configuration(&jeu, false);
             break;
         case P_CUSTOM:
-            prochaine_page = page_configuration(true);
+            prochaine_page = page_configuration(&jeu, true);
             break;
         case P_CHARGER:
             prochaine_page = page_charger();

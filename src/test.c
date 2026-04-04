@@ -496,6 +496,27 @@ bool test_varstring_ajouter_chaine(void)
     return true;
 }
 
+bool test_varstring_dupliquer_chaine(void)
+{
+    VarString s = creer_varstring();
+    char *dup;
+
+    // duplication de chaine vide
+    dup = dupliquer_chaine(&s);
+    if (dup != NULL) return false;
+
+    // duplication normal
+    ajouter_chaine(&s, "hello");
+    dup = dupliquer_chaine(&s);
+
+    if (dup == s.texte) return false;
+    if (strcmp(dup, s.texte)) return false;
+
+    free(dup);
+    detruire_varstring(s);
+    return true;
+}
+
 bool test_varstring_vider(void)
 {
     VarString s = creer_varstring();
@@ -1128,6 +1149,7 @@ Test unit_tests[] = {
     TEST(test_varstring_ajouter_char),
     TEST(test_varstring_retirer_char),
     TEST(test_varstring_ajouter_chaine),
+    TEST(test_varstring_dupliquer_chaine),
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),

@@ -17,7 +17,7 @@ BEAR := $(shell command -v bear)
 
 VALGRIND := $(shell command -v valgrind)
 ifneq ($(strip $(VALGRIND)),)
-VGFLAGS := -q --leak-check=full --show-leak-kinds=all
+VGFLAGS := -q --leak-check=full --show-leak-kinds=all --suppressions=.vg_suppress
 endif
 
 SHELL:= bash
@@ -31,7 +31,7 @@ endif
 
 # Commmandes
 
-.PHONY: default all release debug test run clean bear help
+.PHONY: default all release debug test run runvg clean bear help
 default: debug
 
 all: debug release test
@@ -50,6 +50,11 @@ run: debug
 	@printf "\x1b[95mexecution de $<:\x1b[0;0m\n"
 	@$(DBG)
 
+runvg: debug
+	@printf "\x1b[95mexecution de $< avec valgrind:\x1b[0;0m\n"
+	$(VALGRIND) $(VGFLAGS) ./$(DBG)
+
+
 clean:
 	@rm -rf $(BUILD_DIR)/*
 	@rm -f  $(BIN_DIR)/*
@@ -62,9 +67,10 @@ help:
 	@echo "  release - Compiler avec optimisation"
 	@echo "  debug   - Compiler avec symboles de debugage"
 	@echo "  test    - Compiler et lancer les tests unitaires"
-	@echo "  bear    - Generer compile_commands.json (nécessite bear)"
 	@echo "  run     - Executer le programme (compile debug si besoin)"
+	@echo "  runvg   - Executer le programme en version debug avec valgrind"
 	@echo "  clean   - Supprimer les artefacts de compilation et les executables"
+	@echo "  bear    - Generer compile_commands.json (nécessite bear)"
 	@echo "  help    - Afficher ce message d'aide"
 
 # Recherche des fichiers
