@@ -16,7 +16,7 @@ enum Page page_jeu(Jeu *jeu)
     Vector2 position_curseur_ecran  = { 0 };
     Vector2 position_curseur_grille = { 0 };
 
-    int max_chunks = (jeu->pile.nb_element * TEXTURE_SIZE) / CHUNK_SIZE;
+    int max_chunks = (jeu->pile.nb_element * TEXTURE_SIZE * 2) / CHUNK_SIZE + 2;
     int nb_chunks = 0;
     Chunk *chunks = ca_alloc(sizeof(Chunk), max_chunks);
 
@@ -38,6 +38,12 @@ enum Page page_jeu(Jeu *jeu)
     while (prochaine_page == P_JEU) {
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
+
+        /* reallouer la memoire necessaire à plus de chunks si besoin */
+        if (nb_chunks == max_chunks) {
+            max_chunks += 4;
+            chunks = ca_realloc(chunks, sizeof(Chunk), max_chunks);
+        }
 
         /* gestion de la vue de la grille */
         vue.width = GetScreenWidth() - SIDEBAR_WIDTH;
@@ -80,8 +86,7 @@ enum Page page_jeu(Jeu *jeu)
         }
 
         /* gestion du popup de sauvegarde */
-        if (afficher_popup)
-        {
+        if (afficher_popup) {
             centrer_popup(&popup);
             update_champsaisie(&popup.champ_partie);
 
@@ -119,8 +124,13 @@ enum Page page_jeu(Jeu *jeu)
 
                 DrawRectangle(256, 256, 256, 256, GREEN);
 
-                for (int i = 0; i < nb_chunks; i++)
-                    DrawTexture(chunks[i].render.texture, chunks[i].x, chunks[i].y, WHITE);
+                for (int i = 0; i < nb_chunks; i++) {
+                    // les textures inversent l'axe y par defaut, on doit le
+                    // remettre dans le bon sens en inversant le rectangle de source.
+                    Rectangle source_chunk = { .width = CHUNK_SIZE, .height = -CHUNK_SIZE };
+                    Vector2 pos = { chunks[i].x, chunks[i].y };
+                    DrawTextureRec(chunks[i].render.texture, source_chunk, pos, WHITE);
+                }
             EndMode2D();
 
             dessiner_barrejoueurs(barrejoueurs, 3);
@@ -131,9 +141,11 @@ enum Page page_jeu(Jeu *jeu)
 
         EndDrawing();
     }
+    free(t);
 
     for (int i = 0; i < nb_chunks; i++)
         UnloadRenderTexture(chunks[i].render);
+    free(chunks);
 
     detruire_barrejoueurs(barrejoueurs);
     detruire_jeu(*jeu);

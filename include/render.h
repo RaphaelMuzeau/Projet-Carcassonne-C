@@ -23,10 +23,15 @@ typedef struct _Chunk {
     int y;
 } Chunk;
 
+void dessiner_tuile(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position);
+RenderTexture2D generer_texture(Tuile t);
+
 /* arrondit x au plus petit multiple de p
  * avec p un puissance de 2 */
 int multiple_inf(float x, int p);
-void dessiner_tuile(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position);
-RenderTexture2D generer_texture(Tuile t);
+/* renvoit x modulo z sur l'ensemble {0..z-1}.
+ * cette fonction est necessaire car l'operateur C '%'
+ * renvoit une valeur negative si x < 0. */
+int mod(int x, int z);
 
 #endif
