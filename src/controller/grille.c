@@ -55,7 +55,7 @@ int recherche_suite(Vec2D grille, L_meeple *loc_meeple_all, enum Zone z, enum Di
         // ajouter un meeple aux listes s'il est present sur ce coté
         if (t->id_meeple != -1 && t->position_meeple == d_depart) {
             nb_meeples[t->id_meeple] += 1;
-            L_meeple maillon = creer_maillon_meeple(x, y, d_depart);
+            L_meeple maillon = creer_maillon_meeple(x, y);
             ajouter_maillon_meeple(loc_meeple_all, maillon);
         }
 
@@ -80,7 +80,7 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
     // traiter le cas du meeple au milieu en premier
     if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
         nb_meeples[t->id_meeple] += 1;
-        L_meeple maillon = creer_maillon_meeple(x, y, D_MILIEU);
+        L_meeple maillon = creer_maillon_meeple(x, y);
         ajouter_maillon_meeple(loc_meeple_all, maillon);
     }
 
@@ -154,7 +154,7 @@ bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
     if (t->id_meeple != -1) return false;
     if (joueur->nb_meeple_restant <= 0) return false;
 
-    L_meeple new = creer_maillon_meeple(x, y, d);
+    L_meeple new = creer_maillon_meeple(x, y);
     ajouter_maillon_meeple(&joueur->localisation_meeples, new);
     t->id_meeple = joueur->id;
     t->position_meeple = d;

@@ -10,7 +10,7 @@
 #include "grille.h"
 #include "pile.h"
 
-#define VERSION "SV0.1"
+#define VERSION "SV0.2"
 #define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)
@@ -39,7 +39,7 @@ bool charger_partie(Jeu *partie, char *fname)
     }
 
     char version[LEN_VER] = { 0 };
-    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.1")) {
+    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.2")) {
         perror("carcassonne");
         fclose(f);
         return false;
@@ -225,35 +225,30 @@ void sauvegarder_joueur(Joueur joueur, FILE *f)
 
 Joueur charger_joueur(FILE *f)
 {
-    Joueur j;
-    if (fread(&j, sizeof(Joueur), 1, f) != 1)
+    Joueur joueur;
+    if (fread(&joueur, sizeof(Joueur), 1, f) != 1)
         goto erreur_joueur;
 
     size_t taille_nom = 0;
     if (fread(&taille_nom, sizeof(size_t), 1, f) != 1)
         goto erreur_joueur;
 
-    j.nom = ca_alloc(taille_nom, sizeof(char));
-    size_t tmp = fread(j.nom, sizeof(char), taille_nom, f);
-
-    if (tmp != taille_nom)
+    joueur.nom = ca_alloc(taille_nom, sizeof(char));
+    if (fread(joueur.nom, sizeof(char), taille_nom, f) != taille_nom)
         goto erreur_joueur;
 
     int nb_meeple_pose = 0;
     if (fread(&nb_meeple_pose, sizeof(int), 1, f) != 1)
         goto erreur_joueur;
 
-    if (nb_meeple_pose) {
-        int cmpt = 0;
-        do {
-            L_meeple tmp = creer_maillon_meeple(0, 0, 0);
-            if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
-                goto erreur_joueur;
-            ajouter_maillon_meeple(&j.localisation_meeples, tmp);
-            cmpt++;
-        } while (cmpt <nb_meeple_pose);
+    for (int i = 0; i < nb_meeple_pose; i++) {
+        L_meeple tmp = creer_maillon_meeple(0, 0);
+        if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
+            goto erreur_joueur;
+        ajouter_maillon_meeple(&joueur.localisation_meeples, tmp);
     }
-    return j;
+
+    return joueur;
 
 erreur_joueur:
     fprintf(stderr, "carcassonne: fichier invalide (joueur)\n");

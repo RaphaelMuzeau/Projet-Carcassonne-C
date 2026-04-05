@@ -358,13 +358,13 @@ void generer_fichier_joueur(void)
     test.nom = "Damien";
     test.pts = 300;
 
-    L_meeple meeple1 = creer_maillon_meeple(0, 0, D_SUD);
+    L_meeple meeple1 = creer_maillon_meeple(0, 0);
     ajouter_maillon_meeple(&test.localisation_meeples, meeple1);
 
-    L_meeple meeple2 = creer_maillon_meeple(0, 12, D_NORD);
+    L_meeple meeple2 = creer_maillon_meeple(0, 12);
     ajouter_maillon_meeple(&test.localisation_meeples, meeple2);
 
-    L_meeple meeple3 = creer_maillon_meeple(-4, -8, D_EST);
+    L_meeple meeple3 = creer_maillon_meeple(-4, -8);
     ajouter_maillon_meeple(&test.localisation_meeples, meeple3);
 
     FILE *f = fopen("data/test/fichier_test_joueur.bin", "w");
@@ -392,13 +392,13 @@ void generer_fichier_liste_joueurs(void)
     joueurs.tableau[0].nom = "Damien";
     joueurs.tableau[0].pts = 300;
     joueurs.tableau[0].nb_meeple_restant = 1;
-    L_meeple meeple1 = creer_maillon_meeple(0, 0, D_SUD);
+    L_meeple meeple1 = creer_maillon_meeple(0, 0);
     ajouter_maillon_meeple(&joueurs.tableau[0].localisation_meeples, meeple1);
 
-    L_meeple meeple2 = creer_maillon_meeple(0, 12, D_NORD);
+    L_meeple meeple2 = creer_maillon_meeple(0, 12);
     ajouter_maillon_meeple(&joueurs.tableau[0].localisation_meeples, meeple2);
 
-    L_meeple meeple3 = creer_maillon_meeple(-4, -8, D_EST);
+    L_meeple meeple3 = creer_maillon_meeple(-4, -8);
     ajouter_maillon_meeple(&joueurs.tableau[0].localisation_meeples, meeple3);
 
     joueurs.tableau[1].nom = "Léo";
@@ -408,7 +408,7 @@ void generer_fichier_liste_joueurs(void)
     joueurs.tableau[2].nom  = "Seth";
     joueurs.tableau[2].pts = 777;
     joueurs.tableau[2].nb_meeple_restant = 3;
-    L_meeple meeple4 = creer_maillon_meeple(7, 6, D_OUEST);
+    L_meeple meeple4 = creer_maillon_meeple(7, 6);
     ajouter_maillon_meeple(&joueurs.tableau[2].localisation_meeples, meeple4);
 
     FILE *f = fopen("data/test/fichier_test_liste_joueurs.bin", "w");

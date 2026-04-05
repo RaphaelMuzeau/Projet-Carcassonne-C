@@ -2,13 +2,12 @@
 #include "meeple.h"
 #include "libca.h"
 
-L_meeple creer_maillon_meeple(int x, int y, enum Direction d)
+L_meeple creer_maillon_meeple(int x, int y)
 {
     L_meeple liste = ca_alloc(1, sizeof(struct _Maillon));
     liste->next = NULL;
     liste->x = x;
     liste->y = y;
-    liste->d = d;
 
     return liste;
 }

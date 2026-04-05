@@ -717,11 +717,10 @@ bool test_listejoueurs_creer(void)
 
 bool test_liste_meeple_creer(void)
 {
-    L_meeple liste = creer_maillon_meeple(1, 5, D_EST);
+    L_meeple liste = creer_maillon_meeple(1, 5);
 
     if (liste->x != 1)       return false;
     if (liste->y != 5)       return false;
-    if (liste->d != D_EST)   return false;
     if (liste->next != NULL) return false;
 
     detruire_liste_meeple(liste);
@@ -732,22 +731,20 @@ bool test_liste_meeple_ajouter(void)
 {
     L_meeple liste = NULL;
 
-    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
+    L_meeple maillon1 = creer_maillon_meeple(1, 1);
     ajouter_maillon_meeple(&liste, maillon1);
 
     if (liste != maillon1)    return false;
     if (liste->x != 1)        return false;
     if (liste->y != 1)        return false;
-    if (liste->d != D_MILIEU) return false;
     if (liste->next != NULL)  return false;
 
-    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
+    L_meeple maillon2 = creer_maillon_meeple(2, 2);
     ajouter_maillon_meeple(&liste, maillon2);
 
     if (liste != maillon2)       return false;
     if (liste->x != 2)           return false;
     if (liste->y != 2)           return false;
-    if (liste->d != D_SUD)    return false;
     if (liste->next != maillon1) return false;
 
     detruire_liste_meeple(liste);
@@ -762,8 +759,8 @@ bool test_liste_meeple_retirer(void)
     retirer_maillon_meeple(&liste, 0, 0);
     if (liste != NULL) return false;
 
-    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
-    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
+    L_meeple maillon1 = creer_maillon_meeple(1, 1);
+    L_meeple maillon2 = creer_maillon_meeple(2, 2);
     ajouter_maillon_meeple(&liste, maillon1);
     ajouter_maillon_meeple(&liste, maillon2);
 
@@ -778,7 +775,7 @@ bool test_liste_meeple_retirer(void)
     if (liste->next != NULL) return false;
 
     // retrait de meeple en fin de chaine
-    L_meeple maillon3 = creer_maillon_meeple(3, 3, D_NORD);
+    L_meeple maillon3 = creer_maillon_meeple(3, 3);
     ajouter_maillon_meeple(&liste, maillon3);
 
     retirer_maillon_meeple(&liste, 1, 1);
@@ -876,7 +873,6 @@ bool test_grille_placer_meeple(void)
 
     if (joueur.localisation_meeples->x != 1)      return false;
     if (joueur.localisation_meeples->y != 0)      return false;
-    if (joueur.localisation_meeples->d != D_NORD) return false;
     if (joueur.nb_meeple_restant != 1) return false;
 
     if (t1->id_meeple != joueur.id) return false;
@@ -889,10 +885,8 @@ bool test_grille_placer_meeple(void)
 
     if (joueur.localisation_meeples->x != 0)            return false;
     if (joueur.localisation_meeples->y != 1)            return false;
-    if (joueur.localisation_meeples->d != D_SUD)        return false;
     if (joueur.localisation_meeples->next->x != 1)      return false;
     if (joueur.localisation_meeples->next->y != 0)      return false;
-    if (joueur.localisation_meeples->next->d != D_NORD) return false;
     if (joueur.nb_meeple_restant != 0) return false;
 
 
@@ -907,10 +901,8 @@ bool test_grille_placer_meeple(void)
 
     if (joueur.localisation_meeples->x != 0)             return false;
     if (joueur.localisation_meeples->y != 1)             return false;
-    if (joueur.localisation_meeples->d != D_SUD)         return false;
     if (joueur.localisation_meeples->next->x != 1)       return false;
     if (joueur.localisation_meeples->next->y != 0)       return false;
-    if (joueur.localisation_meeples->next->d != D_NORD)  return false;
     if (joueur.localisation_meeples->next->next != NULL) return false;
     if (joueur.nb_meeple_restant != 0) return false;
 
@@ -1034,17 +1026,14 @@ bool test_fichier_charger_joueur(void)
     L_meeple meeple = test_read.localisation_meeples;
     if (meeple->x != 0)      return false;
     if (meeple->y != 0)      return false;
-    if (meeple->d != D_SUD)  return false;
 
     meeple = meeple->next;
     if (meeple->x != 0)      return false;
     if (meeple->y != 12)     return false;
-    if (meeple->d != D_NORD) return false;
 
     meeple = meeple->next;
     if (meeple->x != -4)     return false;
     if (meeple->y != -8)     return false;
-    if (meeple->d != D_EST)  return false;
 
     if (meeple->next != NULL)    return false;
 
@@ -1088,17 +1077,14 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     L_meeple meeple = tab.tableau[0].localisation_meeples;
     if (meeple->x != 0)       return false;
     if (meeple->y != 0)       return false;
-    if (meeple->d != D_SUD)   return false;
 
     meeple = meeple->next;
     if (meeple->x != 0)       return false;
     if (meeple->y != 12)      return false;
-    if (meeple->d != D_NORD)  return false;
 
     meeple = meeple->next;
     if (meeple->x != -4)      return false;
     if (meeple->y != -8)      return false;
-    if (meeple->d != D_EST)   return false;
 
     if (meeple->next != NULL) return false;
 
@@ -1118,7 +1104,6 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
 
     if (meeple->x != 7) return false;
     if (meeple->y != 6) return false;
-    if (meeple->d != D_OUEST) return false;
 
     fclose(f_read);
     free(tab.tableau[0].nom);
