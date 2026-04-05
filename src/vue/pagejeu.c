@@ -10,7 +10,7 @@
 
 enum Page page_jeu(Jeu *jeu)
 {
-    // Etat initial
+    // Etat initial de la page
     enum Page prochaine_page = P_JEU;
     bool afficher_popup = false;
     Vector2 position_curseur_ecran  = { 0 };
@@ -19,8 +19,10 @@ enum Page page_jeu(Jeu *jeu)
     int max_chunks = (jeu->pile.nb_element * TEXTURE_SIZE * 2) / CHUNK_SIZE + 2;
     int nb_chunks = 0;
     Chunk *chunks = ca_alloc(sizeof(Chunk), max_chunks);
+    printf("%d\n", max_chunks); // FIXME
 
-    printf("%d\n", max_chunks);
+    // Etat initial du jeu
+    Tuile t = recup_tuile(&jeu->pile);
 
     // Elements de la page
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
@@ -33,9 +35,11 @@ enum Page page_jeu(Jeu *jeu)
     Camera2D camera = { 0 };
     camera.zoom = 0.5f;
 
-    Tuile t = creer_tuile();
+    // Spritesheet et tuiles
+    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
+    RenderTexture2D render_tuile = generer_render_tuile(t, spritesheet);
 
-    while (prochaine_page == P_JEU) {
+    while (prochaine_page == P_JEU && t != NULL) {
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
@@ -79,8 +83,12 @@ enum Page page_jeu(Jeu *jeu)
 
                 // Placer une tuile avec le clique gauche
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    RenderTexture2D texture_tuile = generer_texture(t);
-                    dessiner_tuile(chunks, &nb_chunks, texture_tuile, position_curseur_grille);
+                    fprintf(stderr, "%x, %x, %x, %x, %x,n", t->milieu, t->sud, t->nord, t->ouest, t->est);
+                    dessiner_tuile(chunks, &nb_chunks, render_tuile, position_curseur_grille);
+
+                    free(t);
+                    t = recup_tuile(&jeu->pile);
+                    render_tuile = generer_render_tuile(t, spritesheet);
                 }
             }
         }
@@ -122,6 +130,7 @@ enum Page page_jeu(Jeu *jeu)
                               (Color) { 0, 228, 48, 128});
 
 
+                // rectangle de reference
                 DrawRectangle(256, 256, 256, 256, GREEN);
 
                 for (int i = 0; i < nb_chunks; i++) {
@@ -146,6 +155,9 @@ enum Page page_jeu(Jeu *jeu)
     for (int i = 0; i < nb_chunks; i++)
         UnloadRenderTexture(chunks[i].render);
     free(chunks);
+
+    UnloadRenderTexture(render_tuile);
+    UnloadTexture(spritesheet);
 
     detruire_barrejoueurs(barrejoueurs);
     detruire_jeu(*jeu);
