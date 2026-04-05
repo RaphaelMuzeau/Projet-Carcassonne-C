@@ -49,7 +49,7 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet)
         dessiner_sprite(spritesheet, t->milieu, 0, 0.0f);
     } else {
         int nb_pivots = 0;
-        while (nb_pivots <= 4) {
+        while (nb_pivots < 4) {
             if        (t->milieu == t->ouest && t->milieu == t->nord && t->milieu == t->est && t->milieu == t->sud) {
                 dessiner_sprite(spritesheet, t->milieu, S_PLEIN, 0.0f);
                 break;
