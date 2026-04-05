@@ -4,11 +4,16 @@
 #include "meeple.h"
 
 //TODO: TESTS
-Jeu creer_jeu(int nb_joueurs, int nb_meeple, int taille_pile)
+Jeu creer_jeu(int nb_joueurs, int nb_meeple, int nb_tuiles)
 {
     Jeu jeu;
+
+    if (nb_joueurs < 1) ca_error("nombre de joueurs inferieur à 1");
+    if (nb_meeple  < 1) ca_error("nombre de meeple inferieur à 1");
+    if (nb_tuiles  < 1) ca_error("nombre de tuiles inferieur à 1");
+
     jeu.joueurs = creer_listejoueurs(nb_joueurs, nb_meeple);
-    jeu.pile = creer_pile(taille_pile, true);
+    jeu.pile = creer_pile(nb_tuiles, true);
     jeu.grille = creer_vec2D();
     return jeu;
 }

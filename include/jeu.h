@@ -12,7 +12,7 @@ typedef struct _Jeu {
     Vec2D grille;
 } Jeu;
 
-Jeu creer_jeu(int nb_joueurs, int nb_meeple, int taille_pile);
+Jeu creer_jeu(int nb_joueurs, int nb_meeple, int nb_tuiles);
 void detruire_jeu(Jeu jeu);
 
 bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple, bool fin);
