@@ -21,6 +21,7 @@
 #include "jeu.h"
 #include "fichier.h"
 #include "gentest.h"
+#include "libca.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -1128,7 +1129,93 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
 
     return true;
 }
+bool test_recherche(void)
+{
+    Vec2D grille;
+    int pts;
+    Tuile t;
+    int* nb_meeple;
+    L_meeple loc_meeple_all;
+    enum Direction d;
 
+    grille = generer_test1();
+    t = get(grille, 2, 1);
+    nb_meeple = ca_alloc(5,sizeof(int));
+    loc_meeple_all = ca_alloc(5,sizeof(L_meeple));
+    d = t->position_meeple;
+    pts = recherche(grille, nb_meeple, &loc_meeple_all, 2, 1, zone_tuile(t,d),d,0);
+    fprintf(stderr, "%d ", pts);
+    if(pts != -1) return false; // TEST VILLE INCOMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test2();
+    t = get(grille, 0, 0);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
+    fprintf(stderr, "%d ", pts);
+    if (pts != 8) return false; // TEST VILLE COMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    loc_meeple_all = NULL;
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test3();
+    t = get(grille, 1, 1);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 1, 1, zone_tuile(t,d),d,0);
+    fprintf(stderr, "%d ", pts);
+    if (pts != 5) return false; // TEST ROUTE COMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    loc_meeple_all =  NULL;
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test4();
+    t = get(grille, 1, 1);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 1, 1, zone_tuile(t,d),d,0);
+    fprintf(stderr, "\n(nb meeple test 4(%d %d))", nb_meeple[0], nb_meeple[1]);
+    fprintf(stderr, "%d ", pts);
+    if (pts != 4) return false; // TEST ROUTE 2 MEEPLE COMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test4();
+    t = get(grille, 0, 0);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
+    fprintf(stderr, "\n(nb meeple test 4(%d %d))", nb_meeple[0], nb_meeple[1]);
+    fprintf(stderr, "%d ", pts);
+    if (pts != 4) return false; // TEST ROUTE 2 MEEPLE COMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test5();
+    t = get(grille, 0, 0);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
+
+    fprintf(stderr, "%d", pts);
+    if (pts != 4) return false; // TEST ROUTE COMPLETE
+    detruire_vec2D(grille);
+    free(nb_meeple);
+
+    nb_meeple = ca_alloc(5,sizeof(int));
+    grille = generer_test7();
+    t = get(grille, 0, 2);
+    d = t->position_meeple;
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 2, zone_tuile(t,d),d,0);
+
+    fprintf(stderr, "\n%d ", pts);
+     fprintf(stderr, "(nb meeple test 7(%d %d))", nb_meeple[0], nb_meeple[1]);
+    if (pts != 22) return false; // TEST ROUTE COMPLETE
+
+    return true;
+}
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -1174,6 +1261,7 @@ Test unit_tests[] = {
     TEST(test_fichier_charger_joueur),
     TEST(test_fichier_charger_joueur_liste_vide),
     TEST(test_fichier_sauvegarder_liste_joueurs),
+    TEST(test_recherche),
 };
 
 // ===========================

@@ -10,7 +10,7 @@ enum Zone {
     Z_ROUTE   = 0x02, // 0b000010
     Z_VILLE   = 0x04, // 0b000100
     Z_BLASON  = 0x0c, // 0b001100
-    Z_VILLAGE = 0x10, // 0b010000
+    Z_VILLAGE = 0x12, // 0b010010
     Z_ABBAYE  = 0x20, // 0b100000
 };
 

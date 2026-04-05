@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include "grille.h"
 #include "tuile.h"
@@ -31,14 +32,12 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
     return true;
 }
 
-int recherche_suite(Vec2D grille, L_meeple loc_meeple_all, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
+int recherche_suite(Vec2D grille, L_meeple *loc_meeple_all, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
 {
     int pts = 0;
-    if (zone_tuile(t, d_depart) & z && d_depart != d_arrive) {
-        if (t->id_meeple != -1 && t->position_meeple == d_depart) {
-            nb_meeples[t->id_meeple] += 1;
-            L_meeple maillon = creer_maillon_meeple(x, y, d_depart);
-            ajouter_maillon_meeple(&loc_meeple_all, maillon);
+    if ((zone_tuile(t, d_depart) & z)) {
+        if(d_depart != d_arrive){
+
         }
         if (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y - 1, z, D_SUD, fin); // on effectue la recherche récursive
         if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y + 1, z, D_NORD, fin);
@@ -49,64 +48,54 @@ int recherche_suite(Vec2D grille, L_meeple loc_meeple_all, enum Zone z, enum Dir
 }
 
 /* recherche */
-
-int recherche(Vec2D grille, int *nb_meeples, L_meeple loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
+int zone_pts(Tuile t, enum Direction d)
 {
-    Tuile t = get(grille, x, y);
     int pts = 0;
-    int tmp = 0;
-
-    if (t == NULL)
-            // si c'est la fin, renvoyer les points, sinon renvoyer -1
-            return fin ? pts : -1;
-
-    if (t->is_verified)
-        return 0;
-    t->is_verified = true;
-
-    if (zone_tuile(t,d) == Z_VILLE)
+     if (zone_tuile(t,d) == Z_VILLE)
         pts += 2;
     else if (zone_tuile(t,d) == Z_BLASON)
         pts += 4;
     else
         pts += 1;
+    return pts;
+}
 
-    if (t->id_meeple != -1 && zone_tuile(t, d) & z) {
-        // ajoute le meeple à la liste du nombre de meeple trouvés indexé par joueur
-        nb_meeples[t->id_meeple] += 1;
-        L_meeple maillon = creer_maillon_meeple(x, y, d);
-        ajouter_maillon_meeple(&loc_meeple_all, maillon);
-    }
+int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
+{
+    Tuile t = get(grille, x, y);
+    int pts = 0;
+    int tmp = 0;
+
+    if (t == NULL) return fin ? pts : -1;
+    // si c'est la fin, renvoyer les points, sinon renvoyer -1
+
+    if (t->is_verified) return 0;
+    t->is_verified = true;
+
+    pts = zone_pts(t,d);
 
     /* Si le milieu de notre tuile correspond à notre zone cherché on continue la recherche
      * sur les côtés de la tuile où la zone est la même que celle cherchée */
     if (zone_tuile(t, D_MILIEU) & z) {
-
-        if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
+        if(t->id_meeple != -1 && zone_tuile(t,t->position_meeple) & z) {
             nb_meeples[t->id_meeple] += 1;
-            L_meeple maillon = creer_maillon_meeple(x, y, D_MILIEU);
-            ajouter_maillon_meeple(&loc_meeple_all, maillon);
-        } // FIN CHECK MILIEU
-
-        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_SUD, t, nb_meeples, x, y, fin);
-        if(tmp == -1) return -1;
-        pts += tmp;
-
-        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_NORD, t, nb_meeples, x, y, fin);
-        if(tmp == -1) return -1;
-        pts += tmp;
-
-        tmp = recherche_suite(grille, loc_meeple_all, z, d, D_OUEST, t, nb_meeples, x, y, fin);
-        if(tmp == -1) return -1;
-        pts += tmp;
-
-        tmp += recherche_suite(grille, loc_meeple_all, z, d, D_EST, t, nb_meeples, x, y, fin);
-        if(tmp == -1) return -1;
-        pts += tmp;
+            L_meeple maillon = creer_maillon_meeple(x, y, d);
+            ajouter_maillon_meeple(loc_meeple_all, maillon);
+        }
+    else if((t->id_meeple != -1 && (zone_tuile(t,t->position_meeple) & z)) && (t->position_meeple == d)) {
+            nb_meeples[t->id_meeple] += 1;
+            L_meeple maillon = creer_maillon_meeple(x, y, d);
+            ajouter_maillon_meeple(loc_meeple_all, maillon);
+        }
+        for (enum Direction direction = D_SUD; direction < D_MILIEU; ++direction) {
+            tmp = recherche_suite(grille, loc_meeple_all, z, d, direction, t, nb_meeples, x, y, fin);
+            if(tmp == -1) return -1;
+            pts += tmp;
+        }
     }
-
     return pts;
 }
+
 
 void recherche_is_verified(Vec2D grille, int x, int y)
 {
