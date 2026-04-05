@@ -70,11 +70,18 @@ enum Zone generer_milieu(void)
     int aleatoire = rand()%100;
 
     // Les probabilités ont été extraites du csv
-    if      (aleatoire <= 43) return Z_ROUTE;
-    else if (aleatoire <= 66) return Z_VILLE;
-    else if (aleatoire <= 79) return Z_PRE;
-    else if (aleatoire <= 90) return Z_VILLAGE;
-    else                      return Z_ABBAYE;
+    if (aleatoire <= 43) {
+        return Z_ROUTE;
+    } else if (aleatoire <= 66) {
+        int blason = rand()%100;
+        return blason <= 8 ? Z_BLASON:Z_VILLE;
+    } else if (aleatoire <= 79) {
+        return Z_PRE;
+    } else if (aleatoire <= 90) {
+        return Z_VILLAGE;
+    } else {
+        return Z_ABBAYE;
+    }
 }
 
 enum Zone generer_cote(int aleatoire)
@@ -115,24 +122,27 @@ Tuile generer_tuile(void)
      * fait le lien entre deux zones, donc au moins deux autres
      * villes ou routes doivent être présentes sur la tuile
      */
-    if (t->milieu == Z_ROUTE || t->milieu == Z_VILLE) {
+    if (t->milieu & (Z_ROUTE | Z_VILLE | Z_BLASON)) {
         int cmpt = 0;
         do {
             cmpt = 0;
             t->est = generer_cote(rand()%100);
-            if (t->est == t->milieu) cmpt++;
+            if (t->milieu == Z_BLASON && t->est == Z_VILLE) t->est = Z_BLASON;
+            if (t->est & t->milieu) cmpt++;
 
             t->sud = generer_cote(rand()%100);
-            if (t->sud== t->milieu) cmpt++;
+            if (t->milieu == Z_BLASON && t->sud == Z_VILLE) t->sud = Z_BLASON;
+            if (t->sud & t->milieu) cmpt++;
 
             t->nord = generer_cote(rand()%100);
-            if (t->nord == t->milieu) cmpt++;
+            if (t->milieu == Z_BLASON && t->nord == Z_VILLE) t->nord = Z_BLASON;
+            if (t->nord & t->milieu) cmpt++;
 
             t->ouest = generer_cote(rand()%100);
-            if (t->ouest == t->milieu) cmpt++;
+            if (t->milieu == Z_BLASON && t->ouest == Z_VILLE) t->ouest = Z_BLASON;
+            if (t->ouest & t->milieu) cmpt++;
         } while (cmpt < 2);
     }
 
     return t;
 }
-
