@@ -116,8 +116,10 @@ void recherche_is_verified(Vec2D grille, int x, int y)
 void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin)
 {
     Tuile t = get(grille, x, y);
+    if (t == NULL) return;
+
     int id_joueur = t->id_meeple;
-    int pts = 1;
+    int pts = 0;
 
     if (id_joueur == -1)
         return;
@@ -139,9 +141,11 @@ void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin
 void verification_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y)
 {
     for(int i = -1; i <= 1; i++)
-        for (int j = -1; j <= 1; j++)
-            if (get(grille, x + i, y + j)->milieu == Z_ABBAYE)
+        for (int j = -1; j <= 1; j++) {
+            Tuile t = get(grille, x + i, y + j);
+            if (t != NULL && t->milieu == Z_ABBAYE)
                 recherche_abbaye(grille, joueurs, x + i, y + j, false);
+        }
 }
 
 /* placement de meeple */
