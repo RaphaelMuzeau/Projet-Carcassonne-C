@@ -152,6 +152,7 @@ bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
 
     if (t == NULL) return false;
     if (t->id_meeple != -1) return false;
+    if (zone_tuile(t, d) & (Z_PRE | Z_VILLAGE)) return false;
     if (joueur->nb_meeple_restant <= 0) return false;
 
     L_meeple new = creer_maillon_meeple(x, y);
@@ -167,7 +168,9 @@ bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
 void retirer_meeple(Vec2D grille, ListeJoueurs listejoueurs, int x, int y)
 {
     Tuile t = get(grille, x, y);
+
     if (t == NULL) return;
+    if (t->id_meeple == -1) return;
 
     listejoueurs.tableau[t->id_meeple].nb_meeple_restant += 1;
     retirer_maillon_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeples, x, y);

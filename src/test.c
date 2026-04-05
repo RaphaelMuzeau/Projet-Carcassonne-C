@@ -849,62 +849,107 @@ bool test_grille_placer_tuile(void)
 bool test_grille_placer_meeple(void)
 {
     Vec2D grille = creer_vec2D();
-    Joueur joueur = creer_joueur(0, 2);
+    Joueur joueur = creer_joueur(0, 3);
 
     // placement sur tuile vide
     if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
     if (joueur.localisation_meeples != NULL) return false;
-    if (joueur.nb_meeple_restant != 2) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+
+    // placement sur zone invalide
+    Tuile t = creer_tuile();
+    t->milieu = Z_VILLAGE;
+    set(&grille, t, 0, -1);
+
+    if (placer_meeple(grille, &joueur, 0, -1, D_MILIEU)) return false;
+    if (joueur.localisation_meeples != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != -1) return false;
+
+    t = creer_tuile();
+    set(&grille, t, -1, -1);
+
+    if (placer_meeple(grille, &joueur, -1, -1, D_MILIEU)) return false;
+    if (joueur.localisation_meeples != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != -1) return false;
 
     // placement sur tuile occupé
-    Tuile t0 = creer_tuile();
-    t0->id_meeple = 1;
-    set(&grille, t0, 0, 0);
+    t = creer_tuile();
+    t->position_meeple = D_MILIEU;
+    t->milieu = Z_ABBAYE;
+    t->id_meeple = 1;
+    set(&grille, t, 0, 0);
 
     if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
     if (joueur.localisation_meeples != NULL) return false;
-    if (joueur.nb_meeple_restant != 2) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != 1) return false;
 
     // placements possibles
-    Tuile t1 = creer_tuile();
-    set(&grille, t1, 1, 0);
+    t = creer_tuile();
+    t->nord = Z_VILLE;
+    set(&grille, t, 1, 0);
 
     if (!placer_meeple(grille, &joueur, 1, 0, D_NORD)) return false;
 
-    if (joueur.localisation_meeples->x != 1)      return false;
-    if (joueur.localisation_meeples->y != 0)      return false;
-    if (joueur.nb_meeple_restant != 1) return false;
+    if (joueur.localisation_meeples->x != 1)  return false;
+    if (joueur.localisation_meeples->y != 0)  return false;
+    if (joueur.localisation_meeples->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 2) return false;
 
-    if (t1->id_meeple != joueur.id) return false;
-    if (t1->position_meeple != D_NORD) return false;
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_NORD) return false;
 
-    Tuile t2 = creer_tuile();
-    set(&grille, t2, 0, 1);
+    t = creer_tuile();
+    t->sud = Z_ROUTE;
+    set(&grille, t, 0, 1);
 
     if (!placer_meeple(grille, &joueur, 0, 1, D_SUD)) return false;
 
-    if (joueur.localisation_meeples->x != 0)            return false;
-    if (joueur.localisation_meeples->y != 1)            return false;
-    if (joueur.localisation_meeples->next->x != 1)      return false;
-    if (joueur.localisation_meeples->next->y != 0)      return false;
+    if (joueur.localisation_meeples->x != 0)              return false;
+    if (joueur.localisation_meeples->y != 1)              return false;
+    if (joueur.localisation_meeples->next->x != 1)        return false;
+    if (joueur.localisation_meeples->next->y != 0)        return false;
+    if (joueur.localisation_meeples->next->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 1) return false;
+
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_SUD) return false;
+
+    t = creer_tuile();
+    t->milieu = Z_ABBAYE;
+    set(&grille, t, 1, 1);
+
+    if (!placer_meeple(grille, &joueur, 1, 1, D_MILIEU)) return false;
+
+    if (joueur.localisation_meeples->x != 1)                    return false;
+    if (joueur.localisation_meeples->y != 1)                    return false;
+    if (joueur.localisation_meeples->next->x != 0)              return false;
+    if (joueur.localisation_meeples->next->y != 1)              return false;
+    if (joueur.localisation_meeples->next->next->x != 1)        return false;
+    if (joueur.localisation_meeples->next->next->y != 0)        return false;
+    if (joueur.localisation_meeples->next->next->next != NULL)  return false;
     if (joueur.nb_meeple_restant != 0) return false;
 
-
-    if (t2->id_meeple != joueur.id) return false;
-    if (t2->position_meeple != D_SUD) return false;
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_MILIEU) return false;
 
     // placement sans meeple restant
-    Tuile t3 = creer_tuile();
-    set(&grille, t3, 1, 1);
+    t = creer_tuile();
+    set(&grille, t, 1, 1);
 
-    if (placer_meeple(grille, &joueur, 1, 1, D_MILIEU)) return false;
+    if (placer_meeple(grille, &joueur, 0, 2, D_MILIEU)) return false;
 
-    if (joueur.localisation_meeples->x != 0)             return false;
-    if (joueur.localisation_meeples->y != 1)             return false;
-    if (joueur.localisation_meeples->next->x != 1)       return false;
-    if (joueur.localisation_meeples->next->y != 0)       return false;
-    if (joueur.localisation_meeples->next->next != NULL) return false;
+    if (joueur.localisation_meeples->x != 1)                    return false;
+    if (joueur.localisation_meeples->y != 1)                    return false;
+    if (joueur.localisation_meeples->next->x != 0)              return false;
+    if (joueur.localisation_meeples->next->y != 1)              return false;
+    if (joueur.localisation_meeples->next->next->x != 1)        return false;
+    if (joueur.localisation_meeples->next->next->y != 0)        return false;
+    if (joueur.localisation_meeples->next->next->next != NULL)  return false;
     if (joueur.nb_meeple_restant != 0) return false;
+    if (t->id_meeple != -1) return false;
 
     detruire_joueur(joueur);
     detruire_vec2D(grille);
@@ -921,15 +966,22 @@ bool test_grille_retirer_meeple(void)
     if (joueurs.tableau[0].nb_meeple_restant != 2) return false;
     if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
 
+    // retrait sur une tuile sans meeple
+    Tuile t = creer_tuile();
+    set(&grille, t, 1, 0);
+
+    retirer_meeple(grille, joueurs, 1, 0);
+    if (joueurs.tableau[1].localisation_meeples != NULL) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
+    if (t->id_meeple != -1) return false;
+
     // retrait normal
-    Tuile t1 = creer_tuile();
-    set(&grille, t1, 1, 0);
     placer_meeple(grille, &joueurs.tableau[1], 1, 0, D_NORD);
 
     retirer_meeple(grille, joueurs, 1, 0);
     if (joueurs.tableau[1].localisation_meeples != NULL) return false;
     if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
-    if (t1->id_meeple != -1) return false;
+    if (t->id_meeple != -1) return false;
 
     detruire_listejoueurs(joueurs);
     detruire_vec2D(grille);
