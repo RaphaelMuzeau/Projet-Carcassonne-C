@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "libca.h"
 #include "tuile.h"
 
@@ -31,8 +30,7 @@ enum Zone zone_tuile(Tuile t, enum Direction d)
     case D_MILIEU:
         return t->milieu;
     default:
-        fprintf(stderr, "carcassonne: direction invalide\n");
-        exit(EXIT_FAILURE);
+        ca_error("direction invalide");
     }
 }
 

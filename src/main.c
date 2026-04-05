@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "test.h"
+#include "libca.h"
 #include "raylib.h"
 #include "jeu.h"
 #include "page.h"
@@ -45,7 +45,7 @@ int main(void)
             break;
         case P_REGLES:
             if (system("xdg-open rapport/analyse.pdf &") == 127) // specifique à linux
-                fprintf(stderr, "carcassonne: l'ouverture des règles nécessite xdg-open");
+                ca_warn("l'ouverture des règles nécessite xdg-open");
             prochaine_page = P_TITRE;
             break;
         default:

@@ -1,5 +1,4 @@
 #include <stdbool.h>
-#include <stdio.h>
 #include "libca.h"
 #include "pile.h"
 #include "tuile.h"
@@ -53,10 +52,8 @@ Tuile recup_tuile(Pile *p)
 
 bool inserer_tuile(Pile *p, Tuile t)
 {
-    if (p->gen_aleatoire) {
-        fprintf(stderr, "carcassonne : insertion dans une pile en mode aléatoire\n");
-        exit(EXIT_FAILURE);
-    }
+    if (p->gen_aleatoire)
+        ca_error("insertion dans une pile en mode aléatoire");
 
     if (pile_pleine(*p))
         return false;

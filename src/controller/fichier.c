@@ -113,8 +113,7 @@ Vec2D charger_grille(FILE *f)
     return g;
 
 erreur_grille:
-    fprintf(stderr, "carcassonne: fichier invalide (grille)\n");
-    exit(EXIT_FAILURE);
+    ca_error("fichier invalide (grille)");
 }
 
 void sauvegarder_pile(Pile p, FILE *f)
@@ -153,8 +152,7 @@ Pile charger_pile(FILE *f)
     return p;
 
 erreur_pile:
-    fprintf(stderr, "carcassonne: fichier invalide (pile)\n");
-    exit(EXIT_FAILURE);
+    ca_error("fichier invalide (pile)");
 }
 
 void sauvegarder_liste_joueurs(ListeJoueurs tab, FILE *f)
@@ -179,8 +177,7 @@ ListeJoueurs charger_liste_joueurs(FILE *f)
     return joueurs;
 
 erreur_liste_joueurs:
-fprintf(stderr, "carcassonne: fichier invalide (liste_joueurs)\n");
-exit(EXIT_FAILURE);
+    ca_error("fichier invalide (lise_joueurs)");
 }
 
 void sauvegarder_joueur(Joueur joueur, FILE *f)
@@ -256,6 +253,5 @@ Joueur charger_joueur(FILE *f)
     return j;
 
 erreur_joueur:
-    fprintf(stderr, "carcassonne: fichier invalide (joueur)\n");
-    exit(EXIT_FAILURE);
+    ca_error("fichier invalide (joueur)");
 }
