@@ -40,17 +40,18 @@ void dessiner_cartejoueur(CarteJoueur carte, bool tour);
 
 typedef struct _BarreJoueurs {
     CarteJoueur *cartes;
+    Rectangle champ;
     ListeJoueurs joueurs;
     ScrollBar scrollbar;
     float fin_liste;
 } BarreJoueurs;
 
-BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs, Rectangle ecran);
+BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs);
 void detruire_barrejoueurs(BarreJoueurs barre);
 
-void update_barrejoueurs(BarreJoueurs *barre, Rectangle ecran);
+void update_barrejoueurs(BarreJoueurs *barre);
 // met à jour le compteur de points et de meeple de chaque joueur
 void rafrachir_barrejoueurs(BarreJoueurs *barre);
-void dessiner_barrejoueurs(BarreJoueurs barre, Rectangle ecran, int id_tour);
+void dessiner_barrejoueurs(BarreJoueurs barre, int id_tour);
 
 #endif

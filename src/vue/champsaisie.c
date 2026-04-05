@@ -9,6 +9,7 @@ ChampSaisie creer_champsaisie(float x, float y, float largeur, float hauteur, bo
     cs.champ  = (Rectangle) { .x = x, .y = y, .width = largeur, .height = hauteur };
     cs.saisie = creer_varstring();
     cs.texte  = creer_texte(0, 0, cs.saisie.texte);
+    cs.texte.position.y = 4;
     cs.vue    = LoadRenderTexture(largeur - CHAMP_BORDER_SIZE*2, hauteur - CHAMP_BORDER_SIZE*2);
     cs.numerique = est_numerique;
 
@@ -26,18 +27,11 @@ void update_champsaisie(ChampSaisie *cs)
     /* manipulation du curseur */
     bool survole = CheckCollisionPointRec(GetMousePosition(), cs->champ);
 
-    if (survole)
-        SetMouseCursor(MOUSE_CURSOR_IBEAM);
-    else if (!cs->focus)
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (survole)
             cs->focus = true;
-        else {
+        else
             cs->focus = false;
-            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-        }
     }
 
     /* entrée du texte */
@@ -74,18 +68,11 @@ void update_champsaisie_camera(ChampSaisie *cs, Camera2D camera)
     /* manipulation du curseur */
     bool survole = CheckCollisionPointRec(GetScreenToWorld2D(GetMousePosition(), camera), cs->champ);
 
-    if (survole)
-        SetMouseCursor(MOUSE_CURSOR_IBEAM);
-    else if (!cs->focus)
-        SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-
     if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         if (survole)
             cs->focus = true;
-        else {
+        else
             cs->focus = false;
-            SetMouseCursor(MOUSE_CURSOR_DEFAULT);
-        }
     }
 
     /* entrée du texte */
