@@ -937,7 +937,7 @@ bool test_grille_placer_meeple(void)
 
     // placement sans meeple restant
     t = creer_tuile();
-    set(&grille, t, 1, 1);
+    set(&grille, t, 0, 2);
 
     if (placer_meeple(grille, &joueur, 0, 2, D_MILIEU)) return false;
 
