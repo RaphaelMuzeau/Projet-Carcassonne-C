@@ -44,7 +44,7 @@ debug:
 test:
 	@printf "Compilation de \x1b[93m$@ \x1b[0m($(TEST))...\n"
 	@${MAKE} $(TEST) | sed 's/^/  /'
-	./$(TEST)
+	$(VALGRIND) $(VGFLAGS) ./$(TEST)
 
 run: debug
 	@printf "\x1b[95mexecution de $<:\x1b[0;0m\n"

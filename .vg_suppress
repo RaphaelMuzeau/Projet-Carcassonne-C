@@ -34,3 +34,18 @@
     ...
     fun:glXSwapBuffers
 }
+{
+   <test_fichier_charger_joueur>
+   Memcheck:Param
+   write(buf)
+   fun:write
+   fun:_IO_file_write@@GLIBC_2.2.5
+   fun:new_do_write
+   fun:_IO_do_write@@GLIBC_2.2.5
+   fun:_IO_switch_to_get_mode
+   fun:_IO_file_seekoff@@GLIBC_2.2.5
+   fun:fseek
+   fun:sauvegarder_joueur
+   fun:generer_fichier_joueur
+   fun:test_fichier_charger_joueur
+}
