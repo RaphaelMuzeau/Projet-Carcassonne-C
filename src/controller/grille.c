@@ -11,7 +11,7 @@ bool est_vide(Vec2D grille, int x, int y)
     return get(grille, x, y) == NULL;
 }
 
-bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
+bool placer_tuile(Vec2D *grille, int x, int y, Tuile t)
 {
     // Tuile occupé
     if (!est_vide(*grille, x, y))
@@ -28,7 +28,7 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
      || !compatibilite_tuile(get(*grille, x, y), get(*grille, x, y + 1), D_SUD))
         return false;
 
-    set(grille, piece, x, y);
+    set(grille, t, x, y);
     return true;
 }
 
@@ -44,7 +44,7 @@ int zone_pts(enum Zone zone)
     exit(EXIT_FAILURE);
 }
 
-int recherche_suite(Vec2D grille, L_meeple *loc_meeple_all, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
+int recherche_suite(Vec2D grille, L_meeple *loc_meeple, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
 {
     int pts = 0;
 
@@ -56,39 +56,39 @@ int recherche_suite(Vec2D grille, L_meeple *loc_meeple_all, enum Zone z, enum Di
         if (t->id_meeple != -1 && t->position_meeple == d_depart) {
             nb_meeples[t->id_meeple] += 1;
             L_meeple maillon = creer_maillon_meeple(x, y);
-            ajouter_maillon_meeple(loc_meeple_all, maillon);
+            ajouter_maillon_meeple(loc_meeple, maillon);
         }
 
         // effectuer la recherche récursive
-        if      (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y - 1, z, D_SUD, fin);
-        else if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y + 1, z, D_NORD, fin);
-        else if (d_depart == D_EST)   pts = recherche(grille, nb_meeples, loc_meeple_all, x + 1,     y, z, D_OUEST, fin);
-        else if (d_depart == D_OUEST) pts = recherche(grille, nb_meeples, loc_meeple_all, x - 1,     y, z, D_EST, fin);
+        if      (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple, x,     y - 1, z, D_SUD, fin);
+        else if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple, x,     y + 1, z, D_NORD, fin);
+        else if (d_depart == D_EST)   pts = recherche(grille, nb_meeples, loc_meeple, x + 1,     y, z, D_OUEST, fin);
+        else if (d_depart == D_OUEST) pts = recherche(grille, nb_meeples, loc_meeple, x - 1,     y, z, D_EST, fin);
     }
 
     return pts;
 }
 
-int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d_arrive, bool fin)
+int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, enum Zone z, enum Direction d_arrive, bool fin)
 {
     Tuile t = get(grille, x, y);
 
     if (t == NULL) return fin ? 0 : -1;
-    if (t->is_verified) return 0;
-    t->is_verified = true;
+    if (t->est_verifie) return 0;
+    t->est_verifie = true;
 
     // traiter le cas du meeple au milieu en premier
     if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
-        nb_meeples[t->id_meeple] += 1;
+        nb_meeple[t->id_meeple] += 1;
         L_meeple maillon = creer_maillon_meeple(x, y);
-        ajouter_maillon_meeple(loc_meeple_all, maillon);
+        ajouter_maillon_meeple(loc_meeple, maillon);
     }
 
     int pts = zone_pts(zone_tuile(t, d_arrive));
 
     // effectuer la recherche sur tous les cote de la tuile
     for (enum Direction d_depart = 0; d_depart < D_MILIEU; ++d_depart) {
-        int tmp = recherche_suite(grille, loc_meeple_all, z, d_arrive, d_depart, t, nb_meeples, x, y, fin);
+        int tmp = recherche_suite(grille, loc_meeple, z, d_arrive, d_depart, t, nb_meeple, x, y, fin);
         if(tmp == -1) return -1;
         pts += tmp;
     }
@@ -97,18 +97,18 @@ int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, in
 }
 
 
-void recherche_is_verified(Vec2D grille, int x, int y)
+void recherche_est_verifie(Vec2D grille, int x, int y)
 {
     Tuile t = get(grille, x , y);
 
-    if (t == NULL || !t->is_verified)
+    if (t == NULL || !t->est_verifie)
         return;
 
-    t->is_verified = false;
-    recherche_is_verified(grille, x+1, y);
-    recherche_is_verified(grille, x-1, y);
-    recherche_is_verified(grille, x, y+1);
-    recherche_is_verified(grille, x, y-1);
+    t->est_verifie = false;
+    recherche_est_verifie(grille, x+1, y);
+    recherche_est_verifie(grille, x-1, y);
+    recherche_est_verifie(grille, x, y+1);
+    recherche_est_verifie(grille, x, y-1);
 }
 
 /* recherche abbaye */
@@ -160,7 +160,7 @@ bool placer_meeple(Vec2D grille, Joueur *joueur, int x, int y, enum Direction d)
     if (joueur->nb_meeple_restant <= 0) return false;
 
     L_meeple new = creer_maillon_meeple(x, y);
-    ajouter_maillon_meeple(&joueur->localisation_meeples, new);
+    ajouter_maillon_meeple(&joueur->localisation_meeple, new);
     t->id_meeple = joueur->id;
     t->position_meeple = d;
 
@@ -177,6 +177,6 @@ void retirer_meeple(Vec2D grille, ListeJoueurs listejoueurs, int x, int y)
     if (t->id_meeple == -1) return;
 
     listejoueurs.tableau[t->id_meeple].nb_meeple_restant += 1;
-    retirer_maillon_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeples, x, y);
+    retirer_maillon_meeple(&listejoueurs.tableau[t->id_meeple].localisation_meeple, x, y);
     t->id_meeple = -1;
 }

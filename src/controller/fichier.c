@@ -60,14 +60,14 @@ int ecrire_grille(Vec2D g, int x, int y, FILE *f)
     if (!cur)
         return 0;
 
-    if (cur->is_verified)
+    if (cur->est_verifie)
         return 0;
 
     fwrite(cur, sizeof(struct _Tuile), 1, f);
     fwrite(&x, sizeof(int), 1, f);
     fwrite(&y, sizeof(int), 1, f);
 
-    cur->is_verified = true;
+    cur->est_verifie = true;
 
     return ecrire_grille(g, x+1, y, f) + ecrire_grille(g, x-1, y, f) + // EST & OUEST
            ecrire_grille(g, x, y+1, f) + ecrire_grille(g, x, y-1, f) + 1; // NORD & SUD
@@ -81,7 +81,7 @@ void sauvegarder_grille(Vec2D g, FILE *f)
     fseek(f, sizeof(int), SEEK_CUR); // Prépare de la place pour nb_tuiles
 
     int nb_tuiles = ecrire_grille(g, 0, 0, f);
-    recherche_is_verified(g, 0, 0);
+    recherche_est_verifie(g, 0, 0);
 
     fsetpos(f, &pos_nb_tuiles);  // Retour arrière pour écrire nb_tuiles
     fwrite(&nb_tuiles, sizeof(int), 1, f);
@@ -186,7 +186,7 @@ exit(EXIT_FAILURE);
 void sauvegarder_joueur(Joueur joueur, FILE *f)
 {
     Joueur joueur_tmp = joueur;
-    joueur_tmp.localisation_meeples = NULL;
+    joueur_tmp.localisation_meeple = NULL;
     joueur_tmp.nom= NULL;
     fwrite(&joueur_tmp, sizeof(Joueur), 1, f);
 
@@ -203,8 +203,8 @@ void sauvegarder_joueur(Joueur joueur, FILE *f)
     /*
      * Se fait via des structures privés pour changer
      * la variable tmp2 sans modifier tmp */
-    if (joueur.localisation_meeples != NULL) {
-        struct _Maillon tmp = *joueur.localisation_meeples;
+    if (joueur.localisation_meeple != NULL) {
+        struct _Maillon tmp = *joueur.localisation_meeple;
         do {
             struct _Maillon tmp2 = tmp;
             tmp2.next = NULL;
@@ -245,7 +245,7 @@ Joueur charger_joueur(FILE *f)
         L_meeple tmp = creer_maillon_meeple(0, 0);
         if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
             goto erreur_joueur;
-        ajouter_maillon_meeple(&joueur.localisation_meeples, tmp);
+        ajouter_maillon_meeple(&joueur.localisation_meeple, tmp);
     }
 
     return joueur;
