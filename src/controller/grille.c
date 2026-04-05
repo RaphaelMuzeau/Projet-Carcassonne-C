@@ -32,67 +32,67 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile piece)
     return true;
 }
 
+/* recherche */
+
+int zone_pts(enum Zone zone)
+{
+    if (zone == Z_ROUTE)  return 1;
+    if (zone == Z_VILLE)  return 2;
+    if (zone == Z_BLASON) return 4;
+
+    fprintf(stderr, "carcassonne: recherche sur une zone invalide\n");
+    exit(EXIT_FAILURE);
+}
+
 int recherche_suite(Vec2D grille, L_meeple *loc_meeple_all, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
 {
     int pts = 0;
-    if ((zone_tuile(t, d_depart) & z)) {
-        if(d_depart != d_arrive){
 
+    // traiter ce coté si c'est celui où a commencé la recherche
+    // ou si on peut y acceder par le milieu
+    if (d_depart == d_arrive || ((zone_tuile(t, d_depart) & z) && (t->milieu & z))) {
+
+        // ajouter un meeple aux listes s'il est present sur ce coté
+        if (t->id_meeple != -1 && t->position_meeple == d_depart) {
+            nb_meeples[t->id_meeple] += 1;
+            L_meeple maillon = creer_maillon_meeple(x, y, d_depart);
+            ajouter_maillon_meeple(loc_meeple_all, maillon);
         }
-        if (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y - 1, z, D_SUD, fin); // on effectue la recherche récursive
-        if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y + 1, z, D_NORD, fin);
-        if (d_depart == D_EST)   pts = recherche(grille, nb_meeples, loc_meeple_all, x + 1,     y, z, D_OUEST, fin);
-        if (d_depart == D_OUEST) pts = recherche(grille, nb_meeples, loc_meeple_all, x - 1,     y, z, D_EST, fin);
+
+        // effectuer la recherche récursive
+        if      (d_depart == D_NORD)  pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y - 1, z, D_SUD, fin);
+        else if (d_depart == D_SUD)   pts = recherche(grille, nb_meeples, loc_meeple_all, x,     y + 1, z, D_NORD, fin);
+        else if (d_depart == D_EST)   pts = recherche(grille, nb_meeples, loc_meeple_all, x + 1,     y, z, D_OUEST, fin);
+        else if (d_depart == D_OUEST) pts = recherche(grille, nb_meeples, loc_meeple_all, x - 1,     y, z, D_EST, fin);
     }
+
     return pts;
 }
 
-/* recherche */
-int zone_pts(Tuile t, enum Direction d)
-{
-    int pts = 0;
-     if (zone_tuile(t,d) == Z_VILLE)
-        pts += 2;
-    else if (zone_tuile(t,d) == Z_BLASON)
-        pts += 4;
-    else
-        pts += 1;
-    return pts;
-}
-
-int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d, bool fin)
+int recherche(Vec2D grille, int *nb_meeples, L_meeple *loc_meeple_all, int x, int y, enum Zone z, enum Direction d_arrive, bool fin)
 {
     Tuile t = get(grille, x, y);
-    int pts = 0;
-    int tmp = 0;
 
-    if (t == NULL) return fin ? pts : -1;
-    // si c'est la fin, renvoyer les points, sinon renvoyer -1
-
+    if (t == NULL) return fin ? 0 : -1;
     if (t->is_verified) return 0;
     t->is_verified = true;
 
-    pts = zone_pts(t,d);
-
-    /* Si le milieu de notre tuile correspond à notre zone cherché on continue la recherche
-     * sur les côtés de la tuile où la zone est la même que celle cherchée */
-    if (zone_tuile(t, D_MILIEU) & z) {
-        if(t->id_meeple != -1 && zone_tuile(t,t->position_meeple) & z) {
-            nb_meeples[t->id_meeple] += 1;
-            L_meeple maillon = creer_maillon_meeple(x, y, d);
-            ajouter_maillon_meeple(loc_meeple_all, maillon);
-        }
-    else if((t->id_meeple != -1 && (zone_tuile(t,t->position_meeple) & z)) && (t->position_meeple == d)) {
-            nb_meeples[t->id_meeple] += 1;
-            L_meeple maillon = creer_maillon_meeple(x, y, d);
-            ajouter_maillon_meeple(loc_meeple_all, maillon);
-        }
-        for (enum Direction direction = D_SUD; direction < D_MILIEU; ++direction) {
-            tmp = recherche_suite(grille, loc_meeple_all, z, d, direction, t, nb_meeples, x, y, fin);
-            if(tmp == -1) return -1;
-            pts += tmp;
-        }
+    // traiter le cas du meeple au milieu en premier
+    if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
+        nb_meeples[t->id_meeple] += 1;
+        L_meeple maillon = creer_maillon_meeple(x, y, D_MILIEU);
+        ajouter_maillon_meeple(loc_meeple_all, maillon);
     }
+
+    int pts = zone_pts(zone_tuile(t, d_arrive));
+
+    // effectuer la recherche sur tous les cote de la tuile
+    for (enum Direction d_depart = 0; d_depart < D_MILIEU; ++d_depart) {
+        int tmp = recherche_suite(grille, loc_meeple_all, z, d_arrive, d_depart, t, nb_meeples, x, y, fin);
+        if(tmp == -1) return -1;
+        pts += tmp;
+    }
+
     return pts;
 }
 

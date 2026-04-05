@@ -3,12 +3,12 @@
 
 #include "vec.h"
 
-Vec2D generer_test1(void);
-Vec2D generer_test2(void);
-Vec2D generer_test3(void);
-Vec2D generer_test4(void);
-Vec2D generer_test5(void);
-Vec2D generer_test7(void);
+Vec2D generer_recherche_ville_incomplete(void);
+Vec2D generer_recherche_ville_complete(void);
+Vec2D generer_recherche_ville_blason(void);
+Vec2D generer_route_village(void);
+Vec2D generer_route_ville(void);
+
 void generer_fichier_grille(void);
 void generer_fichier_pile(void);
 void generer_fichier_joueur(void);

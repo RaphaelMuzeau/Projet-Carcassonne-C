@@ -1129,93 +1129,95 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
 
     return true;
 }
+
 bool test_recherche(void)
 {
-    Vec2D grille;
-    int pts;
-    Tuile t;
-    int* nb_meeple;
-    L_meeple loc_meeple_all;
-    enum Direction d;
+    int *nb_meeple = ca_alloc(2, sizeof(int));
+    L_meeple loc_meeple_all = NULL;
+    Vec2D grille = { 0 };
+    int pts = 0;
 
-    grille = generer_test1();
-    t = get(grille, 2, 1);
-    nb_meeple = ca_alloc(5,sizeof(int));
-    loc_meeple_all = ca_alloc(5,sizeof(L_meeple));
-    d = t->position_meeple;
-    pts = recherche(grille, nb_meeple, &loc_meeple_all, 2, 1, zone_tuile(t,d),d,0);
-    fprintf(stderr, "%d ", pts);
-    if(pts != -1) return false; // TEST VILLE INCOMPLETE
+    // ville incomplete
+
+    grille = generer_recherche_ville_incomplete();
+    pts = recherche(grille, nb_meeple, &loc_meeple_all, 2, 1, Z_VILLE, D_OUEST, false);
+
+    if (pts != -1) return false;
+
     detruire_vec2D(grille);
-    free(nb_meeple);
-
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test2();
-    t = get(grille, 0, 0);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
-    fprintf(stderr, "%d ", pts);
-    if (pts != 8) return false; // TEST VILLE COMPLETE
-    detruire_vec2D(grille);
-    free(nb_meeple);
-
+    detruire_liste_meeple(loc_meeple_all);
     loc_meeple_all = NULL;
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test3();
-    t = get(grille, 1, 1);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 1, 1, zone_tuile(t,d),d,0);
-    fprintf(stderr, "%d ", pts);
-    if (pts != 5) return false; // TEST ROUTE COMPLETE
+    nb_meeple[0] = 0;
+
+    // vile complete
+
+    grille = generer_recherche_ville_complete();
+    pts = recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, Z_VILLE, D_SUD, false);
+
+    if (pts != 8) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 0) return false;
+    if (loc_meeple_all == NULL) return false;
+    if (loc_meeple_all->x != 0) return false;
+    if (loc_meeple_all->y != 0) return false;
+    if (loc_meeple_all->next != NULL) return false;
+
     detruire_vec2D(grille);
-    free(nb_meeple);
+    detruire_liste_meeple(loc_meeple_all);
+    loc_meeple_all = NULL;
+    nb_meeple[0] = 0;
 
-    loc_meeple_all =  NULL;
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test4();
-    t = get(grille, 1, 1);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 1, 1, zone_tuile(t,d),d,0);
-    fprintf(stderr, "\n(nb meeple test 4(%d %d))", nb_meeple[0], nb_meeple[1]);
-    fprintf(stderr, "%d ", pts);
-    if (pts != 4) return false; // TEST ROUTE 2 MEEPLE COMPLETE
+    // ville avec blason
+
+    grille = generer_recherche_ville_blason();
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 2, Z_VILLE, D_EST, false);
+
+    if (pts != 22) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (nb_meeple[1] != 2) return false;
+    if (loc_meeple_all == NULL) return false;
+    // TODO verifier la presence des meeple dans la liste chainé
+
     detruire_vec2D(grille);
-    free(nb_meeple);
+    detruire_liste_meeple(loc_meeple_all);
+    loc_meeple_all = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
 
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test4();
-    t = get(grille, 0, 0);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
-    fprintf(stderr, "\n(nb meeple test 4(%d %d))", nb_meeple[0], nb_meeple[1]);
-    fprintf(stderr, "%d ", pts);
-    if (pts != 4) return false; // TEST ROUTE 2 MEEPLE COMPLETE
+    // route complete, arret sur un village
+
+    grille = generer_route_village();
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, Z_ROUTE, D_SUD, false);
+
+    if (pts != 5) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (loc_meeple_all == NULL) return false;
+    // TODO verifier la presence des meeple dans la liste chainé
+
     detruire_vec2D(grille);
-    free(nb_meeple);
+    detruire_liste_meeple(loc_meeple_all);
+    loc_meeple_all = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
 
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test5();
-    t = get(grille, 0, 0);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 0, zone_tuile(t,d),d,0);
+    // route complete, arret sur une ville
 
-    fprintf(stderr, "%d", pts);
-    if (pts != 4) return false; // TEST ROUTE COMPLETE
+    grille = generer_route_ville();
+    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 1, 1, Z_ROUTE, D_EST, false);
+
+    if (pts != 4) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 1) return false;
+    if (loc_meeple_all == NULL) return false;
+    // TODO verifier la presence des meeple dans la liste chainé
+
     detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple_all);
     free(nb_meeple);
-
-    nb_meeple = ca_alloc(5,sizeof(int));
-    grille = generer_test7();
-    t = get(grille, 0, 2);
-    d = t->position_meeple;
-    pts =  recherche(grille, nb_meeple, &loc_meeple_all, 0, 2, zone_tuile(t,d),d,0);
-
-    fprintf(stderr, "\n%d ", pts);
-     fprintf(stderr, "(nb meeple test 7(%d %d))", nb_meeple[0], nb_meeple[1]);
-    if (pts != 22) return false; // TEST ROUTE COMPLETE
 
     return true;
 }
+
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
