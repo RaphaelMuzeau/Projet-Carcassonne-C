@@ -1181,6 +1181,8 @@ bool test_recherche(void)
 
     if (pts != -1) return false;
 
+    if(!verification_presence_meeple(&loc_meeple, 2, 1)) return false;
+
     detruire_vec2D(grille);
     detruire_liste_meeple(loc_meeple);
     loc_meeple = NULL;
@@ -1199,6 +1201,8 @@ bool test_recherche(void)
     if (loc_meeple->y != 0) return false;
     if (loc_meeple->next != NULL) return false;
 
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+
     detruire_vec2D(grille);
     detruire_liste_meeple(loc_meeple);
     loc_meeple = NULL;
@@ -1213,7 +1217,14 @@ bool test_recherche(void)
     if (nb_meeple[0] != 2) return false;
     if (nb_meeple[1] != 2) return false;
     if (loc_meeple == NULL) return false;
-    // TODO verifier la presence des meeple dans la liste chainé
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, -1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 0, 2)) return false;
+
+    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
+    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
 
     detruire_vec2D(grille);
     detruire_liste_meeple(loc_meeple);
@@ -1229,7 +1240,12 @@ bool test_recherche(void)
     if (pts != 5) return false;
     if (nb_meeple[0] != 2) return false;
     if (loc_meeple == NULL) return false;
-    // TODO verifier la presence des meeple dans la liste chainé
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
+    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
 
     detruire_vec2D(grille);
     detruire_liste_meeple(loc_meeple);
@@ -1246,7 +1262,12 @@ bool test_recherche(void)
     if (nb_meeple[0] != 1) return false;
     if (nb_meeple[1] != 1) return false;
     if (loc_meeple == NULL) return false;
-    // TODO verifier la presence des meeple dans la liste chainé
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
+    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
 
     detruire_vec2D(grille);
     detruire_liste_meeple(loc_meeple);
@@ -1267,6 +1288,7 @@ bool test_verification_abbaye(void)
     detruire_vec2D(grille);
     return true;
 }
+
 bool test_recherche_abbaye_complete(void)
 {
     Vec2D grille = generer_recherche_abbaye_complete();
@@ -1281,7 +1303,7 @@ bool test_recherche_abbaye_complete(void)
     return true;
 }
 
-bool test_recherche_abbaye_non_complete()
+bool test_recherche_abbaye_non_complete(void)
 {
     Vec2D grille = generer_recherche_abbaye_non_complete();
     ListeJoueurs listejoueur = creer_listejoueurs(1,1);
@@ -1299,6 +1321,27 @@ bool test_recherche_abbaye_non_complete()
     return true;
 }
 
+bool test_verification_presence_meeple(void)
+{
+    L_meeple loc_meeple;
+    loc_meeple = creer_maillon_meeple(0,0);
+
+    if(!verification_presence_meeple(&loc_meeple,0,0)) return false;
+
+    L_meeple maillon2;
+    maillon2 = creer_maillon_meeple(0,1);
+    ajouter_maillon_meeple(&loc_meeple,maillon2);
+    if(!verification_presence_meeple(&loc_meeple,0,1)) return false;
+
+    if(verification_presence_meeple(&loc_meeple,9,0)) return false;
+    if(verification_presence_meeple(&loc_meeple,0,9)) return false;
+
+    retirer_maillon_meeple(&loc_meeple,0,1);
+    retirer_maillon_meeple(&loc_meeple,0,0);
+
+    return true;
+
+}
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -1348,6 +1391,7 @@ Test unit_tests[] = {
     TEST(test_verification_abbaye),
     TEST(test_recherche_abbaye_complete),
     TEST(test_recherche_abbaye_non_complete),
+    TEST(test_verification_presence_meeple),
 };
 
 // ===========================
