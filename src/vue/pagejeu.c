@@ -20,7 +20,6 @@ enum Page page_jeu(Jeu *jeu)
     int max_chunks = (jeu->pile.nb_element * TEXTURE_SIZE * 2) / CHUNK_SIZE + 2;
     int nb_chunks = 0;
     Chunk *chunks = ca_alloc(sizeof(Chunk), max_chunks);
-    printf("%d\n", max_chunks); // FIXME
 
     // Etat initial du jeu
     Tuile t = recup_tuile(&jeu->pile);
@@ -41,13 +40,15 @@ enum Page page_jeu(Jeu *jeu)
     Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
     RenderTexture2D render_tuile = generer_render_tuile(t, spritesheet);
 
-    while (prochaine_page == P_JEU && t != NULL) {
+    while (prochaine_page == P_JEU) {
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
-        if (update_bouton(&centrer)) {
+        if (update_bouton(&centrer))
             centre_camera = true;
-        }
+
+        if (t == NULL)
+            continue; // eviter de traiter cette tuile
 
         /* reallouer la memoire necessaire à plus de chunks si besoin */
         if (nb_chunks == max_chunks) {
@@ -89,7 +90,6 @@ enum Page page_jeu(Jeu *jeu)
 
                 // Placer une tuile avec le clique gauche
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    fprintf(stderr, "%x, %x, %x, %x, %x,n", t->milieu, t->sud, t->nord, t->ouest, t->est);
                     dessiner_tuile(chunks, &nb_chunks, render_tuile, position_curseur_grille);
 
                     free(t);
@@ -128,20 +128,24 @@ enum Page page_jeu(Jeu *jeu)
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
+            /* dessin de la grille */
             BeginMode2D(camera);
+                // les textures inversent l'axe y par defaut, on doit le
+                // remettre dans le bon sens en inversant le rectangle de source.
+
                 // dessiner la tuile actuelle sur le curseur
-                DrawRectangle(multiple_inf(position_curseur_grille.x, TEXTURE_SIZE),
-                              multiple_inf(position_curseur_grille.y, TEXTURE_SIZE),
-                              TEXTURE_SIZE, TEXTURE_SIZE,
-                              (Color) { 0, 228, 48, 128});
+                Vector2 pos = { multiple_inf(position_curseur_grille.x, TEXTURE_SIZE),
+                                multiple_inf(position_curseur_grille.y, TEXTURE_SIZE) };
+                Vector2 origin = { TEXTURE_SIZE / 2.0f, TEXTURE_SIZE / 2.0f };
+                Rectangle source_tuile = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
+                Rectangle dest_tuile   = { .width = TEXTURE_SIZE, .height =  TEXTURE_SIZE };
+                dest_tuile.x = pos.x + TEXTURE_SIZE/2.0f;
+                dest_tuile.y = pos.y + TEXTURE_SIZE/2.0f;
+                Color base = { 255, 255, 255, 128 }; // la tuile est semi-transparente
+                DrawTexturePro(render_tuile.texture, source_tuile, dest_tuile, origin, 0.0f, base);
 
-
-                // rectangle de reference
-                DrawRectangle(256, 256, 256, 256, GREEN);
-
+                // dessiner chaque chunk
                 for (int i = 0; i < nb_chunks; i++) {
-                    // les textures inversent l'axe y par defaut, on doit le
-                    // remettre dans le bon sens en inversant le rectangle de source.
                     Rectangle source_chunk = { .width = CHUNK_SIZE, .height = -CHUNK_SIZE };
                     Vector2 pos = { chunks[i].x, chunks[i].y };
                     DrawTextureRec(chunks[i].render.texture, source_chunk, pos, WHITE);
