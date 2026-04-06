@@ -5,6 +5,23 @@
 #include "tuile.h"
 #include "render.h"
 
+/* operations necessaires au placement des render */
+
+int multiple_inf(float x, int p)
+{
+    return (int) nearbyint(x) & ~(p - 1);
+}
+
+int mod(int x, int z)
+{
+    int res = x % z;
+    if (res < 0)
+        res += z;
+    return res;
+}
+
+/* generation des render */
+
 void dessiner_sprite(Texture spritesheet, enum Zone zone, enum Sprite sprite, float rotation)
 {
     if (zone == Z_PRE) return;
@@ -74,25 +91,21 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet)
     return render;
 }
 
-// dessine le render d'une tuile dans un chunk et le detruit
-void dessiner_tuile(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position)
+// ajoute le render d'une tuile aux chunks
+void ajouter_tuile_chunk(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position, float rotation)
 {
     int x_chunk = multiple_inf(position.x, CHUNK_SIZE);
     int y_chunk = multiple_inf(position.y, CHUNK_SIZE);
 
-    int x_tuile = mod(multiple_inf(position.x, TEXTURE_SIZE), CHUNK_SIZE);
-    int y_tuile = mod(multiple_inf(position.y, TEXTURE_SIZE), CHUNK_SIZE);
-    Vector2 position_tuile = { x_tuile, y_tuile };
-
-    Rectangle source = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
+    position.x = mod(multiple_inf(position.x, TEXTURE_SIZE), CHUNK_SIZE);
+    position.y = mod(multiple_inf(position.y, TEXTURE_SIZE), CHUNK_SIZE);
 
     // On cherche si le chunk requis existe déjà
     for (int i = 0; i < *nb_chunks; i++) {
         if (chunks[i].x == x_chunk && chunks[i].y == y_chunk) {
             BeginTextureMode(chunks[i].render);
-                DrawTextureRec(render_tuile.texture, source, position_tuile, WHITE);
+                dessiner_tuile(render_tuile, position, rotation, 255);
             EndTextureMode();
-            UnloadRenderTexture(render_tuile);
             return;
         }
     }
@@ -103,22 +116,34 @@ void dessiner_tuile(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile,
     chunks[*nb_chunks].y = y_chunk;
 
     BeginTextureMode(chunks[*nb_chunks].render);
-            DrawTextureRec(render_tuile.texture, source, position_tuile, WHITE);
+        dessiner_tuile(render_tuile, position, rotation, 255);
     EndTextureMode();
-    UnloadRenderTexture(render_tuile);
 
     ++*nb_chunks;
 }
 
-int multiple_inf(float x, int p)
+/* dessin des chunks et tuiles */
+
+void dessiner_chunk(Chunk chunk)
 {
-    return (int) nearbyint(x) & ~(p - 1);
+    Rectangle source = { .width = CHUNK_SIZE, .height = -CHUNK_SIZE };
+    Vector2 pos = { chunk.x, chunk.y  };
+    DrawTextureRec(chunk.render.texture, source, pos, WHITE);
 }
 
-int mod(int x, int z)
+void dessiner_tuile(RenderTexture2D render_tuile, Vector2 position, float rotation, int alpha)
 {
-    int res = x % z;
-    if (res < 0)
-        res += z;
-    return res;
+    // aligner la tuile à une 'case' sur la grille
+    position.x = multiple_inf(position.x, TEXTURE_SIZE);
+    position.y = multiple_inf(position.y, TEXTURE_SIZE);
+
+    // dessiner sa texture
+    Vector2 origin = { TEXTURE_SIZE / 2.0f, TEXTURE_SIZE / 2.0f };
+    Rectangle source_tuile = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
+    Rectangle dest_tuile   = { .width = TEXTURE_SIZE, .height =  TEXTURE_SIZE };
+    dest_tuile.x = position.x + TEXTURE_SIZE/2.0f;
+    dest_tuile.y = position.y + TEXTURE_SIZE/2.0f;
+    Color base = { 255, 255, 255, alpha };
+
+    DrawTexturePro(render_tuile.texture, source_tuile, dest_tuile, origin, rotation, base);
 }

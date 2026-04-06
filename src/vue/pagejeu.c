@@ -14,25 +14,26 @@ enum Page page_jeu(Jeu *jeu)
     enum Page prochaine_page = P_JEU;
     bool afficher_popup = false;
     bool centre_camera = false;
+    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
+
+    // Initialisation du renderer
+    int max_chunks = jeu->pile.nb_element * TEXTURE_SIZE * 2 / CHUNK_SIZE + 2;
+    int nb_chunks  = 0;
+    Chunk *chunks  = ca_alloc(sizeof(Chunk), max_chunks);
+
+    float rotation_tuile = 0.0f;
+    Vector2 pos_tuile = { 0 };
     Vector2 position_curseur_ecran  = { 0 };
     Vector2 position_curseur_grille = { 0 };
 
     // Etat initial du jeu
     Tuile t = recup_tuile(&jeu->pile);
-    set(&jeu->grille, t, 0, 0);
+    set(&jeu->grille, t, 0, 0); // on place la tuile racine
     int tour_joueur = 0;
-
-    // Renderer
-    int max_chunks = jeu->pile.nb_element * TEXTURE_SIZE * 2 / CHUNK_SIZE + 2;
-    int nb_chunks  = 0;
-    Chunk *chunks  = ca_alloc(sizeof(Chunk), max_chunks);
-    Vector2 pos_tuile = { 0 };
-
-    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
 
     // dessiner la tuile 0, 0
     RenderTexture2D render_tuile = generer_render_tuile(t, spritesheet);
-    dessiner_tuile(chunks, &nb_chunks, render_tuile, (Vector2) { 0.0f, 0.0f });
+    ajouter_tuile_chunk(chunks, &nb_chunks, render_tuile, pos_tuile, 0.0f);
 
     // piocher la premiere tuile
     t = recup_tuile(&jeu->pile);
@@ -93,17 +94,19 @@ enum Page page_jeu(Jeu *jeu)
                     camera.offset = position_curseur_ecran;
                     camera.target = position_curseur_grille;
 
-                    // Incremeneter le zoom avec une échelle logarithmique
+                    // Incrementer le zoom avec une échelle logarithmique
                     float echelle = 0.2f*scroll;
                     camera.zoom = Clamp(expf(logf(camera.zoom)+echelle), 0.0125f, 64.0f);
                 }
 
                 // Placer une tuile avec le clique gauche
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && tour(jeu, t, pos_tuile.x / TEXTURE_SIZE, pos_tuile.y / TEXTURE_SIZE, -1, 0, false)) {
-                    dessiner_tuile(chunks, &nb_chunks, render_tuile, position_curseur_grille);
+                    ajouter_tuile_chunk(chunks, &nb_chunks, render_tuile, position_curseur_grille, rotation_tuile);
                     rafraichir_barrejoueurs(&barrejoueurs);
 
                     tour_joueur = (tour_joueur + 1) % jeu->joueurs.nb_joueurs;
+                    rotation_tuile = 0;
+                    UnloadRenderTexture(render_tuile);
                     t = recup_tuile(&jeu->pile);
                     render_tuile = generer_render_tuile(t, spritesheet);
                 }
@@ -137,6 +140,18 @@ enum Page page_jeu(Jeu *jeu)
         }
 
         update_controles(&ctrl);
+        if (update_bouton_adapte(&ctrl.rotation) || IsKeyPressed(KEY_R)) {
+            pivot_90(t);
+            rotation_tuile = fmod(rotation_tuile + 90.0f, 360.0f);
+        }
+        if (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D)) {
+            free(t);
+            UnloadRenderTexture(render_tuile);
+            rotation_tuile = 0;
+            t = recup_tuile(&jeu->pile);
+            render_tuile = generer_render_tuile(t, spritesheet);
+        }
+
         update_barrejoueurs(&barrejoueurs);
 
         BeginDrawing();
@@ -144,29 +159,16 @@ enum Page page_jeu(Jeu *jeu)
 
             /* dessin de la grille */
             BeginMode2D(camera);
-                // les textures inversent l'axe y par defaut, on doit le
-                // remettre dans le bon sens en inversant le rectangle de source.
-
-                // dessiner la tuile actuelle sur le curseur
-                Vector2 origin = { TEXTURE_SIZE / 2.0f, TEXTURE_SIZE / 2.0f };
-                Rectangle source_tuile = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
-                Rectangle dest_tuile   = { .width = TEXTURE_SIZE, .height =  TEXTURE_SIZE };
-                dest_tuile.x = pos_tuile.x + TEXTURE_SIZE/2.0f;
-                dest_tuile.y = pos_tuile.y + TEXTURE_SIZE/2.0f;
-                Color base = { 255, 255, 255, 128 }; // la tuile est semi-transparente
-                DrawTexturePro(render_tuile.texture, source_tuile, dest_tuile, origin, 0.0f, base);
-
+                // dessiner la tuile actuelle sur le curseur avec une transparence de 50%
+                dessiner_tuile(render_tuile, position_curseur_grille, rotation_tuile, 128);
                 // dessiner chaque chunk
-                for (int i = 0; i < nb_chunks; i++) {
-                    Rectangle source_chunk = { .width = CHUNK_SIZE, .height = -CHUNK_SIZE };
-                    Vector2 pos = { chunks[i].x, chunks[i].y };
-                    DrawTextureRec(chunks[i].render.texture, source_chunk, pos, WHITE);
-                }
+                for (int i = 0; i < nb_chunks; i++)
+                    dessiner_chunk(chunks[i]);
             EndMode2D();
 
             /* dessin de la sidebar */
             dessiner_barrejoueurs(barrejoueurs, 3);
-            dessiner_controles(ctrl);
+            dessiner_controles(ctrl, render_tuile);
 
             /* dessin de l'interface */
             dessiner_bouton(retour);
