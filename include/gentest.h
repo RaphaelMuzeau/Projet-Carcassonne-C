@@ -10,8 +10,6 @@ Vec2D generer_route_village(void);
 Vec2D generer_route_ville(void);
 Vec2D generer_recherche_abbaye_complete(void);
 Vec2D generer_recherche_abbaye_non_complete(void);
-void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin);
-
 
 void generer_fichier_grille(void);
 void generer_fichier_pile(void);
