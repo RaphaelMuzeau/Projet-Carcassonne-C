@@ -121,8 +121,7 @@ void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin
     int id_joueur = t->id_meeple;
     int pts = 0;
 
-    if (id_joueur == -1)
-        return;
+    if (id_joueur == -1) return;
 
     for(int i = -1; i < 2; i++) {
         for (int j = -1; j < 2; j++) {
@@ -132,9 +131,9 @@ void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin
                 pts += 1;
             else if (!fin)
                 return;
+
         }
     }
-
     joueurs.tableau[id_joueur].pts += pts;
 }
 

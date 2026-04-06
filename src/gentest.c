@@ -305,6 +305,58 @@ Vec2D generer_route_ville(void)
     return grille;
 }
 
+Vec2D generer_recherche_abbaye_complete(void)
+{
+    // fin == 1 || 0 : résultat == 9
+    // listejoueur.tableau[0].pts = 9
+    Vec2D grille = creer_vec2D();
+    Tuile tuile1 = creer_tuile();
+
+    Tuile tuile2 = creer_tuile();
+    tuile2->milieu = Z_ABBAYE;
+    tuile2->position_meeple = D_MILIEU;
+    tuile2->id_meeple = 0;
+
+    Tuile tuile3 = creer_tuile();
+    Tuile tuile4 = creer_tuile();
+    Tuile tuile5 = creer_tuile();
+    Tuile tuile6 = creer_tuile();
+    Tuile tuile7 = creer_tuile();
+    Tuile tuile8 = creer_tuile();
+    Tuile tuile9 = creer_tuile();
+    set(&grille, tuile1, 0, 0);
+    set(&grille, tuile2, 0, 1);
+    set(&grille, tuile3, -1, 0);
+    set(&grille, tuile4, -1, 1);
+    set(&grille, tuile5, -1, 2);
+    set(&grille, tuile6, 0, 2);
+    set(&grille, tuile7, 1, 0);
+    set(&grille, tuile8, 1, 1);
+    set(&grille, tuile9, 1, 2);
+
+    return grille;
+}
+Vec2D generer_recherche_abbaye_non_complete(void)
+{
+    // if fin == 1 :résultat = 4;
+    // else : résultat = 0
+
+    Vec2D grille = creer_vec2D();
+    Tuile tuile1 = creer_tuile();
+    set(&grille, tuile1, 0, 0);
+    Tuile tuile2 = creer_tuile();
+    tuile2->milieu = Z_ABBAYE;
+    tuile2->position_meeple = D_MILIEU;
+    tuile2->id_meeple = 0;
+    set(&grille, tuile2, 0, 1);
+    Tuile tuile3 = creer_tuile();
+    Tuile tuile4 = creer_tuile();
+    set(&grille, tuile4, -1, 0);
+    set(&grille, tuile3, -1, 1);
+
+    return grille;
+}
+
 void generer_fichier_grille(void)
 {
     Vec2D grille = creer_vec2D();

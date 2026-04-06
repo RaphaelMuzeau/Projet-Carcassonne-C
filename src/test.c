@@ -1254,6 +1254,50 @@ bool test_recherche(void)
 
     return true;
 }
+bool test_verification_abbaye(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    verification_abbaye(grille, listejoueur, 0, 0);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+bool test_recherche_abbaye_complete(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_recherche_abbaye_non_complete()
+{
+    Vec2D grille = generer_recherche_abbaye_non_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 0) return false;
+
+    recherche_abbaye(grille, listejoueur, 0, 1, true);
+
+    if (listejoueur.tableau[0].pts != 4) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
 
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
@@ -1301,6 +1345,9 @@ Test unit_tests[] = {
     TEST(test_fichier_charger_joueur_liste_vide),
     TEST(test_fichier_sauvegarder_liste_joueurs),
     TEST(test_recherche),
+    TEST(test_verification_abbaye),
+    TEST(test_recherche_abbaye_complete),
+    TEST(test_recherche_abbaye_non_complete),
 };
 
 // ===========================
