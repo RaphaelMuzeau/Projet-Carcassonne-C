@@ -70,18 +70,12 @@ enum Zone generer_milieu(void)
     int aleatoire = rand()%100;
 
     // Les probabilités ont été extraites du csv
-    if (aleatoire <= 43) {
-        return Z_ROUTE;
-    } else if (aleatoire <= 66) {
-        int blason = rand()%100;
-        return blason <= 8 ? Z_BLASON:Z_VILLE;
-    } else if (aleatoire <= 79) {
-        return Z_PRE;
-    } else if (aleatoire <= 90) {
-        return Z_VILLAGE;
-    } else {
-        return Z_ABBAYE;
-    }
+    if (aleatoire <= 43) return Z_ROUTE;
+    else if (aleatoire <= 66) return rand()%100 <= 8 ? Z_BLASON:Z_VILLE;
+    else if (aleatoire <= 79) return Z_PRE;
+    else if (aleatoire <= 90) return Z_VILLAGE;
+    else return Z_ABBAYE;
+
 }
 
 enum Zone generer_cote(int aleatoire)
