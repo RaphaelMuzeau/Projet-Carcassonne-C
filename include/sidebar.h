@@ -22,7 +22,7 @@ typedef struct _Controles {
 
 Controles creer_controles(void);
 void update_controles(Controles *ctrl);
-void dessiner_controles(Controles ctrl);
+void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile);
 
 typedef struct _CarteJoueur {
     Joueur *joueur;

@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "libca.h"
 #include "sidebar.h"
+#include "render.h"
 
 /* Controles */
 
@@ -38,17 +39,18 @@ void update_controles(Controles *ctrl)
     ctrl->apercu.x         += dec;
     ctrl->rotation.champ.x += dec;
     ctrl->detruire.champ.x += dec;
-
-    update_bouton_adapte(&ctrl->rotation);
-    update_bouton_adapte(&ctrl->detruire);
 }
 
-void dessiner_controles(Controles ctrl)
+void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile)
 {
     DrawRectangleRec(ctrl.champ, DARKGRAY);
-    DrawRectangleRec(ctrl.apercu, DARKGREEN);
     dessiner_bouton(ctrl.rotation);
     dessiner_bouton(ctrl.detruire);
+
+    Rectangle source = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
+    Vector2 origin = { 0, 0 };
+
+    DrawTexturePro(render_tuile.texture, source, ctrl.apercu, origin, 0.0f, WHITE);
 }
 
 /* CarteJoueur */
