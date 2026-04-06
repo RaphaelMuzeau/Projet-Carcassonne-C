@@ -13,6 +13,7 @@ enum Page page_jeu(Jeu *jeu)
     // Etat initial de la page
     enum Page prochaine_page = P_JEU;
     bool afficher_popup = false;
+    bool centre_camera = false;
     Vector2 position_curseur_ecran  = { 0 };
     Vector2 position_curseur_grille = { 0 };
 
@@ -26,6 +27,7 @@ enum Page page_jeu(Jeu *jeu)
 
     // Elements de la page
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
+    Bouton centrer = creer_bouton_adapte(retour.champ.width + 30, retour.champ.y, "centrer");
     Controles ctrl = creer_controles();
     BarreJoueurs barrejoueurs = creer_barrejoueurs(jeu->joueurs);
     Popup popup = creer_popup();
@@ -43,6 +45,10 @@ enum Page page_jeu(Jeu *jeu)
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
+        if (update_bouton(&centrer)) {
+            centre_camera = true;
+        }
+
         /* reallouer la memoire necessaire à plus de chunks si besoin */
         if (nb_chunks == max_chunks) {
             max_chunks += 4;
@@ -55,7 +61,7 @@ enum Page page_jeu(Jeu *jeu)
         position_curseur_ecran = GetMousePosition();
         position_curseur_grille = GetScreenToWorld2D(position_curseur_ecran, camera);
 
-        if (!afficher_popup) {
+        if (!afficher_popup && !centre_camera) {
             if (IsKeyDown(KEY_LEFT))  camera.target.x += -7.5f / camera.zoom;
             if (IsKeyDown(KEY_RIGHT)) camera.target.x +=  7.5f / camera.zoom;
             if (IsKeyDown(KEY_UP))    camera.target.y += -7.5f / camera.zoom;
@@ -148,6 +154,19 @@ enum Page page_jeu(Jeu *jeu)
             dessiner_bouton(retour);
             if (afficher_popup) dessiner_popup(popup);
 
+            dessiner_bouton(centrer);
+            if (centre_camera) {
+                if (nb_chunks != 0) {
+                    camera.zoom = 0.5f + (float) 1/nb_chunks;
+                    camera.target.x = 0 - (float) 1/nb_chunks;
+                    camera.target.y = 0;
+                } else {
+                camera.zoom = 0.5f;
+                camera.target.x = 0;
+                camera.target.y = 0;
+                }
+            centre_camera = false;
+            }
         EndDrawing();
     }
     free(t);
