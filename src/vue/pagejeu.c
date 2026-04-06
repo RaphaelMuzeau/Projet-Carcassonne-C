@@ -17,12 +17,26 @@ enum Page page_jeu(Jeu *jeu)
     Vector2 position_curseur_ecran  = { 0 };
     Vector2 position_curseur_grille = { 0 };
 
-    int max_chunks = (jeu->pile.nb_element * TEXTURE_SIZE * 2) / CHUNK_SIZE + 2;
-    int nb_chunks = 0;
-    Chunk *chunks = ca_alloc(sizeof(Chunk), max_chunks);
-
     // Etat initial du jeu
     Tuile t = recup_tuile(&jeu->pile);
+    set(&jeu->grille, t, 0, 0);
+    int tour_joueur = 0;
+
+    // Renderer
+    int max_chunks = jeu->pile.nb_element * TEXTURE_SIZE * 2 / CHUNK_SIZE + 2;
+    int nb_chunks  = 0;
+    Chunk *chunks  = ca_alloc(sizeof(Chunk), max_chunks);
+    Vector2 pos_tuile = { 0 };
+
+    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
+
+    // dessiner la tuile 0, 0
+    RenderTexture2D render_tuile = generer_render_tuile(t, spritesheet);
+    dessiner_tuile(chunks, &nb_chunks, render_tuile, (Vector2) { 0.0f, 0.0f });
+
+    // piocher la premiere tuile
+    t = recup_tuile(&jeu->pile);
+    render_tuile = generer_render_tuile(t, spritesheet);
 
     // Elements de la page
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
@@ -36,19 +50,12 @@ enum Page page_jeu(Jeu *jeu)
     Camera2D camera = { 0 };
     camera.zoom = 0.5f;
 
-    // Spritesheet et tuiles
-    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
-    RenderTexture2D render_tuile = generer_render_tuile(t, spritesheet);
-
     while (prochaine_page == P_JEU) {
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
         if (update_bouton(&centrer))
             centre_camera = true;
-
-        if (t == NULL)
-            continue; // eviter de traiter cette tuile
 
         /* reallouer la memoire necessaire à plus de chunks si besoin */
         if (nb_chunks == max_chunks) {
@@ -61,6 +68,9 @@ enum Page page_jeu(Jeu *jeu)
         vue.height = GetScreenHeight();
         position_curseur_ecran = GetMousePosition();
         position_curseur_grille = GetScreenToWorld2D(position_curseur_ecran, camera);
+
+        pos_tuile.x = multiple_inf(position_curseur_grille.x, TEXTURE_SIZE);
+        pos_tuile.y = multiple_inf(position_curseur_grille.y, TEXTURE_SIZE);
 
         if (!afficher_popup && !centre_camera) {
             if (IsKeyDown(KEY_LEFT))  camera.target.x += -7.5f / camera.zoom;
@@ -89,15 +99,19 @@ enum Page page_jeu(Jeu *jeu)
                 }
 
                 // Placer une tuile avec le clique gauche
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && tour(jeu, t, pos_tuile.x / TEXTURE_SIZE, pos_tuile.y / TEXTURE_SIZE, -1, 0, false)) {
                     dessiner_tuile(chunks, &nb_chunks, render_tuile, position_curseur_grille);
+                    rafraichir_barrejoueurs(&barrejoueurs);
 
-                    free(t);
+                    tour_joueur = (tour_joueur + 1) % jeu->joueurs.nb_joueurs;
                     t = recup_tuile(&jeu->pile);
                     render_tuile = generer_render_tuile(t, spritesheet);
                 }
             }
         }
+
+        if (t == NULL)
+            prochaine_page = P_TITRE;
 
         /* gestion du popup de sauvegarde */
         if (afficher_popup) {
@@ -134,13 +148,11 @@ enum Page page_jeu(Jeu *jeu)
                 // remettre dans le bon sens en inversant le rectangle de source.
 
                 // dessiner la tuile actuelle sur le curseur
-                Vector2 pos = { multiple_inf(position_curseur_grille.x, TEXTURE_SIZE),
-                                multiple_inf(position_curseur_grille.y, TEXTURE_SIZE) };
                 Vector2 origin = { TEXTURE_SIZE / 2.0f, TEXTURE_SIZE / 2.0f };
                 Rectangle source_tuile = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
                 Rectangle dest_tuile   = { .width = TEXTURE_SIZE, .height =  TEXTURE_SIZE };
-                dest_tuile.x = pos.x + TEXTURE_SIZE/2.0f;
-                dest_tuile.y = pos.y + TEXTURE_SIZE/2.0f;
+                dest_tuile.x = pos_tuile.x + TEXTURE_SIZE/2.0f;
+                dest_tuile.y = pos_tuile.y + TEXTURE_SIZE/2.0f;
                 Color base = { 255, 255, 255, 128 }; // la tuile est semi-transparente
                 DrawTexturePro(render_tuile.texture, source_tuile, dest_tuile, origin, 0.0f, base);
 
@@ -152,9 +164,11 @@ enum Page page_jeu(Jeu *jeu)
                 }
             EndMode2D();
 
+            /* dessin de la sidebar */
             dessiner_barrejoueurs(barrejoueurs, 3);
             dessiner_controles(ctrl);
 
+            /* dessin de l'interface */
             dessiner_bouton(retour);
             if (afficher_popup) dessiner_popup(popup);
 
@@ -167,7 +181,6 @@ enum Page page_jeu(Jeu *jeu)
             }
         EndDrawing();
     }
-    free(t);
 
     for (int i = 0; i < nb_chunks; i++)
         UnloadRenderTexture(chunks[i].render);
@@ -177,7 +190,9 @@ enum Page page_jeu(Jeu *jeu)
     UnloadTexture(spritesheet);
 
     detruire_barrejoueurs(barrejoueurs);
+
     detruire_jeu(*jeu);
     *jeu = (Jeu) { 0 };
+
     return prochaine_page;
 }

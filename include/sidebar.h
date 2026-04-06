@@ -51,7 +51,7 @@ void detruire_barrejoueurs(BarreJoueurs barre);
 
 void update_barrejoueurs(BarreJoueurs *barre);
 // met à jour le compteur de points et de meeple de chaque joueur
-void rafrachir_barrejoueurs(BarreJoueurs *barre);
+void rafraichir_barrejoueurs(BarreJoueurs *barre);
 void dessiner_barrejoueurs(BarreJoueurs barre, int id_tour);
 
 #endif
