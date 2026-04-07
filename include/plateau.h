@@ -2,6 +2,7 @@
 #define plateau_h
 
 #include "render.h"
+#include "bouton.h"
 #include "jeu.h"
 
 /* Le Plateau est une vue scrollable et zoomable sur toute la grille,
@@ -14,6 +15,9 @@ typedef struct _Plateau {
     Chunk *chunks;
     int nb_chunks;
     int max_chunks;
+    Vector2 pos_tuile; // position de la tuile courante
+    bool placement;    // un placement est-il en cours ?
+    Bouton nord, sud, est, ouest, milieu, aucun; // boutons de placement de meeple
 } Plateau;
 
 Plateau creer_plateau(Jeu *jeu, Texture spritesheet);
@@ -32,7 +36,7 @@ typedef struct _Placement {
 
 // Met à jour le plateau et renvoit le placement décidé par le joueur.
 // renvoit un placement avec (x, y) = (0, 0) si le joueur
-// n'a pas décidé de placer une tuile.
+// n'a pas encore décidé de placer une tuile.
 Placement update_plateau(Plateau *plateau);
 
 #endif

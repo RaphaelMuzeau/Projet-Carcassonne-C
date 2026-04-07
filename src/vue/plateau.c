@@ -25,6 +25,17 @@ Plateau creer_plateau(Jeu *jeu, Texture spritesheet)
     plateau.camera.offset = (Vector2) { plateau.vue.width/2.0f, plateau.vue.height/2.0f };
     plateau.camera.offset = Vector2Scale(plateau.camera.offset, plateau.camera.zoom);
 
+    // intialiser les boutons de placement de meeple
+    plateau.placement = false;
+
+    plateau.nord = creer_bouton(0, 0, NULL);
+    plateau.nord.champ.height = TEXTURE_SIZE * 0.2f;
+    plateau.nord.champ.width  = TEXTURE_SIZE * 0.2f;
+    plateau.sud = plateau.est = plateau.ouest = plateau.milieu = plateau.aucun = plateau.nord;
+
+    plateau.aucun.texte.contenu = "x";
+    adapter_bouton(&plateau.aucun);
+
     // afficher la tuile racine
     RenderTexture2D render = generer_render_tuile(get(jeu->grille, 0, 0), spritesheet);
     placer_render_tuile(&plateau, render, 0, 0, 0.0f);
@@ -82,12 +93,57 @@ Placement update_plateau(Plateau *plateau)
         plateau->camera.zoom = Clamp(expf(logf(plateau->camera.zoom) + echelle), 0.0125f, 64.0f);
     }
 
-    /* Placement de tuile */
+    /* Placement */
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        placement.x = multiple_inf(position_curseur_grille.x, TEXTURE_SIZE) / TEXTURE_SIZE;
-        placement.y = multiple_inf(position_curseur_grille.y, TEXTURE_SIZE) / TEXTURE_SIZE;
-        placement.placer_meeple = false;
+    // ces deux phases doivent prendre place à des frames differentes
+    // pour eviter qu'un clic place la tuile et pose un meeple en meme temps
+
+    /* Phase 1: placement de tuile */
+
+    if (!plateau->placement) {
+        // sauvegarder la position de la tuile
+        plateau->pos_tuile.x = multiple_inf(position_curseur_grille.x, TEXTURE_SIZE);
+        plateau->pos_tuile.y = multiple_inf(position_curseur_grille.y, TEXTURE_SIZE);
+
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            plateau->placement = true; // la position de la tuile est maintenant verrouillé
+
+            // disposer les boutons de placement de meeple
+            plateau->ouest.champ.x  = plateau->pos_tuile.x + TEXTURE_SIZE * 0.1f;
+            plateau->est.champ.x    = plateau->pos_tuile.x + TEXTURE_SIZE * 0.7f;
+            plateau->ouest.champ.y  = plateau->pos_tuile.y + TEXTURE_SIZE * 0.40f;
+            plateau->est.champ.y    = plateau->pos_tuile.y + TEXTURE_SIZE * 0.40f;
+
+            plateau->nord.champ.x   = plateau->pos_tuile.x + TEXTURE_SIZE * 0.40f;
+            plateau->sud.champ.x    = plateau->pos_tuile.x + TEXTURE_SIZE * 0.40f;
+            plateau->nord.champ.y   = plateau->pos_tuile.y + TEXTURE_SIZE * 0.1f;
+            plateau->sud.champ.y    = plateau->pos_tuile.y + TEXTURE_SIZE * 0.7f;
+
+            plateau->milieu.champ.x = plateau->pos_tuile.x + TEXTURE_SIZE * 0.40f;
+            plateau->milieu.champ.y = plateau->pos_tuile.y + TEXTURE_SIZE * 0.40f;
+
+            plateau->aucun.champ.x  = plateau->pos_tuile.x + TEXTURE_SIZE * 1.1f;
+            plateau->aucun.champ.y  = plateau->pos_tuile.y - TEXTURE_SIZE * 0.1f;
+            adapter_bouton(&plateau->aucun);
+        }
+    }
+
+    /* Phase 2: placement de meeple */
+
+    else {
+        placement.placer_meeple = true;
+        if (update_bouton_camera(&plateau->nord,   plateau->camera)) { placement.position_meeple = D_NORD;   plateau->placement = false; }
+        if (update_bouton_camera(&plateau->sud,    plateau->camera)) { placement.position_meeple = D_SUD;    plateau->placement = false; }
+        if (update_bouton_camera(&plateau->est,    plateau->camera)) { placement.position_meeple = D_EST;    plateau->placement = false; }
+        if (update_bouton_camera(&plateau->ouest,  plateau->camera)) { placement.position_meeple = D_OUEST;  plateau->placement = false; }
+        if (update_bouton_camera(&plateau->milieu, plateau->camera)) { placement.position_meeple = D_MILIEU; plateau->placement = false; }
+        if (update_bouton_camera(&plateau->aucun,  plateau->camera)) { placement.placer_meeple = false;      plateau->placement = false; }
+
+        // on a terminé le placement actuel
+        if (!plateau->placement) {
+            placement.x = plateau->pos_tuile.x / TEXTURE_SIZE;
+            placement.y = plateau->pos_tuile.y / TEXTURE_SIZE;
+        }
     }
 
     return placement;
@@ -95,14 +151,19 @@ Placement update_plateau(Plateau *plateau)
 
 void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotation)
 {
-    // la tuile doit etre dessiné sur la case sous le curseur
-    Vector2 position = GetScreenToWorld2D(GetMousePosition(), plateau.camera);
-    position.x = multiple_inf(position.x, TEXTURE_SIZE);
-    position.y = multiple_inf(position.y, TEXTURE_SIZE);
-
     BeginMode2D(plateau.camera);
         // dessiner la tuile courante avec une transparence de 50%
-        dessiner_tuile(render_tuile, position, rotation, 128);
+        dessiner_tuile(render_tuile, plateau.pos_tuile, rotation, 128);
+
+        // dessiner les boutons de placement de meeple
+        if (plateau.placement) {
+            dessiner_bouton(plateau.nord);
+            dessiner_bouton(plateau.sud);
+            dessiner_bouton(plateau.est);
+            dessiner_bouton(plateau.ouest);
+            dessiner_bouton(plateau.milieu);
+            dessiner_bouton(plateau.aucun);
+        }
 
         // dessiner tous les chunks
         for (int i = 0; i < plateau.nb_chunks; i++)

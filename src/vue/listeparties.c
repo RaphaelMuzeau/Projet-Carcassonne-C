@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <string.h>
 #include "raylib.h"
 #include "libca.h"
 #include "fichier.h"
