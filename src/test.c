@@ -561,128 +561,6 @@ bool test_varstring_null(void)
     return true;
 }
 
-bool test_csv_compter_lignes(void)
-{
-
-    FILE *f0, *f1, *f2;
-    f0 = fopen("data/test/0_test.csv", "r");
-    if (compter_lignes(f0) != 1) {
-        fclose(f0);
-        return false;
-    }
-    fclose(f0);
-    f1 = fopen("data/test/1_test.csv", "r");
-    if (compter_lignes(f1) != 5) {
-        fclose(f1);
-        return false;
-    }
-    fclose(f1);
-    f2 = fopen("data/test/test_non_existant.csv", "r");
-    if (compter_lignes(f2) != 0) {
-        return false;
-    }
-    return true;
-}
-
-bool test_csv_lecture_zone(void)
-{
-    FILE *f = fopen("data/test/0_test.csv", "r");
-    Tuile t = creer_tuile();
-
-    lire_zone(&t->est, f);
-    lire_zone(&t->nord, f);
-    lire_zone(&t->ouest, f);
-    lire_zone(&t->sud, f);
-    lire_zone(&t->milieu, f);
-
-    if (t->est != Z_ROUTE) return false;
-    if (t->nord != Z_VILLE) return false;
-    if (t->ouest!= Z_BLASON) return false;
-    if (t->sud != Z_PRE) return false;
-    if (t->milieu != Z_ABBAYE) return false;
-
-    free(t);
-    fclose(f);
-    return true;
-}
-
-bool test_csv_lecture_fichier(void)
-{
-    int i;
-    Pile p = lire_tuiles_csv("data/test/1_test.csv");
-
-    if (p.nb_element < p.nb_element_max) return false;
-
-    for (i = 0; i < p.nb_element_max; i++)
-        if (p.tab[i] == NULL) return false;
-
-    if (p.tab[0]->nord != Z_VILLE) return false;
-    if (p.tab[0]->sud != Z_VILLE) return false;
-    if (p.tab[0]->est != Z_ROUTE) return false;
-    if (p.tab[0]->ouest != Z_ROUTE) return false;
-    if (p.tab[0]->milieu != Z_ROUTE) return false;
-
-    if (p.tab[1]->nord != Z_ROUTE) return false;
-    if (p.tab[1]->sud != Z_VILLE) return false;
-    if (p.tab[1]->est != Z_VILLE) return false;
-    if (p.tab[1]->ouest != Z_PRE) return false;
-    if (p.tab[1]->milieu != Z_ABBAYE) return false;
-
-    if (p.tab[2]->nord != Z_BLASON) return false;
-    if (p.tab[2]->sud != Z_BLASON) return false;
-    if (p.tab[2]->est != Z_BLASON) return false;
-    if (p.tab[2]->ouest != Z_BLASON) return false;
-    if (p.tab[2]->milieu != Z_BLASON) return false;
-
-    if (p.tab[3]->nord != Z_ROUTE) return false;
-    if (p.tab[3]->sud != Z_ROUTE) return false;
-    if (p.tab[3]->est != Z_PRE) return false;
-    if (p.tab[3]->ouest != Z_ROUTE) return false;
-    if (p.tab[3]->milieu != Z_VILLAGE) return false;
-
-    if (p.tab[4]->nord != Z_BLASON) return false;
-    if (p.tab[4]->sud != Z_BLASON) return false;
-    if (p.tab[4]->est != Z_BLASON) return false;
-    if (p.tab[4]->ouest != Z_ROUTE) return false;
-    if (p.tab[4]->milieu != Z_BLASON) return false;
-
-    detruire_pile(&p);
-    return true;
-}
-
-bool test_csv_fichier_vide(void)
-{
-    Pile p;
-    p = lire_tuiles_csv("data/test/2_test.csv");
-
-    if (p.nb_element_max != 0) return false;
-    detruire_pile(&p);
-
-    return true;
-}
-
-bool test_csv_fichier_introuvable(void)
-{
-    Pile p;
-    p = lire_tuiles_csv("data/test/test_non_existant.csv");
-
-    if (p.nb_element_max != 0) return false;
-    detruire_pile(&p);
-
-    return true;
-}
-
-bool test_csv_fichier_invalide(void)
-{
-    Pile p;
-    p = lire_tuiles_csv("data/test/3_test.csv");
-
-    if (p.nb_element_max != 0) return false;
-
-    detruire_pile(&p);
-    return true;
-}
-
 bool test_joueur_creer(void)
 {
     Joueur joueur = creer_joueur(2, 5);
@@ -787,6 +665,28 @@ bool test_liste_meeple_retirer(void)
     if (liste != NULL) return false;
 
     return true;
+}
+
+bool test_liste_meeple_verification_presence_meeple(void)
+{
+    L_meeple loc_meeple;
+    loc_meeple = creer_maillon_meeple(0,0);
+
+    if(!verification_presence_meeple(&loc_meeple,0,0)) return false;
+
+    L_meeple maillon2;
+    maillon2 = creer_maillon_meeple(0,1);
+    ajouter_maillon_meeple(&loc_meeple,maillon2);
+    if(!verification_presence_meeple(&loc_meeple,0,1)) return false;
+
+    if(verification_presence_meeple(&loc_meeple,9,0)) return false;
+    if(verification_presence_meeple(&loc_meeple,0,9)) return false;
+
+    retirer_maillon_meeple(&loc_meeple,0,1);
+    retirer_maillon_meeple(&loc_meeple,0,0);
+
+    return true;
+
 }
 
 bool test_grille_placer_tuile(void)
@@ -988,7 +888,153 @@ bool test_grille_retirer_meeple(void)
     return true;
 }
 
-bool test_maximal(void)
+bool test_grille_recherche(void)
+{
+    int *nb_meeple = ca_alloc(2, sizeof(int));
+    L_meeple loc_meeple = NULL;
+    Vec2D grille = { 0 };
+    int pts = 0;
+
+    // ville incomplete
+
+    grille = generer_recherche_ville_incomplete();
+    pts = recherche(grille, nb_meeple, &loc_meeple, 2, 1, Z_VILLE, D_OUEST, false);
+
+    if (pts != -1) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 2, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+
+    // vile complete
+
+    grille = generer_recherche_ville_complete();
+    pts = recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_VILLE, D_SUD, false);
+
+    if (pts != 8) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 0) return false;
+    if (loc_meeple == NULL) return false;
+    if (loc_meeple->x != 0) return false;
+    if (loc_meeple->y != 0) return false;
+    if (loc_meeple->next != NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+
+    // ville avec blason
+
+    grille = generer_recherche_ville_blason();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 2, Z_VILLE, D_EST, false);
+
+    if (pts != 22) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (nb_meeple[1] != 2) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, -1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 0, 2)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
+
+    // route complete, arret sur un village
+
+    grille = generer_route_village();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_ROUTE, D_SUD, false);
+
+    if (pts != 5) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
+
+    // route complete, arret sur une ville
+
+    grille = generer_route_ville();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 1, 1, Z_ROUTE, D_EST, false);
+
+    if (pts != 4) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 1) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    free(nb_meeple);
+
+    return true;
+}
+
+bool test_grille_recherche_abbaye_complete(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_recherche_abbaye_non_complete(void)
+{
+    Vec2D grille = generer_recherche_abbaye_non_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 0) return false;
+
+    recherche_abbaye(grille, listejoueur, 0, 1, true);
+
+    if (listejoueur.tableau[0].pts != 4) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_verification_abbaye(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    verification_abbaye(grille, listejoueur, 0, 0);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_jeu_maximal(void)
 {
     int nb_joueur = 3;
     int nb_meeple[3];
@@ -1000,6 +1046,128 @@ bool test_maximal(void)
     nb_meeple[0] = 1;
     if (maximal(nb_meeple,nb_joueur) != 1) return false;
 
+    return true;
+}
+
+bool test_csv_compter_lignes(void)
+{
+
+    FILE *f0, *f1, *f2;
+    f0 = fopen("data/test/0_test.csv", "r");
+    if (compter_lignes(f0) != 1) {
+        fclose(f0);
+        return false;
+    }
+    fclose(f0);
+    f1 = fopen("data/test/1_test.csv", "r");
+    if (compter_lignes(f1) != 5) {
+        fclose(f1);
+        return false;
+    }
+    fclose(f1);
+    f2 = fopen("data/test/test_non_existant.csv", "r");
+    if (compter_lignes(f2) != 0) {
+        return false;
+    }
+    return true;
+}
+
+bool test_csv_lecture_zone(void)
+{
+    FILE *f = fopen("data/test/0_test.csv", "r");
+    Tuile t = creer_tuile();
+
+    lire_zone(&t->est, f);
+    lire_zone(&t->nord, f);
+    lire_zone(&t->ouest, f);
+    lire_zone(&t->sud, f);
+    lire_zone(&t->milieu, f);
+
+    if (t->est != Z_ROUTE) return false;
+    if (t->nord != Z_VILLE) return false;
+    if (t->ouest!= Z_BLASON) return false;
+    if (t->sud != Z_PRE) return false;
+    if (t->milieu != Z_ABBAYE) return false;
+
+    free(t);
+    fclose(f);
+    return true;
+}
+
+bool test_csv_lecture_fichier(void)
+{
+    int i;
+    Pile p = lire_tuiles_csv("data/test/1_test.csv");
+
+    if (p.nb_element < p.nb_element_max) return false;
+
+    for (i = 0; i < p.nb_element_max; i++)
+        if (p.tab[i] == NULL) return false;
+
+    if (p.tab[0]->nord != Z_VILLE) return false;
+    if (p.tab[0]->sud != Z_VILLE) return false;
+    if (p.tab[0]->est != Z_ROUTE) return false;
+    if (p.tab[0]->ouest != Z_ROUTE) return false;
+    if (p.tab[0]->milieu != Z_ROUTE) return false;
+
+    if (p.tab[1]->nord != Z_ROUTE) return false;
+    if (p.tab[1]->sud != Z_VILLE) return false;
+    if (p.tab[1]->est != Z_VILLE) return false;
+    if (p.tab[1]->ouest != Z_PRE) return false;
+    if (p.tab[1]->milieu != Z_ABBAYE) return false;
+
+    if (p.tab[2]->nord != Z_BLASON) return false;
+    if (p.tab[2]->sud != Z_BLASON) return false;
+    if (p.tab[2]->est != Z_BLASON) return false;
+    if (p.tab[2]->ouest != Z_BLASON) return false;
+    if (p.tab[2]->milieu != Z_BLASON) return false;
+
+    if (p.tab[3]->nord != Z_ROUTE) return false;
+    if (p.tab[3]->sud != Z_ROUTE) return false;
+    if (p.tab[3]->est != Z_PRE) return false;
+    if (p.tab[3]->ouest != Z_ROUTE) return false;
+    if (p.tab[3]->milieu != Z_VILLAGE) return false;
+
+    if (p.tab[4]->nord != Z_BLASON) return false;
+    if (p.tab[4]->sud != Z_BLASON) return false;
+    if (p.tab[4]->est != Z_BLASON) return false;
+    if (p.tab[4]->ouest != Z_ROUTE) return false;
+    if (p.tab[4]->milieu != Z_BLASON) return false;
+
+    detruire_pile(&p);
+    return true;
+}
+
+bool test_csv_fichier_vide(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/2_test.csv");
+
+    if (p.nb_element_max != 0) return false;
+    detruire_pile(&p);
+
+    return true;
+}
+
+bool test_csv_fichier_introuvable(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/test_non_existant.csv");
+
+    if (p.nb_element_max != 0) return false;
+    detruire_pile(&p);
+
+    return true;
+}
+
+bool test_csv_fichier_invalide(void)
+{
+    Pile p;
+    p = lire_tuiles_csv("data/test/3_test.csv");
+
+    if (p.nb_element_max != 0) return false;
+
+    detruire_pile(&p);
     return true;
 }
 
@@ -1167,181 +1335,6 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     return true;
 }
 
-bool test_recherche(void)
-{
-    int *nb_meeple = ca_alloc(2, sizeof(int));
-    L_meeple loc_meeple = NULL;
-    Vec2D grille = { 0 };
-    int pts = 0;
-
-    // ville incomplete
-
-    grille = generer_recherche_ville_incomplete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 2, 1, Z_VILLE, D_OUEST, false);
-
-    if (pts != -1) return false;
-
-    if(!verification_presence_meeple(&loc_meeple, 2, 1)) return false;
-
-    detruire_vec2D(grille);
-    detruire_liste_meeple(loc_meeple);
-    loc_meeple = NULL;
-    nb_meeple[0] = 0;
-
-    // vile complete
-
-    grille = generer_recherche_ville_complete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_VILLE, D_SUD, false);
-
-    if (pts != 8) return false;
-    if (nb_meeple[0] != 1) return false;
-    if (nb_meeple[1] != 0) return false;
-    if (loc_meeple == NULL) return false;
-    if (loc_meeple->x != 0) return false;
-    if (loc_meeple->y != 0) return false;
-    if (loc_meeple->next != NULL) return false;
-
-    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
-
-    detruire_vec2D(grille);
-    detruire_liste_meeple(loc_meeple);
-    loc_meeple = NULL;
-    nb_meeple[0] = 0;
-
-    // ville avec blason
-
-    grille = generer_recherche_ville_blason();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 2, Z_VILLE, D_EST, false);
-
-    if (pts != 22) return false;
-    if (nb_meeple[0] != 2) return false;
-    if (nb_meeple[1] != 2) return false;
-    if (loc_meeple == NULL) return false;
-
-    if(!verification_presence_meeple(&loc_meeple, 0, 1)) return false;
-    if(!verification_presence_meeple(&loc_meeple, -1, 1)) return false;
-    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
-    if(!verification_presence_meeple(&loc_meeple, 0, 2)) return false;
-
-    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
-    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
-
-    detruire_vec2D(grille);
-    detruire_liste_meeple(loc_meeple);
-    loc_meeple = NULL;
-    nb_meeple[0] = 0;
-    nb_meeple[1] = 0;
-
-    // route complete, arret sur un village
-
-    grille = generer_route_village();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_ROUTE, D_SUD, false);
-
-    if (pts != 5) return false;
-    if (nb_meeple[0] != 2) return false;
-    if (loc_meeple == NULL) return false;
-
-    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
-    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
-
-    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
-    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
-
-    detruire_vec2D(grille);
-    detruire_liste_meeple(loc_meeple);
-    loc_meeple = NULL;
-    nb_meeple[0] = 0;
-    nb_meeple[1] = 0;
-
-    // route complete, arret sur une ville
-
-    grille = generer_route_ville();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 1, 1, Z_ROUTE, D_EST, false);
-
-    if (pts != 4) return false;
-    if (nb_meeple[0] != 1) return false;
-    if (nb_meeple[1] != 1) return false;
-    if (loc_meeple == NULL) return false;
-
-    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
-    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
-
-    if(verification_presence_meeple(&loc_meeple, 2, 4)) return false;
-    if(verification_presence_meeple(&loc_meeple, 6, 4)) return false;
-
-    detruire_vec2D(grille);
-    detruire_liste_meeple(loc_meeple);
-    free(nb_meeple);
-
-    return true;
-}
-bool test_verification_abbaye(void)
-{
-    Vec2D grille = generer_recherche_abbaye_complete();
-    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
-
-    verification_abbaye(grille, listejoueur, 0, 0);
-
-    if (listejoueur.tableau[0].pts != 9) return false;
-
-    detruire_listejoueurs(listejoueur);
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_recherche_abbaye_complete(void)
-{
-    Vec2D grille = generer_recherche_abbaye_complete();
-    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
-
-    recherche_abbaye(grille, listejoueur, 0, 1, false);
-
-    if (listejoueur.tableau[0].pts != 9) return false;
-
-    detruire_listejoueurs(listejoueur);
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_recherche_abbaye_non_complete(void)
-{
-    Vec2D grille = generer_recherche_abbaye_non_complete();
-    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
-
-    recherche_abbaye(grille, listejoueur, 0, 1, false);
-
-    if (listejoueur.tableau[0].pts != 0) return false;
-
-    recherche_abbaye(grille, listejoueur, 0, 1, true);
-
-    if (listejoueur.tableau[0].pts != 4) return false;
-
-    detruire_listejoueurs(listejoueur);
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_verification_presence_meeple(void)
-{
-    L_meeple loc_meeple;
-    loc_meeple = creer_maillon_meeple(0,0);
-
-    if(!verification_presence_meeple(&loc_meeple,0,0)) return false;
-
-    L_meeple maillon2;
-    maillon2 = creer_maillon_meeple(0,1);
-    ajouter_maillon_meeple(&loc_meeple,maillon2);
-    if(!verification_presence_meeple(&loc_meeple,0,1)) return false;
-
-    if(verification_presence_meeple(&loc_meeple,9,0)) return false;
-    if(verification_presence_meeple(&loc_meeple,0,9)) return false;
-
-    retirer_maillon_meeple(&loc_meeple,0,1);
-    retirer_maillon_meeple(&loc_meeple,0,0);
-
-    return true;
-
-}
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
     TEST(test_tuile_creer),
@@ -1366,32 +1359,32 @@ Test unit_tests[] = {
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),
+    TEST(test_joueur_creer),
+    TEST(test_listejoueurs_creer),
+    TEST(test_liste_meeple_creer),
+    TEST(test_liste_meeple_ajouter),
+    TEST(test_liste_meeple_retirer),
+    TEST(test_liste_meeple_verification_presence_meeple),
+    TEST(test_grille_placer_tuile),
+    TEST(test_grille_placer_meeple),
+    TEST(test_grille_retirer_meeple),
+    TEST(test_grille_recherche),
+    TEST(test_grille_recherche_abbaye_complete),
+    TEST(test_grille_recherche_abbaye_non_complete),
+    TEST(test_grille_verification_abbaye),
+    TEST(test_jeu_maximal),
     TEST(test_csv_compter_lignes),
     TEST(test_csv_lecture_zone),
     TEST(test_csv_lecture_fichier),
     TEST(test_csv_fichier_vide),
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
-    TEST(test_joueur_creer),
-    TEST(test_listejoueurs_creer),
-    TEST(test_liste_meeple_creer),
-    TEST(test_liste_meeple_ajouter),
-    TEST(test_liste_meeple_retirer),
-    TEST(test_grille_placer_tuile),
-    TEST(test_grille_placer_meeple),
-    TEST(test_grille_retirer_meeple),
-    TEST(test_maximal),
     TEST(test_fichier_charger_grille),
     TEST(test_fichier_charger_pile),
     TEST(test_fichier_charger_pile_aleatoire),
     TEST(test_fichier_charger_joueur),
     TEST(test_fichier_charger_joueur_liste_vide),
     TEST(test_fichier_sauvegarder_liste_joueurs),
-    TEST(test_recherche),
-    TEST(test_verification_abbaye),
-    TEST(test_recherche_abbaye_complete),
-    TEST(test_recherche_abbaye_non_complete),
-    TEST(test_verification_presence_meeple),
 };
 
 // ===========================
