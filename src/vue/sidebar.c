@@ -41,16 +41,18 @@ void update_controles(Controles *ctrl)
     ctrl->detruire.champ.x += dec;
 }
 
-void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile)
+void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rotation)
 {
     DrawRectangleRec(ctrl.champ, DARKGRAY);
     dessiner_bouton(ctrl.rotation);
     dessiner_bouton(ctrl.detruire);
 
     Rectangle source = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
-    Vector2 origin = { 0, 0 };
+    Vector2 origin = { CONTROLES_APERCU_SIZE / 2.0f, CONTROLES_APERCU_SIZE / 2.0f };
+    ctrl.apercu.x += CONTROLES_APERCU_SIZE/2.0f;
+    ctrl.apercu.y += CONTROLES_APERCU_SIZE/2.0f;
 
-    DrawTexturePro(render_tuile.texture, source, ctrl.apercu, origin, 0.0f, WHITE);
+    DrawTexturePro(render_tuile.texture, source, ctrl.apercu, origin, rotation, WHITE);
 }
 
 /* CarteJoueur */

@@ -111,7 +111,7 @@ enum Page page_jeu(Jeu *jeu)
 
             // dessin de la sidebar
             dessiner_barrejoueurs(barrejoueurs, 3);
-            dessiner_controles(ctrl, render_tuile);
+            dessiner_controles(ctrl, render_tuile, rotation_tuile);
 
             // dessin de l'interface
             dessiner_bouton(retour);
