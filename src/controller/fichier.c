@@ -10,7 +10,7 @@
 #include "grille.h"
 #include "pile.h"
 
-#define VERSION "SV0.1"
+#define VERSION "SV0.2"
 #define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)
@@ -39,7 +39,7 @@ bool charger_partie(Jeu *partie, char *fname)
     }
 
     char version[LEN_VER] = { 0 };
-    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.1")) {
+    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.2")) {
         perror("carcassonne");
         fclose(f);
         return false;
@@ -60,14 +60,14 @@ int ecrire_grille(Vec2D g, int x, int y, FILE *f)
     if (!cur)
         return 0;
 
-    if (cur->is_verified)
+    if (cur->est_verifie)
         return 0;
 
     fwrite(cur, sizeof(struct _Tuile), 1, f);
     fwrite(&x, sizeof(int), 1, f);
     fwrite(&y, sizeof(int), 1, f);
 
-    cur->is_verified = true;
+    cur->est_verifie = true;
 
     return ecrire_grille(g, x+1, y, f) + ecrire_grille(g, x-1, y, f) + // EST & OUEST
            ecrire_grille(g, x, y+1, f) + ecrire_grille(g, x, y-1, f) + 1; // NORD & SUD
@@ -81,7 +81,7 @@ void sauvegarder_grille(Vec2D g, FILE *f)
     fseek(f, sizeof(int), SEEK_CUR); // Prépare de la place pour nb_tuiles
 
     int nb_tuiles = ecrire_grille(g, 0, 0, f);
-    recherche_is_verified(g, 0, 0);
+    recherche_est_verifie(g, 0, 0);
 
     fsetpos(f, &pos_nb_tuiles);  // Retour arrière pour écrire nb_tuiles
     fwrite(&nb_tuiles, sizeof(int), 1, f);
@@ -183,7 +183,7 @@ erreur_liste_joueurs:
 void sauvegarder_joueur(Joueur joueur, FILE *f)
 {
     Joueur joueur_tmp = joueur;
-    joueur_tmp.localisation_meeples = NULL;
+    joueur_tmp.localisation_meeple = NULL;
     joueur_tmp.nom= NULL;
     fwrite(&joueur_tmp, sizeof(Joueur), 1, f);
 
@@ -200,18 +200,13 @@ void sauvegarder_joueur(Joueur joueur, FILE *f)
     /*
      * Se fait via des structures privés pour changer
      * la variable tmp2 sans modifier tmp */
-    if (joueur.localisation_meeples != NULL) {
-        struct _Maillon tmp = *joueur.localisation_meeples;
-        do {
-            struct _Maillon tmp2 = tmp;
+    if (joueur.localisation_meeple != NULL) {
+        for (L_meeple tmp = joueur.localisation_meeple; tmp != NULL; tmp = tmp->next) {
+            struct _Maillon tmp2 = *tmp;
             tmp2.next = NULL;
             fwrite(&tmp2, sizeof(struct _Maillon), 1, f);
-            if (tmp.next != NULL)
-                tmp = *tmp.next;
             nb_meeple_pose++;
-        } while (tmp.next != NULL);
-        fwrite(&tmp, sizeof(struct _Maillon), 1, f);
-        nb_meeple_pose++;
+        }
     }
 
     // Écrit au bon endroit nb_meeple_pose et revient à la fin
@@ -222,35 +217,30 @@ void sauvegarder_joueur(Joueur joueur, FILE *f)
 
 Joueur charger_joueur(FILE *f)
 {
-    Joueur j;
-    if (fread(&j, sizeof(Joueur), 1, f) != 1)
+    Joueur joueur;
+    if (fread(&joueur, sizeof(Joueur), 1, f) != 1)
         goto erreur_joueur;
 
     size_t taille_nom = 0;
     if (fread(&taille_nom, sizeof(size_t), 1, f) != 1)
         goto erreur_joueur;
 
-    j.nom = ca_alloc(taille_nom, sizeof(char));
-    size_t tmp = fread(j.nom, sizeof(char), taille_nom, f);
-
-    if (tmp != taille_nom)
+    joueur.nom = ca_alloc(taille_nom, sizeof(char));
+    if (fread(joueur.nom, sizeof(char), taille_nom, f) != taille_nom)
         goto erreur_joueur;
 
     int nb_meeple_pose = 0;
     if (fread(&nb_meeple_pose, sizeof(int), 1, f) != 1)
         goto erreur_joueur;
 
-    if (nb_meeple_pose) {
-        int cmpt = 0;
-        do {
-            L_meeple tmp = creer_maillon_meeple(0, 0, 0);
-            if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
-                goto erreur_joueur;
-            ajouter_maillon_meeple(&j.localisation_meeples, tmp);
-            cmpt++;
-        } while (cmpt <nb_meeple_pose);
+    for (int i = 0; i < nb_meeple_pose; i++) {
+        L_meeple tmp = creer_maillon_meeple(0, 0);
+        if (fread(tmp, sizeof(struct _Maillon), 1, f) != 1)
+            goto erreur_joueur;
+        ajouter_maillon_meeple(&joueur.localisation_meeple, tmp);
     }
-    return j;
+
+    return joueur;
 
 erreur_joueur:
     ca_error("fichier invalide (joueur)");

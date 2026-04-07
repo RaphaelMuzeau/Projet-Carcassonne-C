@@ -26,7 +26,7 @@ struct _Tuile {
     enum Zone milieu, nord, sud, est, ouest;
     int id_meeple;
     enum Direction position_meeple;
-    bool is_verified;
+    bool est_verifie;
 };
 typedef struct _Tuile *Tuile;
 

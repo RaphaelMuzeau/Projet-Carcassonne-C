@@ -1,14 +1,15 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include "meeple.h"
 #include "libca.h"
 
-L_meeple creer_maillon_meeple(int x, int y, enum Direction d)
+
+L_meeple creer_maillon_meeple(int x, int y)
 {
     L_meeple liste = ca_alloc(1, sizeof(struct _Maillon));
     liste->next = NULL;
     liste->x = x;
     liste->y = y;
-    liste->d = d;
 
     return liste;
 }
@@ -61,4 +62,17 @@ void retirer_maillon_meeple(L_meeple *liste, int x, int y)
         tmp = tmp->next;
         tmp2 = tmp2->next;
     }
+}
+bool verification_presence_meeple(L_meeple *liste, int x, int y)
+{
+    if (*liste == NULL) return false;
+
+    L_meeple tmp = *liste;
+    while (tmp->next != NULL) {
+        if (tmp->x == x && tmp->y == y) return true;
+        tmp = tmp->next;
+    }
+    if (tmp->x == x && tmp->y == y) return true;
+
+    return false;
 }

@@ -21,6 +21,7 @@
 #include "jeu.h"
 #include "fichier.h"
 #include "gentest.h"
+#include "libca.h"
 
 typedef struct _Test {
     bool (*run)(void);
@@ -560,6 +561,524 @@ bool test_varstring_null(void)
     return true;
 }
 
+bool test_joueur_creer(void)
+{
+    Joueur joueur = creer_joueur(2, 5);
+
+    if (joueur.nom != NULL) return false;
+    if (joueur.id != 2)  return false;
+    if (joueur.pts != 0) return false;
+    if (joueur.nb_meeple_restant != 5) return false;
+    if (joueur.localisation_meeple != NULL) return false;
+
+    detruire_joueur(joueur);
+    return true;
+}
+
+bool test_listejoueurs_creer(void)
+{
+    ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
+
+    if (joueurs.nb_joueurs != 3) return false;
+    if (joueurs.tableau == NULL) return false;
+
+    if (joueurs.tableau[0].id != 0) return false;
+    if (joueurs.tableau[1].id != 1) return false;
+    if (joueurs.tableau[2].id != 2) return false;
+    if (joueurs.tableau[0].nb_meeple_restant != 5) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 5) return false;
+    if (joueurs.tableau[2].nb_meeple_restant != 5) return false;
+
+    detruire_listejoueurs(joueurs);
+    return true;
+}
+
+bool test_liste_meeple_creer(void)
+{
+    L_meeple liste = creer_maillon_meeple(1, 5);
+
+    if (liste->x != 1)       return false;
+    if (liste->y != 5)       return false;
+    if (liste->next != NULL) return false;
+
+    detruire_liste_meeple(liste);
+    return true;
+}
+
+bool test_liste_meeple_ajouter(void)
+{
+    L_meeple liste = NULL;
+
+    L_meeple maillon1 = creer_maillon_meeple(1, 1);
+    ajouter_maillon_meeple(&liste, maillon1);
+
+    if (liste != maillon1)    return false;
+    if (liste->x != 1)        return false;
+    if (liste->y != 1)        return false;
+    if (liste->next != NULL)  return false;
+
+    L_meeple maillon2 = creer_maillon_meeple(2, 2);
+    ajouter_maillon_meeple(&liste, maillon2);
+
+    if (liste != maillon2)       return false;
+    if (liste->x != 2)           return false;
+    if (liste->y != 2)           return false;
+    if (liste->next != maillon1) return false;
+
+    detruire_liste_meeple(liste);
+    return true;
+}
+
+bool test_liste_meeple_retirer(void)
+{
+    L_meeple liste = NULL;
+
+    // retrait sur liste vide
+    retirer_maillon_meeple(&liste, 0, 0);
+    if (liste != NULL) return false;
+
+    L_meeple maillon1 = creer_maillon_meeple(1, 1);
+    L_meeple maillon2 = creer_maillon_meeple(2, 2);
+    ajouter_maillon_meeple(&liste, maillon1);
+    ajouter_maillon_meeple(&liste, maillon2);
+
+    // retrait de meeple non present
+    retirer_maillon_meeple(&liste, 0, 0);
+    if (liste != maillon2) return false;
+    if (liste->next != maillon1) return false;
+
+    // retrait de meeple en milieu de chaine
+    retirer_maillon_meeple(&liste, 2, 2);
+    if (liste != maillon1) return false;
+    if (liste->next != NULL) return false;
+
+    // retrait de meeple en fin de chaine
+    L_meeple maillon3 = creer_maillon_meeple(3, 3);
+    ajouter_maillon_meeple(&liste, maillon3);
+
+    retirer_maillon_meeple(&liste, 1, 1);
+    if (liste != maillon3) return false;
+    if (liste->next != NULL) return false;
+
+    // retrait de tous les meeple
+    retirer_maillon_meeple(&liste, 3, 3);
+    if (liste != NULL) return false;
+
+    return true;
+}
+
+bool test_liste_meeple_verification_presence_meeple(void)
+{
+    L_meeple loc_meeple;
+    loc_meeple = creer_maillon_meeple(0,0);
+
+    if(!verification_presence_meeple(&loc_meeple,0,0)) return false;
+
+    L_meeple maillon2;
+    maillon2 = creer_maillon_meeple(0,1);
+    ajouter_maillon_meeple(&loc_meeple,maillon2);
+    if(!verification_presence_meeple(&loc_meeple,0,1)) return false;
+
+    if(verification_presence_meeple(&loc_meeple,9,0)) return false;
+    if(verification_presence_meeple(&loc_meeple,0,9)) return false;
+
+    retirer_maillon_meeple(&loc_meeple,0,1);
+    retirer_maillon_meeple(&loc_meeple,0,0);
+
+    return true;
+
+}
+
+bool test_grille_placer_tuile(void)
+{
+    Vec2D grille = creer_vec2D();
+    Tuile t = creer_tuile();
+
+    // placement sans connexion
+    if (placer_tuile(&grille, 1, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 0, t)) return false;
+    if (placer_tuile(&grille, 0, 1, t)) return false;
+    if (placer_tuile(&grille, 1, 9, t)) return false;
+    if (placer_tuile(&grille, 9, 1, t)) return false;
+    if (get(grille, 1, 1) == t) return false;
+    if (get(grille, 1, 0) == t) return false;
+    if (get(grille, 0, 1) == t) return false;
+    if (get(grille, 1, 9) == t) return false;
+    if (get(grille, 9, 1) == t) return false;
+
+    set(&grille, t, 1, 1);
+
+    // tuile occupée
+    if (placer_tuile(&grille, 1, 1, t)) return false;
+
+    // placement compatible
+    t = creer_tuile();
+    if (!placer_tuile(&grille, 0, 1, t)) return false;
+    if (get(grille, 0, 1)  != t) return false;
+    t = creer_tuile();
+    if (!placer_tuile(&grille, 1, 0, t)) return false;
+    if (get(grille, 1, 0)  != t) return false;
+    t = creer_tuile();
+    if (!placer_tuile(&grille, 2, 1, t)) return false;
+    if (get(grille, 2, 1) != t) return false;
+    t = creer_tuile();
+    if (!placer_tuile(&grille, 1, 2, t)) return false;
+    if (get(grille, 1, 2) != t) return false;
+
+    // placement incompatible
+    t = creer_tuile();
+    t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
+    set(&grille, t, 5, 5);
+
+    t = creer_tuile();
+    if (placer_tuile(&grille, 5, 6, t)) return false;
+    if (get(grille, 5, 6)  == t) return false;
+    if (placer_tuile(&grille, 4, 5, t)) return false;
+    if (get(grille, 4, 5)  == t) return false;
+    if (placer_tuile(&grille, 5, 4, t)) return false;
+    if (get(grille, 5, 4)  == t) return false;
+    if (placer_tuile(&grille, 6, 5, t)) return false;
+    if (get(grille, 6, 5) == t) return false;
+
+    free(t);
+
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_placer_meeple(void)
+{
+    Vec2D grille = creer_vec2D();
+    Joueur joueur = creer_joueur(0, 3);
+
+    // placement sur tuile vide
+    if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
+    if (joueur.localisation_meeple != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+
+    // placement sur zone invalide
+    Tuile t = creer_tuile();
+    t->milieu = Z_VILLAGE;
+    set(&grille, t, 0, -1);
+
+    if (placer_meeple(grille, &joueur, 0, -1, D_MILIEU)) return false;
+    if (joueur.localisation_meeple != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != -1) return false;
+
+    t = creer_tuile();
+    set(&grille, t, -1, -1);
+
+    if (placer_meeple(grille, &joueur, -1, -1, D_MILIEU)) return false;
+    if (joueur.localisation_meeple != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != -1) return false;
+
+    // placement sur tuile occupé
+    t = creer_tuile();
+    t->position_meeple = D_MILIEU;
+    t->milieu = Z_ABBAYE;
+    t->id_meeple = 1;
+    set(&grille, t, 0, 0);
+
+    if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
+    if (joueur.localisation_meeple != NULL) return false;
+    if (joueur.nb_meeple_restant != 3) return false;
+    if (t->id_meeple != 1) return false;
+
+    // placements possibles
+    t = creer_tuile();
+    t->nord = Z_VILLE;
+    set(&grille, t, 1, 0);
+
+    if (!placer_meeple(grille, &joueur, 1, 0, D_NORD)) return false;
+
+    if (joueur.localisation_meeple->x != 1)  return false;
+    if (joueur.localisation_meeple->y != 0)  return false;
+    if (joueur.localisation_meeple->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 2) return false;
+
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_NORD) return false;
+
+    t = creer_tuile();
+    t->sud = Z_ROUTE;
+    set(&grille, t, 0, 1);
+
+    if (!placer_meeple(grille, &joueur, 0, 1, D_SUD)) return false;
+
+    if (joueur.localisation_meeple->x != 0)              return false;
+    if (joueur.localisation_meeple->y != 1)              return false;
+    if (joueur.localisation_meeple->next->x != 1)        return false;
+    if (joueur.localisation_meeple->next->y != 0)        return false;
+    if (joueur.localisation_meeple->next->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 1) return false;
+
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_SUD) return false;
+
+    t = creer_tuile();
+    t->milieu = Z_ABBAYE;
+    set(&grille, t, 1, 1);
+
+    if (!placer_meeple(grille, &joueur, 1, 1, D_MILIEU)) return false;
+
+    if (joueur.localisation_meeple->x != 1)                    return false;
+    if (joueur.localisation_meeple->y != 1)                    return false;
+    if (joueur.localisation_meeple->next->x != 0)              return false;
+    if (joueur.localisation_meeple->next->y != 1)              return false;
+    if (joueur.localisation_meeple->next->next->x != 1)        return false;
+    if (joueur.localisation_meeple->next->next->y != 0)        return false;
+    if (joueur.localisation_meeple->next->next->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 0) return false;
+
+    if (t->id_meeple != joueur.id) return false;
+    if (t->position_meeple != D_MILIEU) return false;
+
+    // placement sans meeple restant
+    t = creer_tuile();
+    set(&grille, t, 0, 2);
+
+    if (placer_meeple(grille, &joueur, 0, 2, D_MILIEU)) return false;
+
+    if (joueur.localisation_meeple->x != 1)                    return false;
+    if (joueur.localisation_meeple->y != 1)                    return false;
+    if (joueur.localisation_meeple->next->x != 0)              return false;
+    if (joueur.localisation_meeple->next->y != 1)              return false;
+    if (joueur.localisation_meeple->next->next->x != 1)        return false;
+    if (joueur.localisation_meeple->next->next->y != 0)        return false;
+    if (joueur.localisation_meeple->next->next->next != NULL)  return false;
+    if (joueur.nb_meeple_restant != 0) return false;
+    if (t->id_meeple != -1) return false;
+
+    detruire_joueur(joueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_retirer_meeple(void)
+{
+    Vec2D grille = creer_vec2D();
+    ListeJoueurs joueurs = creer_listejoueurs(2, 2);
+
+    // retrait sur tuile vide
+    retirer_meeple(grille, joueurs, 0, 0);
+    if (joueurs.tableau[0].nb_meeple_restant != 2) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
+
+    // retrait sur une tuile sans meeple
+    Tuile t = creer_tuile();
+    set(&grille, t, 1, 0);
+
+    retirer_meeple(grille, joueurs, 1, 0);
+    if (joueurs.tableau[1].localisation_meeple != NULL) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
+    if (t->id_meeple != -1) return false;
+
+    // retrait normal
+    placer_meeple(grille, &joueurs.tableau[1], 1, 0, D_NORD);
+
+    retirer_meeple(grille, joueurs, 1, 0);
+    if (joueurs.tableau[1].localisation_meeple != NULL) return false;
+    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
+    if (t->id_meeple != -1) return false;
+
+    detruire_listejoueurs(joueurs);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_recherche(void)
+{
+    int *nb_meeple = ca_alloc(2, sizeof(int));
+    L_meeple loc_meeple = NULL;
+    Vec2D grille = { 0 };
+    int pts = 0;
+
+    // ville incomplete
+
+    grille = generer_recherche_ville_incomplete();
+    pts = recherche(grille, nb_meeple, &loc_meeple, 2, 1, Z_VILLE, D_OUEST, false);
+
+    if (pts != -1) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 2, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+
+    // vile complete
+
+    grille = generer_recherche_ville_complete();
+    pts = recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_VILLE, D_SUD, false);
+
+    if (pts != 8) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 0) return false;
+    if (loc_meeple == NULL) return false;
+    if (loc_meeple->x != 0) return false;
+    if (loc_meeple->y != 0) return false;
+    if (loc_meeple->next != NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+
+    // ville avec blason
+
+    grille = generer_recherche_ville_blason();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 2, Z_VILLE, D_EST, false);
+
+    if (pts != 22) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (nb_meeple[1] != 2) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, -1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 0, 2)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
+
+    // route complete, arret sur un village
+
+    grille = generer_route_village();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_ROUTE, D_SUD, false);
+
+    if (pts != 5) return false;
+    if (nb_meeple[0] != 2) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    loc_meeple = NULL;
+    nb_meeple[0] = 0;
+    nb_meeple[1] = 0;
+
+    // route complete, arret sur une ville
+
+    grille = generer_route_ville();
+    pts =  recherche(grille, nb_meeple, &loc_meeple, 1, 1, Z_ROUTE, D_EST, false);
+
+    if (pts != 4) return false;
+    if (nb_meeple[0] != 1) return false;
+    if (nb_meeple[1] != 1) return false;
+    if (loc_meeple == NULL) return false;
+
+    if(!verification_presence_meeple(&loc_meeple, 0, 0)) return false;
+    if(!verification_presence_meeple(&loc_meeple, 1, 1)) return false;
+
+    detruire_vec2D(grille);
+    detruire_liste_meeple(loc_meeple);
+    free(nb_meeple);
+
+    return true;
+}
+
+bool test_jeu_attribution_points(void)
+{
+    Jeu jeu = creer_jeu(3, 3, 3);
+    L_meeple loc_meeple = creer_maillon_meeple(0,0);
+    int *nb_meeple = ca_alloc(jeu.joueurs.nb_joueurs,sizeof(int));
+
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+
+    if (jeu.joueurs.tableau[0].pts != 0) return false;
+    if (jeu.joueurs.tableau[1].pts != 0) return false;
+    if (jeu.joueurs.tableau[2].pts != 0) return false;
+    nb_meeple[1] = 2;
+
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+
+    if (jeu.joueurs.tableau[1].pts != 10) return false;
+
+    nb_meeple[2] = 2;
+    jeu.joueurs.tableau[1].pts = 0;
+
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+
+    if (jeu.joueurs.tableau[1].pts != 10) return false;
+    if (jeu.joueurs.tableau[1].pts != 10) return false;
+
+    free(nb_meeple);
+    detruire_liste_meeple(loc_meeple);
+    detruire_jeu(jeu);
+    return true;
+}
+bool test_grille_recherche_abbaye_complete(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_recherche_abbaye_non_complete(void)
+{
+    Vec2D grille = generer_recherche_abbaye_non_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    recherche_abbaye(grille, listejoueur, 0, 1, false);
+
+    if (listejoueur.tableau[0].pts != 0) return false;
+
+    recherche_abbaye(grille, listejoueur, 0, 1, true);
+
+    if (listejoueur.tableau[0].pts != 4) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_grille_verification_abbaye(void)
+{
+    Vec2D grille = generer_recherche_abbaye_complete();
+    ListeJoueurs listejoueur = creer_listejoueurs(1,1);
+
+    verification_abbaye(grille, listejoueur, 0, 0);
+
+    if (listejoueur.tableau[0].pts != 9) return false;
+
+    detruire_listejoueurs(listejoueur);
+    detruire_vec2D(grille);
+    return true;
+}
+
+bool test_jeu_maximal(void)
+{
+    int nb_joueur = 3;
+    int nb_meeple[3];
+    nb_meeple[0] = 2;
+    nb_meeple[1] = 1;
+    nb_meeple[2] = 3;
+    if (maximal(nb_meeple, nb_joueur) != 3) return false;
+    nb_joueur = 1;
+    nb_meeple[0] = 1;
+    if (maximal(nb_meeple,nb_joueur) != 1) return false;
+
+    return true;
+}
+
 bool test_csv_compter_lignes(void)
 {
 
@@ -682,282 +1201,6 @@ bool test_csv_fichier_invalide(void)
     return true;
 }
 
-bool test_joueur_creer(void)
-{
-    Joueur joueur = creer_joueur(2, 5);
-
-    if (joueur.nom != NULL) return false;
-    if (joueur.id != 2)  return false;
-    if (joueur.pts != 0) return false;
-    if (joueur.nb_meeple_restant != 5) return false;
-    if (joueur.localisation_meeples != NULL) return false;
-
-    detruire_joueur(joueur);
-    return true;
-}
-
-bool test_listejoueurs_creer(void)
-{
-    ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
-
-    if (joueurs.nb_joueurs != 3) return false;
-    if (joueurs.tableau == NULL) return false;
-
-    if (joueurs.tableau[0].id != 0) return false;
-    if (joueurs.tableau[1].id != 1) return false;
-    if (joueurs.tableau[2].id != 2) return false;
-    if (joueurs.tableau[0].nb_meeple_restant != 5) return false;
-    if (joueurs.tableau[1].nb_meeple_restant != 5) return false;
-    if (joueurs.tableau[2].nb_meeple_restant != 5) return false;
-
-    detruire_listejoueurs(joueurs);
-    return true;
-}
-
-bool test_liste_meeple_creer(void)
-{
-    L_meeple liste = creer_maillon_meeple(1, 5, D_EST);
-
-    if (liste->x != 1)       return false;
-    if (liste->y != 5)       return false;
-    if (liste->d != D_EST)   return false;
-    if (liste->next != NULL) return false;
-
-    detruire_liste_meeple(liste);
-    return true;
-}
-
-bool test_liste_meeple_ajouter(void)
-{
-    L_meeple liste = NULL;
-
-    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
-    ajouter_maillon_meeple(&liste, maillon1);
-
-    if (liste != maillon1)    return false;
-    if (liste->x != 1)        return false;
-    if (liste->y != 1)        return false;
-    if (liste->d != D_MILIEU) return false;
-    if (liste->next != NULL)  return false;
-
-    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
-    ajouter_maillon_meeple(&liste, maillon2);
-
-    if (liste != maillon2)       return false;
-    if (liste->x != 2)           return false;
-    if (liste->y != 2)           return false;
-    if (liste->d != D_SUD)    return false;
-    if (liste->next != maillon1) return false;
-
-    detruire_liste_meeple(liste);
-    return true;
-}
-
-bool test_liste_meeple_retirer(void)
-{
-    L_meeple liste = NULL;
-
-    // retrait sur liste vide
-    retirer_maillon_meeple(&liste, 0, 0);
-    if (liste != NULL) return false;
-
-    L_meeple maillon1 = creer_maillon_meeple(1, 1, D_MILIEU);
-    L_meeple maillon2 = creer_maillon_meeple(2, 2, D_SUD);
-    ajouter_maillon_meeple(&liste, maillon1);
-    ajouter_maillon_meeple(&liste, maillon2);
-
-    // retrait de meeple non present
-    retirer_maillon_meeple(&liste, 0, 0);
-    if (liste != maillon2) return false;
-    if (liste->next != maillon1) return false;
-
-    // retrait de meeple en milieu de chaine
-    retirer_maillon_meeple(&liste, 2, 2);
-    if (liste != maillon1) return false;
-    if (liste->next != NULL) return false;
-
-    // retrait de meeple en fin de chaine
-    L_meeple maillon3 = creer_maillon_meeple(3, 3, D_NORD);
-    ajouter_maillon_meeple(&liste, maillon3);
-
-    retirer_maillon_meeple(&liste, 1, 1);
-    if (liste != maillon3) return false;
-    if (liste->next != NULL) return false;
-
-    // retrait de tous les meeple
-    retirer_maillon_meeple(&liste, 3, 3);
-    if (liste != NULL) return false;
-
-    return true;
-}
-
-bool test_grille_placer_tuile(void)
-{
-    Vec2D grille = creer_vec2D();
-    Tuile t = creer_tuile();
-
-    // placement sans connexion
-    if (placer_tuile(&grille, 1, 1, t)) return false;
-    if (placer_tuile(&grille, 1, 0, t)) return false;
-    if (placer_tuile(&grille, 0, 1, t)) return false;
-    if (placer_tuile(&grille, 1, 9, t)) return false;
-    if (placer_tuile(&grille, 9, 1, t)) return false;
-    if (get(grille, 1, 1) == t) return false;
-    if (get(grille, 1, 0) == t) return false;
-    if (get(grille, 0, 1) == t) return false;
-    if (get(grille, 1, 9) == t) return false;
-    if (get(grille, 9, 1) == t) return false;
-
-    set(&grille, t, 1, 1);
-
-    // tuile occupée
-    if (placer_tuile(&grille, 1, 1, t)) return false;
-
-    // placement compatible
-    t = creer_tuile();
-    if (!placer_tuile(&grille, 0, 1, t)) return false;
-    if (get(grille, 0, 1)  != t) return false;
-    t = creer_tuile();
-    if (!placer_tuile(&grille, 1, 0, t)) return false;
-    if (get(grille, 1, 0)  != t) return false;
-    t = creer_tuile();
-    if (!placer_tuile(&grille, 2, 1, t)) return false;
-    if (get(grille, 2, 1) != t) return false;
-    t = creer_tuile();
-    if (!placer_tuile(&grille, 1, 2, t)) return false;
-    if (get(grille, 1, 2) != t) return false;
-
-    // placement incompatible
-    t = creer_tuile();
-    t->nord = Z_VILLE; t->sud = Z_VILLE; t->est = Z_VILLE; t->ouest = Z_VILLE;
-    set(&grille, t, 5, 5);
-
-    t = creer_tuile();
-    if (placer_tuile(&grille, 0, 1, t)) return false;
-    if (get(grille, 0, 1)  == t) return false;
-    if (placer_tuile(&grille, 1, 0, t)) return false;
-    if (get(grille, 1, 0)  == t) return false;
-    if (placer_tuile(&grille, 2, 1, t)) return false;
-    if (get(grille, 2, 1)  == t) return false;
-    if (placer_tuile(&grille, 1, 2, t)) return false;
-    if (get(grille, 1, 2) == t) return false;
-
-    free(t);
-
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_grille_placer_meeple(void)
-{
-    Vec2D grille = creer_vec2D();
-    Joueur joueur = creer_joueur(0, 2);
-
-    // placement sur tuile vide
-    if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
-    if (joueur.localisation_meeples != NULL) return false;
-    if (joueur.nb_meeple_restant != 2) return false;
-
-    // placement sur tuile occupé
-    Tuile t0 = creer_tuile();
-    t0->id_meeple = 1;
-    set(&grille, t0, 0, 0);
-
-    if (placer_meeple(grille, &joueur, 0, 0, D_MILIEU)) return false;
-    if (joueur.localisation_meeples != NULL) return false;
-    if (joueur.nb_meeple_restant != 2) return false;
-
-    // placements possibles
-    Tuile t1 = creer_tuile();
-    set(&grille, t1, 1, 0);
-
-    if (!placer_meeple(grille, &joueur, 1, 0, D_NORD)) return false;
-
-    if (joueur.localisation_meeples->x != 1)      return false;
-    if (joueur.localisation_meeples->y != 0)      return false;
-    if (joueur.localisation_meeples->d != D_NORD) return false;
-    if (joueur.nb_meeple_restant != 1) return false;
-
-    if (t1->id_meeple != joueur.id) return false;
-    if (t1->position_meeple != D_NORD) return false;
-
-    Tuile t2 = creer_tuile();
-    set(&grille, t2, 0, 1);
-
-    if (!placer_meeple(grille, &joueur, 0, 1, D_SUD)) return false;
-
-    if (joueur.localisation_meeples->x != 0)            return false;
-    if (joueur.localisation_meeples->y != 1)            return false;
-    if (joueur.localisation_meeples->d != D_SUD)        return false;
-    if (joueur.localisation_meeples->next->x != 1)      return false;
-    if (joueur.localisation_meeples->next->y != 0)      return false;
-    if (joueur.localisation_meeples->next->d != D_NORD) return false;
-    if (joueur.nb_meeple_restant != 0) return false;
-
-
-    if (t2->id_meeple != joueur.id) return false;
-    if (t2->position_meeple != D_SUD) return false;
-
-    // placement sans meeple restant
-    Tuile t3 = creer_tuile();
-    set(&grille, t3, 1, 1);
-
-    if (placer_meeple(grille, &joueur, 1, 1, D_MILIEU)) return false;
-
-    if (joueur.localisation_meeples->x != 0)             return false;
-    if (joueur.localisation_meeples->y != 1)             return false;
-    if (joueur.localisation_meeples->d != D_SUD)         return false;
-    if (joueur.localisation_meeples->next->x != 1)       return false;
-    if (joueur.localisation_meeples->next->y != 0)       return false;
-    if (joueur.localisation_meeples->next->d != D_NORD)  return false;
-    if (joueur.localisation_meeples->next->next != NULL) return false;
-    if (joueur.nb_meeple_restant != 0) return false;
-
-    detruire_joueur(joueur);
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_grille_retirer_meeple(void)
-{
-    Vec2D grille = creer_vec2D();
-    ListeJoueurs joueurs = creer_listejoueurs(2, 2);
-
-    // retrait sur tuile vide
-    retirer_meeple(grille, joueurs, 0, 0);
-    if (joueurs.tableau[0].nb_meeple_restant != 2) return false;
-    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
-
-    // retrait normal
-    Tuile t1 = creer_tuile();
-    set(&grille, t1, 1, 0);
-    placer_meeple(grille, &joueurs.tableau[1], 1, 0, D_NORD);
-
-    retirer_meeple(grille, joueurs, 1, 0);
-    if (joueurs.tableau[1].localisation_meeples != NULL) return false;
-    if (joueurs.tableau[1].nb_meeple_restant != 2) return false;
-    if (t1->id_meeple != -1) return false;
-
-    detruire_listejoueurs(joueurs);
-    detruire_vec2D(grille);
-    return true;
-}
-
-bool test_maximal(void)
-{
-    int nb_joueur = 3;
-    int nb_meeple[3];
-    nb_meeple[0] = 2;
-    nb_meeple[1] = 1;
-    nb_meeple[2] = 3;
-    if (maximal(nb_meeple, nb_joueur) != 3) return false;
-    nb_joueur = 1;
-    nb_meeple[0] = 1;
-    if (maximal(nb_meeple,nb_joueur) != 1) return false;
-
-    return true;
-}
-
 bool test_fichier_charger_grille(void)
 {
     generer_fichier_grille();
@@ -1030,20 +1273,17 @@ bool test_fichier_charger_joueur(void)
     if (strcmp(test_read.nom, "Damien")) return false;
     if (test_read.pts != 300)            return false;
 
-    L_meeple meeple = test_read.localisation_meeples;
+    L_meeple meeple = test_read.localisation_meeple;
     if (meeple->x != 0)      return false;
     if (meeple->y != 0)      return false;
-    if (meeple->d != D_SUD)  return false;
 
     meeple = meeple->next;
     if (meeple->x != 0)      return false;
     if (meeple->y != 12)     return false;
-    if (meeple->d != D_NORD) return false;
 
     meeple = meeple->next;
     if (meeple->x != -4)     return false;
     if (meeple->y != -8)     return false;
-    if (meeple->d != D_EST)  return false;
 
     if (meeple->next != NULL)    return false;
 
@@ -1063,7 +1303,7 @@ bool test_fichier_charger_joueur_liste_vide(void)
 
     if (strcmp(test_read.nom, "Damien")) return false;
     if (test_read.pts != 300)            return false;
-    if (test_read.localisation_meeples)  return false;
+    if (test_read.localisation_meeple)  return false;
 
     free(test_read.nom);
     detruire_joueur(test_read);
@@ -1084,20 +1324,17 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     if (tab.tableau[0].nb_meeple_restant != 1) return false;
     if (tab.tableau[0].pts != 300) return false;
 
-    L_meeple meeple = tab.tableau[0].localisation_meeples;
+    L_meeple meeple = tab.tableau[0].localisation_meeple;
     if (meeple->x != 0)       return false;
     if (meeple->y != 0)       return false;
-    if (meeple->d != D_SUD)   return false;
 
     meeple = meeple->next;
     if (meeple->x != 0)       return false;
     if (meeple->y != 12)      return false;
-    if (meeple->d != D_NORD)  return false;
 
     meeple = meeple->next;
     if (meeple->x != -4)      return false;
     if (meeple->y != -8)      return false;
-    if (meeple->d != D_EST)   return false;
 
     if (meeple->next != NULL) return false;
 
@@ -1106,18 +1343,17 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     if (tab.tableau[1].nb_meeple_restant != 4) return false;
     if (tab.tableau[1].pts != 22) return false;
 
-    if (tab.tableau[1].localisation_meeples != NULL) return false;
+    if (tab.tableau[1].localisation_meeple != NULL) return false;
 
     if (strcmp(tab.tableau[2].nom, "Seth")) return false;
     if (tab.tableau[2].id != 2) return false;
     if (tab.tableau[2].nb_meeple_restant != 3) return false;
     if (tab.tableau[2].pts != 777) return false;
 
-    meeple = tab.tableau[2].localisation_meeples;
+    meeple = tab.tableau[2].localisation_meeple;
 
     if (meeple->x != 7) return false;
     if (meeple->y != 6) return false;
-    if (meeple->d != D_OUEST) return false;
 
     fclose(f_read);
     free(tab.tableau[0].nom);
@@ -1153,21 +1389,27 @@ Test unit_tests[] = {
     TEST(test_varstring_vider),
     TEST(test_varstring_ajouter_null),
     TEST(test_varstring_null),
+    TEST(test_joueur_creer),
+    TEST(test_listejoueurs_creer),
+    TEST(test_liste_meeple_creer),
+    TEST(test_liste_meeple_ajouter),
+    TEST(test_liste_meeple_retirer),
+    TEST(test_liste_meeple_verification_presence_meeple),
+    TEST(test_grille_placer_tuile),
+    TEST(test_grille_placer_meeple),
+    TEST(test_grille_retirer_meeple),
+    TEST(test_grille_recherche),
+    TEST(test_grille_recherche_abbaye_complete),
+    TEST(test_grille_recherche_abbaye_non_complete),
+    TEST(test_grille_verification_abbaye),
+    TEST(test_jeu_maximal),
+    TEST(test_jeu_attribution_points),
     TEST(test_csv_compter_lignes),
     TEST(test_csv_lecture_zone),
     TEST(test_csv_lecture_fichier),
     TEST(test_csv_fichier_vide),
     TEST(test_csv_fichier_introuvable),
     TEST(test_csv_fichier_invalide),
-    TEST(test_joueur_creer),
-    TEST(test_listejoueurs_creer),
-    TEST(test_liste_meeple_creer),
-    TEST(test_liste_meeple_ajouter),
-    TEST(test_liste_meeple_retirer),
-    TEST(test_grille_placer_tuile),
-    TEST(test_grille_placer_meeple),
-    TEST(test_grille_retirer_meeple),
-    TEST(test_maximal),
     TEST(test_fichier_charger_grille),
     TEST(test_fichier_charger_pile),
     TEST(test_fichier_charger_pile_aleatoire),

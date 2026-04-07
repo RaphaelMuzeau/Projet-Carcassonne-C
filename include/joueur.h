@@ -8,7 +8,7 @@ typedef struct _Joueur {
     int id;
     int pts;
     int nb_meeple_restant;
-    L_meeple localisation_meeples;
+    L_meeple localisation_meeple;
 } Joueur;
 
 typedef struct _ListeJoueurs {
