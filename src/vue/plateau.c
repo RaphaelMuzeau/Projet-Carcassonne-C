@@ -27,7 +27,7 @@ Plateau creer_plateau(Jeu *jeu, Texture spritesheet)
 
     // afficher la tuile racine
     RenderTexture2D render = generer_render_tuile(get(jeu->grille, 0, 0), spritesheet);
-    placer_render_tuile(&plateau, render, (Vector2) { 0, 0 }, 0.0f);
+    placer_render_tuile(&plateau, render, 0, 0, 0.0f);
 
     return plateau;
 }
@@ -39,8 +39,10 @@ void detruire_plateau(Plateau plateau)
     free(plateau.chunks);
 }
 
-void update_plateau(Plateau *plateau)
+Placement update_plateau(Plateau *plateau)
 {
+    Placement placement = { 0 };
+
     plateau->vue.width = GetScreenWidth() - SIDEBAR_WIDTH;
     plateau->vue.height = GetScreenHeight();
 
@@ -49,7 +51,7 @@ void update_plateau(Plateau *plateau)
 
     // il n'y a rien à faire si le curseur n'est pas sur le plateau
     if (!CheckCollisionPointRec(position_curseur_ecran, plateau->vue))
-        return;
+        return placement;
 
     /* Deplacement */
 
@@ -79,6 +81,16 @@ void update_plateau(Plateau *plateau)
         float echelle = 0.2f*scroll;
         plateau->camera.zoom = Clamp(expf(logf(plateau->camera.zoom) + echelle), 0.0125f, 64.0f);
     }
+
+    /* Placement de tuile */
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        placement.x = multiple_inf(position_curseur_grille.x, TEXTURE_SIZE) / TEXTURE_SIZE;
+        placement.y = multiple_inf(position_curseur_grille.y, TEXTURE_SIZE) / TEXTURE_SIZE;
+        placement.placer_meeple = false;
+    }
+
+    return placement;
 }
 
 void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotation)
@@ -98,19 +110,21 @@ void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotat
     EndMode2D();
 }
 
-void placer_render_tuile(Plateau *plateau, RenderTexture2D render, Vector2 position, float rotation)
+void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y, float rotation)
 {
-    int x_chunk = multiple_inf(position.x, CHUNK_SIZE);
-    int y_chunk = multiple_inf(position.y, CHUNK_SIZE);
+    // On passe de la position dans la grille à la position graphique
+    x *= TEXTURE_SIZE;
+    y *= TEXTURE_SIZE;
 
-    position.x = mod(multiple_inf(position.x, TEXTURE_SIZE), CHUNK_SIZE);
-    position.y = mod(multiple_inf(position.y, TEXTURE_SIZE), CHUNK_SIZE);
+    int x_chunk = multiple_inf(x, CHUNK_SIZE);
+    int y_chunk = multiple_inf(y, CHUNK_SIZE);
+    Vector2 position_tuile = { mod(x, CHUNK_SIZE), mod(y, CHUNK_SIZE) };
 
     // On cherche si le chunk requis existe déjà
     for (int i = 0; i < plateau->nb_chunks; i++) {
         if (plateau->chunks[i].x == x_chunk && plateau->chunks[i].y == y_chunk) {
             BeginTextureMode(plateau->chunks[i].render);
-                dessiner_tuile(render, position, rotation, 255);
+                dessiner_tuile(render, position_tuile, rotation, 255);
             EndTextureMode();
             return;
         }
@@ -122,7 +136,7 @@ void placer_render_tuile(Plateau *plateau, RenderTexture2D render, Vector2 posit
     plateau->chunks[plateau->nb_chunks].y = y_chunk;
 
     BeginTextureMode(plateau->chunks[plateau->nb_chunks].render);
-        dessiner_tuile(render, position, rotation, 255);
+        dessiner_tuile(render, position_tuile, rotation, 255);
     EndTextureMode();
 
     ++plateau->nb_chunks;

@@ -19,9 +19,20 @@ typedef struct _Plateau {
 Plateau creer_plateau(Jeu *jeu, Texture spritesheet);
 void detruire_plateau(Plateau plateau);
 
-void update_plateau(Plateau *plateau);
 void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotation);
+void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y, float rotation);
 
-void placer_render_tuile(Plateau *plateau, RenderTexture2D render, Vector2 position, float rotation);
+/* informations necessaires au placement d'une tuile */
+typedef struct _Placement {
+    int x;
+    int y;
+    enum Direction position_meeple;
+    bool placer_meeple;
+} Placement;
+
+// Met à jour le plateau et renvoit le placement décidé par le joueur.
+// renvoit un placement avec (x, y) = (0, 0) si le joueur
+// n'a pas décidé de placer une tuile.
+Placement update_plateau(Plateau *plateau);
 
 #endif

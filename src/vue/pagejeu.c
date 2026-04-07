@@ -3,6 +3,7 @@
 #include "libca.h"
 #include "raylib.h"
 #include "page.h"
+#include "jeu.h"
 #include "render.h"
 #include "plateau.h"
 #include "sidebar.h"
@@ -17,15 +18,15 @@ enum Page page_jeu(Jeu *jeu)
     bool centre_camera = false;
 
     // Etat initial du jeu
-    Tuile t = recup_tuile(&jeu->pile);
-    set(&jeu->grille, t, 0, 0); // on place la tuile racine
+    set(&jeu->grille, recup_tuile(&jeu->pile), 0, 0); // on place la tuile racine
+    int id_tour = 0;
 
     // Charger la Spritesheet
     Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
     if (!IsTextureValid(spritesheet))
         ca_error("Echec lors du chargement de la spritesheet");
 
-    // piocher la premiere tuile
+    // Piocher la premiere tuile
     Tuile tuile = recup_tuile(&jeu->pile);
     RenderTexture2D render_tuile = generer_render_tuile(tuile, spritesheet);
     float rotation_tuile = 0.0f;
@@ -77,24 +78,41 @@ enum Page page_jeu(Jeu *jeu)
 
         /* gestion du plateau */
 
-        if (!afficher_popup && !centre_camera)
-            update_plateau(&plateau);
+        if (!afficher_popup && !centre_camera) {
+            Placement placement = update_plateau(&plateau);
+            if (placement.x != 0 || placement.y != 0) {
+                if (tour(jeu, tuile, placement.x, placement.y, placement.placer_meeple ? id_tour : -1, placement.position_meeple)) {
+                    // mettre à jour l'hud
+                    rafraichir_controles(&ctrl, jeu->pile.nb_element);
+                    rafraichir_barrejoueurs(&barrejoueurs);
+                    placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
+
+                    // piocher la prochaine tuile
+                    tuile          = recup_tuile(&jeu->pile);
+                    render_tuile   = generer_render_tuile(tuile, spritesheet);
+                    rotation_tuile = 0.0f;
+
+                    // passer au tour d'un nouveau joueur
+                    id_tour = (id_tour + 1) % jeu->joueurs.nb_joueurs;
+                }
+            }
+        }
 
         /* controles de la tuile */
 
         update_controles(&ctrl);
 
         if (update_bouton_adapte(&ctrl.rotation) || IsKeyPressed(KEY_R)) {
-            pivot_90(t);
+            pivot_90(tuile);
             rotation_tuile = fmod(rotation_tuile + 90.0f, 360.0f);
         }
 
         if (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D)) {
-            free(t);
+            free(tuile);
             UnloadRenderTexture(render_tuile);
             rotation_tuile = 0;
-            t = recup_tuile(&jeu->pile);
-            render_tuile = generer_render_tuile(t, spritesheet);
+            tuile = recup_tuile(&jeu->pile);
+            render_tuile = generer_render_tuile(tuile, spritesheet);
         }
 
         /* barre joueurs */
@@ -110,7 +128,7 @@ enum Page page_jeu(Jeu *jeu)
             dessiner_plateau(plateau, render_tuile, rotation_tuile);
 
             // dessin de la sidebar
-            dessiner_barrejoueurs(barrejoueurs, 3);
+            dessiner_barrejoueurs(barrejoueurs, id_tour);
             dessiner_controles(ctrl, render_tuile, rotation_tuile);
 
             // dessin de l'interface
