@@ -37,6 +37,7 @@ void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts)
         return;
 
     int maxi = maximal(nb_meeples, jeu->joueurs.nb_joueurs);
+    if(maxi == 0 ) return;
 
     for (int i = 0; i < jeu->joueurs.nb_joueurs; i++)
         if (nb_meeples[i] == maxi)
