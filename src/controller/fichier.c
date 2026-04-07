@@ -204,17 +204,12 @@ void sauvegarder_joueur(Joueur joueur, FILE *f)
      * Se fait via des structures privés pour changer
      * la variable tmp2 sans modifier tmp */
     if (joueur.localisation_meeple != NULL) {
-        struct _Maillon tmp = *joueur.localisation_meeple;
-        do {
-            struct _Maillon tmp2 = tmp;
+        for (L_meeple tmp = joueur.localisation_meeple; tmp != NULL; tmp = tmp->next) {
+            struct _Maillon tmp2 = *tmp;
             tmp2.next = NULL;
             fwrite(&tmp2, sizeof(struct _Maillon), 1, f);
-            if (tmp.next != NULL)
-                tmp = *tmp.next;
             nb_meeple_pose++;
-        } while (tmp.next != NULL);
-        fwrite(&tmp, sizeof(struct _Maillon), 1, f);
-        nb_meeple_pose++;
+        }
     }
 
     // Écrit au bon endroit nb_meeple_pose et revient à la fin
