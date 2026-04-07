@@ -6,7 +6,7 @@
 
 #define CONTROLES_PADDING 20.0f
 #define CONTROLES_APERCU_SIZE 128.0f
-#define CONTROLES_HEIGHT (CONTROLES_APERCU_SIZE + 2 * CONTROLES_PADDING)
+#define CONTROLES_HEIGHT (CONTROLES_APERCU_SIZE + 2 * CONTROLES_PADDING + 20.0f)
 
 #define CARTEJOUEUR_WIDTH 250.0f
 #define CARTEJOUEUR_HEIGHT 100.0f
@@ -18,10 +18,12 @@ typedef struct _Controles {
     Rectangle apercu;
     Bouton rotation;
     Bouton detruire;
+    Texte nb_tuiles;
 } Controles;
 
-Controles creer_controles(void);
+Controles creer_controles(int nb_tuiles);
 void update_controles(Controles *ctrl);
+void rafraichir_controles(Controles *ctrl, int nb_tuiles);
 void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rotation);
 
 typedef struct _CarteJoueur {

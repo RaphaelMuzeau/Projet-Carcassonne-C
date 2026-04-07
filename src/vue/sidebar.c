@@ -6,7 +6,7 @@
 
 /* Controles */
 
-Controles creer_controles(void)
+Controles creer_controles(int nb_tuiles)
 {
     int largeur_ecran = GetScreenWidth();
     Controles ctrl = { 0 };
@@ -27,6 +27,11 @@ Controles creer_controles(void)
     ctrl.detruire = creer_bouton_adapte(0, ctrl.rotation.champ.y + 60, " X ");
     ctrl.detruire.champ.x = (ctrl.champ.x + ctrl.apercu.x) / 2 - ctrl.detruire.champ.width / 2;
 
+    ctrl.nb_tuiles.contenu = ca_alloc(10, sizeof(char));
+    ctrl.nb_tuiles = creer_texte(0, ctrl.apercu.y + ctrl.apercu.height + 10.0f, ctrl.nb_tuiles.contenu);
+    ctrl.nb_tuiles.couleur = BLUE;
+    rafraichir_controles(&ctrl, nb_tuiles);
+
     return ctrl;
 }
 
@@ -35,10 +40,17 @@ void update_controles(Controles *ctrl)
     int largeur_ecran = GetScreenWidth();
 
     float dec = largeur_ecran - ctrl->champ.width - ctrl->champ.x;
-    ctrl->champ.x          += dec;
-    ctrl->apercu.x         += dec;
-    ctrl->rotation.champ.x += dec;
-    ctrl->detruire.champ.x += dec;
+    ctrl->champ.x              += dec;
+    ctrl->apercu.x             += dec;
+    ctrl->rotation.champ.x     += dec;
+    ctrl->detruire.champ.x     += dec;
+    ctrl->nb_tuiles.position.x += dec;
+}
+
+void rafraichir_controles(Controles *ctrl, int nb_tuiles)
+{
+    snprintf(ctrl->nb_tuiles.contenu, 10, "%d", nb_tuiles);
+    ctrl->nb_tuiles.position.x = ctrl->apercu.x + ctrl->apercu.width/2.0f - mesurer_texte(ctrl->nb_tuiles).x/2.0f;
 }
 
 void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rotation)
@@ -46,6 +58,7 @@ void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rota
     DrawRectangleRec(ctrl.champ, DARKGRAY);
     dessiner_bouton(ctrl.rotation);
     dessiner_bouton(ctrl.detruire);
+    dessiner_texte(ctrl.nb_tuiles);
 
     Rectangle source = { .width = TEXTURE_SIZE, .height = -TEXTURE_SIZE };
     Vector2 origin = { CONTROLES_APERCU_SIZE / 2.0f, CONTROLES_APERCU_SIZE / 2.0f };

@@ -34,7 +34,7 @@ enum Page page_jeu(Jeu *jeu)
     Plateau plateau = creer_plateau(jeu, spritesheet);
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
     Bouton centrer = creer_bouton_adapte(retour.champ.width + 30, retour.champ.y, "centrer");
-    Controles ctrl = creer_controles();
+    Controles ctrl = creer_controles(jeu->pile.nb_element);
     BarreJoueurs barrejoueurs = creer_barrejoueurs(jeu->joueurs);
     Popup popup = creer_popup();
 
