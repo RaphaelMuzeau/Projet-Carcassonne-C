@@ -156,16 +156,10 @@ enum Page page_jeu(Jeu *jeu)
 
             dessiner_bouton(centrer);
             if (centre_camera) {
-                if (nb_chunks != 0) {
-                    camera.zoom = 0.5f + (float) 1/nb_chunks;
-                    camera.target.x = 0 - (float) 1/nb_chunks;
-                    camera.target.y = 0;
-                } else {
-                camera.zoom = 0.5f;
                 camera.target.x = 0;
                 camera.target.y = 0;
-                }
-            centre_camera = false;
+                camera.offset = (Vector2) {vue.width / 2, vue.height / 2};
+                centre_camera = false;
             }
         EndDrawing();
     }
