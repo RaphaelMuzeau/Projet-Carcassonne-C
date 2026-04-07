@@ -2,5 +2,9 @@
 build
 bin
 compile_commands.json
+
 **/**.swp
-data/parties/**
+
+data/parties/*
+# conserver le csv d'exemple
+!data/parties/tuiles.csv
