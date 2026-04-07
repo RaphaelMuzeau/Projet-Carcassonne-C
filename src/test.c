@@ -991,23 +991,30 @@ bool test_grille_recherche(void)
 bool test_jeu_attribution_points(void)
 {
     Jeu jeu = creer_jeu(3, 3, 3);
-    L_meeple loc_meeple;
-    loc_meeple = creer_maillon_meeple(0,0);
-    int *nb_meeple;
-    nb_meeple = ca_alloc(jeu.joueurs.nb_joueurs,sizeof(int));
+    L_meeple loc_meeple = creer_maillon_meeple(0,0);
+    int *nb_meeple = ca_alloc(jeu.joueurs.nb_joueurs,sizeof(int));
+
     attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+
     if (jeu.joueurs.tableau[0].pts != 0) return false;
     if (jeu.joueurs.tableau[1].pts != 0) return false;
     if (jeu.joueurs.tableau[2].pts != 0) return false;
     nb_meeple[1] = 2;
+
     attribution_points(&jeu, loc_meeple, nb_meeple, 10);
-     if (jeu.joueurs.tableau[1].pts != 10) return false;
+
+    if (jeu.joueurs.tableau[1].pts != 10) return false;
+
     nb_meeple[2] = 2;
     jeu.joueurs.tableau[1].pts = 0;
+
     attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+
     if (jeu.joueurs.tableau[1].pts != 10) return false;
     if (jeu.joueurs.tableau[1].pts != 10) return false;
+
     free(nb_meeple);
+    detruire_liste_meeple(loc_meeple);
     detruire_jeu(jeu);
     return true;
 }
