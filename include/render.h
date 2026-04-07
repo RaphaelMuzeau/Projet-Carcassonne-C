@@ -34,7 +34,6 @@ enum Sprite {
 };
 
 RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet);
-void ajouter_tuile_chunk(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position, float rotation);
 
 void dessiner_chunk(Chunk chunk);
 void dessiner_tuile(RenderTexture2D render_tuile, Vector2 position, float rotation, int alpha);

@@ -91,37 +91,6 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet)
     return render;
 }
 
-// ajoute le render d'une tuile aux chunks
-void ajouter_tuile_chunk(Chunk *chunks, int *nb_chunks, RenderTexture2D render_tuile, Vector2 position, float rotation)
-{
-    int x_chunk = multiple_inf(position.x, CHUNK_SIZE);
-    int y_chunk = multiple_inf(position.y, CHUNK_SIZE);
-
-    position.x = mod(multiple_inf(position.x, TEXTURE_SIZE), CHUNK_SIZE);
-    position.y = mod(multiple_inf(position.y, TEXTURE_SIZE), CHUNK_SIZE);
-
-    // On cherche si le chunk requis existe déjà
-    for (int i = 0; i < *nb_chunks; i++) {
-        if (chunks[i].x == x_chunk && chunks[i].y == y_chunk) {
-            BeginTextureMode(chunks[i].render);
-                dessiner_tuile(render_tuile, position, rotation, 255);
-            EndTextureMode();
-            return;
-        }
-    }
-
-    // Sinon, il faut le creer
-    chunks[*nb_chunks].render = LoadRenderTexture(CHUNK_SIZE, CHUNK_SIZE);
-    chunks[*nb_chunks].x = x_chunk;
-    chunks[*nb_chunks].y = y_chunk;
-
-    BeginTextureMode(chunks[*nb_chunks].render);
-        dessiner_tuile(render_tuile, position, rotation, 255);
-    EndTextureMode();
-
-    ++*nb_chunks;
-}
-
 /* dessin des chunks et tuiles */
 
 void dessiner_chunk(Chunk chunk)
