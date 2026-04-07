@@ -22,10 +22,10 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile t)
         return false;
 
     // compatibilité
-    if (!compatibilite_tuile(get(*grille, x, y), get(*grille, x - 1, y), D_OUEST)
-     || !compatibilite_tuile(get(*grille, x, y), get(*grille, x + 1, y), D_EST)
-     || !compatibilite_tuile(get(*grille, x, y), get(*grille, x, y - 1), D_NORD)
-     || !compatibilite_tuile(get(*grille, x, y), get(*grille, x, y + 1), D_SUD))
+    if (!compatibilite_tuile(t, get(*grille, x - 1, y), D_OUEST)
+     || !compatibilite_tuile(t, get(*grille, x + 1, y), D_EST)
+     || !compatibilite_tuile(t, get(*grille, x, y - 1), D_NORD)
+     || !compatibilite_tuile(t, get(*grille, x, y + 1), D_SUD))
         return false;
 
     set(grille, t, x, y);
