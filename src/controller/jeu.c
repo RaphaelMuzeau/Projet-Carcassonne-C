@@ -17,6 +17,10 @@ Jeu creer_jeu(int nb_joueurs, int nb_meeple, int nb_tuiles)
     jeu.joueurs = creer_listejoueurs(nb_joueurs, nb_meeple);
     jeu.pile = creer_pile(nb_tuiles, true);
     jeu.grille = creer_vec2D();
+
+    // placer la tuile racine
+    set(&jeu.grille, recup_tuile(&jeu.pile), 0, 0);
+
     return jeu;
 }
 
