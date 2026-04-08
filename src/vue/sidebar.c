@@ -70,7 +70,7 @@ void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rota
 
 /* CarteJoueur */
 
-CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur, Color couleur)
+CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur)
 {
     CarteJoueur carte = { 0 };
 
@@ -80,7 +80,6 @@ CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur, Color couleur)
     carte.champ.y = y;
 
     carte.joueur  = joueur;
-    carte.couleur = couleur;
 
     carte.texte_nom = creer_texte(0, y + 3, joueur->nom);
     carte.texte_nom.position.x = x + carte.champ.width/2 - mesurer_texte(carte.texte_nom).x/2;
@@ -109,10 +108,10 @@ void rafraichir_cartejoueur(CarteJoueur *carte)
 void dessiner_cartejoueur(CarteJoueur carte, bool tour)
 {
     DrawRectangleRounded(carte.champ, 0.30f, 1, RAYWHITE);
-    DrawRectangleRoundedLinesEx(carte.champ, 0.30f, 1, 4, tour ? carte.couleur : BLACK);
+    DrawRectangleRoundedLinesEx(carte.champ, 0.30f, 1, 4, tour ? carte.joueur->couleur : BLACK);
     DrawLineEx((Vector2) {carte.champ.x, carte.champ.y + 30},
                (Vector2) {carte.champ.x + carte.champ.width, carte.champ.y + 30},
-               4, tour ? carte.couleur : BLACK);
+               4, tour ? carte.joueur->couleur : BLACK);
     dessiner_texte(carte.texte_nom);
     dessiner_texte(carte.texte_pts);
     dessiner_texte(carte.texte_meeple);
@@ -137,7 +136,7 @@ BarreJoueurs creer_barrejoueurs(ListeJoueurs joueurs)
     float y = barre.champ.y + 10.0f;
     barre.cartes = ca_alloc(joueurs.nb_joueurs, sizeof(CarteJoueur));
     for (int i = 0; i < joueurs.nb_joueurs; i++) {
-        barre.cartes[i] = creer_cartejoueur(0, y, &barre.joueurs.tableau[i], RED);
+        barre.cartes[i] = creer_cartejoueur(0, y, &barre.joueurs.tableau[i]);
         y += CARTEJOUEUR_HEIGHT + 20.0f;
     }
     barre.fin_liste = y - CARTEJOUEUR_HEIGHT;

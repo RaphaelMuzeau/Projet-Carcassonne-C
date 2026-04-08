@@ -1,6 +1,7 @@
 #ifndef joueur_h
 #define joueur_h
 
+#include "raylib.h"
 #include "meeple.h"
 
 typedef struct _Joueur {
@@ -9,6 +10,7 @@ typedef struct _Joueur {
     int pts;
     int nb_meeple_restant;
     L_meeple localisation_meeple;
+    Color couleur;
 } Joueur;
 
 typedef struct _ListeJoueurs {

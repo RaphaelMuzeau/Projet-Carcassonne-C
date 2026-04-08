@@ -10,7 +10,7 @@
 #include "grille.h"
 #include "pile.h"
 
-#define VERSION "SV0.2"
+#define VERSION "SV0.3"
 #define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)

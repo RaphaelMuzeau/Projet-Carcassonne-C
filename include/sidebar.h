@@ -28,14 +28,13 @@ void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rota
 
 typedef struct _CarteJoueur {
     Joueur *joueur;
-    Color couleur;
     Rectangle champ;
     Texte texte_nom;
     Texte texte_pts;
     Texte texte_meeple;
 } CarteJoueur;
 
-CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur, Color couleur);
+CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur);
 void detruire_cartejoueur(CarteJoueur carte);
 void rafraichir_cartejoueur(CarteJoueur *carte);
 void dessiner_cartejoueur(CarteJoueur carte, bool tour);

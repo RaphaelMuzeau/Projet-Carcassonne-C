@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 #include "libca.h"
 #include "joueur.h"
 
@@ -8,8 +9,14 @@ Joueur creer_joueur(int id, int nb_meeple)
     Joueur joueur = { 0 };
     joueur.nom = NULL;
     joueur.id = id;
+    joueur.pts = 0;
     joueur.nb_meeple_restant = nb_meeple;
     joueur.localisation_meeple = NULL;
+
+    joueur.couleur.r = rand()%CHAR_MAX;
+    joueur.couleur.g = rand()%CHAR_MAX;
+    joueur.couleur.b = rand()%CHAR_MAX;
+    joueur.couleur.a = CHAR_MAX;
 
     return joueur;
 }
