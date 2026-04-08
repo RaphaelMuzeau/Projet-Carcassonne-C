@@ -122,8 +122,8 @@ PlacementTuile update_plateau(Plateau *plateau)
             plateau->milieu.champ.x = plateau->pos_tuile.x + TEXTURE_SIZE * 0.40f;
             plateau->milieu.champ.y = plateau->pos_tuile.y + TEXTURE_SIZE * 0.40f;
 
-            plateau->aucun.champ.x  = plateau->pos_tuile.x + TEXTURE_SIZE * 1.1f;
-            plateau->aucun.champ.y  = plateau->pos_tuile.y - TEXTURE_SIZE * 0.1f;
+            plateau->aucun.champ.x  = plateau->pos_tuile.x + TEXTURE_SIZE * 0.8f;
+            plateau->aucun.champ.y  = plateau->pos_tuile.y + TEXTURE_SIZE * 0.1f;
             adapter_bouton(&plateau->aucun);
         }
     }
@@ -152,6 +152,10 @@ PlacementTuile update_plateau(Plateau *plateau)
 void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotation)
 {
     BeginMode2D(plateau.camera);
+        // dessiner tous les chunks
+        for (int i = 0; i < plateau.nb_chunks; i++)
+            dessiner_chunk(plateau.chunks[i]);
+
         // dessiner la tuile courante avec une transparence de 50%
         dessiner_tuile(render_tuile, plateau.pos_tuile, rotation, 128);
 
@@ -164,10 +168,6 @@ void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotat
             dessiner_bouton(plateau.milieu);
             dessiner_bouton(plateau.aucun);
         }
-
-        // dessiner tous les chunks
-        for (int i = 0; i < plateau.nb_chunks; i++)
-            dessiner_chunk(plateau.chunks[i]);
     EndMode2D();
 }
 

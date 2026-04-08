@@ -18,6 +18,8 @@ enum Page page_jeu(Jeu *jeu)
     bool afficher_popup = false;
     bool centre_camera = false;
 
+    SetExitKey(KEY_NULL);
+
     // Charger la Spritesheet
     Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
     if (!IsTextureValid(spritesheet))
@@ -40,6 +42,11 @@ enum Page page_jeu(Jeu *jeu)
     // Vue de la grille
 
     while (prochaine_page == P_JEU) {
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            if (plateau.placement) plateau.placement = false;
+            else afficher_popup = true;
+        }
+
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
@@ -149,6 +156,8 @@ enum Page page_jeu(Jeu *jeu)
 
     detruire_jeu(*jeu);
     *jeu = (Jeu) { 0 };
+
+    SetExitKey(KEY_ESCAPE);
 
     return prochaine_page;
 }
