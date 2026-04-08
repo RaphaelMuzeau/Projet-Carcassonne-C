@@ -83,15 +83,16 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
     }
 
     int pts = zone_pts(zone_tuile(t, d_arrive));
+    bool complete = true; // la zone est-elle complete ?
 
     // effectuer la recherche sur tous les cote de la tuile
     for (enum Direction d_depart = 0; d_depart < D_MILIEU; ++d_depart) {
         int tmp = recherche_suite(grille, loc_meeple, z, d_arrive, d_depart, t, nb_meeple, x, y, fin);
-        if(tmp == -1) return -1;
+        if (tmp == -1) complete = false;
         pts += tmp;
     }
 
-    return pts;
+    return complete ? pts : -1;
 }
 
 
