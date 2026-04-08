@@ -70,7 +70,7 @@ Notre tuile ainsi définie intéragit avec différentes fonctions, en voici une 
 - `Tuile generer_tuile(void)`
 
 ### Schéma de la tuile :
-![](../data/analyse/schema_tuile.png)
+![](../data/analyse/schema_tuile.svg)
 
 #### Précisions sur certaines fonctions :
 
@@ -89,8 +89,8 @@ La fonction ***`generer_tuile`*** sert à générer une tuile (respectant les r�
 La génération aléatoire est une des demandes à respecter ajouté à l'analyse du projet. Pour pouvoir la réaliser nous avons étuider longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
 Une règle implicite que nous ajoutons au jeu est le fait que si une zone "route" ou "ville" apparaît au milieu, alors celle-ci fait le lien entre deux autres zones, comme sous cet exemple : 
 
-![](../data/analyse/exemple_tuile.svg "exemple de tuiles")
-**
+![](../data/analyse/exemple_tuile.svg)
+
 Nous autorisons aussi la génération de tuiles qui n'existent pas dans le Carcassonne d'origine, comme celles-ci, par exemple : 
 
  ![](../data/analyse/exemple_abbaye_non_commun.png)
@@ -117,7 +117,6 @@ struct _Maillon {
     struct _Maillon *next;
     int x;
     int y;
-    enum Direction d;
 };
 typedef struct _Maillon *L_meeple;
 ```
@@ -230,9 +229,79 @@ La fonction ***`set`*** pose la tuile aux coordonées passées en argument.
 Vient ensuite, la représentation de nos joueurs, ici encore, une réflexion rapide nous à apporter toutes les informations que nous **voulions** dans notre strucutre, ce qui nous a donné le code suivant : 
 
 ```
-
+typedef struct _Joueur {
+    char *nom;
+    int id;
+    int pts;
+    int nb_meeple_restant;
+    L_meeple localisation_meeple;
+	Color couleur;
+} Joueur;
 ```
 
+La structure `L_meeple` (localisation meeple) enregistre tous les meeple placés par le joueur sur le grille ainsi que leur position.
+
+Liste exhaustive des fonctions : 
+
+- ***`Joueur creer_joueur(int id, int nb_meeple)`***
+- ***`void detruire_joueur(Joueur joueur)`***
+- ***`ListeJoueurs creer_listejoueurs(int nb_joueurs, int nb_meeple)`***
+- ***`void detruire_listejoueurs(ListeJoueurs joueurs)`***
+
+
+![](../data/analyse/schema_joueur.svg)
+
+
+Il nous fallait un endroit où réunir tous nos joueurs, donc nous avons créer un tableau où se trouvent tous nos joueurs : 
+
+```
+typedef struct _ListeJoueurs {
+    int nb_joueurs;
+    Joueur *tableau;
+} ListeJoueurs;
+```
+
+
+![](../data/analyse/schema_listejoueurs.svg)
+
+
+## Algorithmique :
+
+
+## Jeu :
+
+Cette algorithme s'exécute lorsqu'une procédure de recherche est engagée. Exemple : Lors d'un placement de tuile. Cette fonction permet de renvoyer les points que nous allons pouvoir attribuer par la suit, la recherche effectue également l'analyse du nombre de meeple présents dans un tableau indexé par l'id des joueurs sur la zone recherchée et sauvegarde leurs localisations dans *loc_meeple_all*, une liste chaînée contenant tous les meeples trouvés. <br>
+La recherche s'arrête quand on arrive sur une tuile déjà vérifiée ou une tuile vide.
+
+Cette fonction est récusrive, elle sera appelée sur chaque case de notre recherche.
+
+Il y a un booléen présent dans la recherchen nommé *complete*, définit sur *true*, il peut changer de valeur dans le cas où `recherche_suite` renverait *-1* dans la valeur *tmp*.
+
+Si `recherche` réussie, elle renvoie le nombre de points, si la zone est complétée. Sinon, elle renvoie -1.
+
+![](../data/analyse/code_recherche.svg)
+
+La fonction appelée dans `recherche`, `recherche_suite` est une encapsulation qui permet une meilleur lisibilité du code dans son ensemble. Pour autant elle marche de pair avec `recherche`, en voici le codde : 
+
+![](../data/analyse/code_recherche_suite.svg)
+
+Cette fonction consiste simplement à analyser la présence d'un meeple sur une tuile et l'ajouter à *loc_meeple* et appelle de manière récusrive la `recherche` sur les différentes directions qui composent la tuile aux zones compatibles avec celle de la recherche.
+
+Liste des fonctions : 
+
+- ***`Jeu creer_jeu(int nb_joueurs, int nb_meeple, int nb_tuiles)`***
+- ***`void detruire_jeu(Jeu jeu)`***
+- ***`void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts)`***
+- ***`bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple)`***
+- ***`void fin(Jeu *jeu)`***
+
+#### Précisions sur les fonctions :
+
+La fonction ***`attribution_points`*** n'est appelée qu'après une recherche. Elle va aussi attribuer les points au joueur ayant le plus de meeple.
+
+La fonction ***`tour`*** gère touts les actions réalisées par un joueur durant un tour, pour être plus précis : placement de la tuile, du meeple éventuel, de la recherche, et de l'attribution des points. Tour vérifie aussi la présence d'abbaye à proximité et va attribuer les points si nécessaire.
+
+La fonction ***`fin`*** aura un comportement similaire, mais celle-ci va lancer une recherche à la position de chaque meeple, attribue les points et annonce le gagnant de la partie.
 
 ## Fichiers :
 
@@ -242,7 +311,7 @@ Vient ensuite, la représentation de nos joueurs, ici encore, une réflexion rap
  Une seule information importante est à noter : la dernière valeur de chaque ligne du `.csv` représente la valeur de son milieu. Nous pouvons l'analyse facilement grâce aux valeurs `villages` et `abbaye` qui n'apparaissent qu'au milieu.   
 Avec la commande `cat tuiles.csv | grep abbaye && cat tuiles.csv | grep village`
  
- ```
+ ```csv
  pre,pre,pre,pre,abbaye
 pre,pre,pre,route,abbaye
 pre,pre,pre,pre,abbaye
