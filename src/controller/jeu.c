@@ -101,9 +101,11 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction
         }
 
         // sinon, on peut retroactivement ajouter le meeple et attribuer les points
-        nb_meeple[jeu->joueurs.tour] += 1;
-        ajouter_maillon_meeple(&loc_meeple, creer_maillon_meeple(x,y));
-        attribution_points(jeu, loc_meeple, nb_meeple, pts, false);
+        if (pts != 0) {
+            nb_meeple[jeu->joueurs.tour] += 1;
+            ajouter_maillon_meeple(&loc_meeple, creer_maillon_meeple(x,y));
+            attribution_points(jeu, loc_meeple, nb_meeple, pts, false);
+        }
     }
 
     // lancer la recherche sur tous les autres cotés
