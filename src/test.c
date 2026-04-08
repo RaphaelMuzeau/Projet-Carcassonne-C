@@ -581,6 +581,7 @@ bool test_listejoueurs_creer(void)
 
     if (joueurs.nb_joueurs != 3) return false;
     if (joueurs.tableau == NULL) return false;
+    if (joueurs.tour != 0)       return false;
 
     if (joueurs.tableau[0].id != 0) return false;
     if (joueurs.tableau[1].id != 1) return false;
@@ -992,23 +993,23 @@ bool test_jeu_attribution_points(void)
 {
     Jeu jeu = creer_jeu(3, 3, 3);
     L_meeple loc_meeple = creer_maillon_meeple(0,0);
-    int *nb_meeple = ca_alloc(jeu.joueurs.nb_joueurs,sizeof(int));
+    int *nb_meeple = ca_alloc(jeu.joueurs.nb_joueurs, sizeof(int));
 
-    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10, false);
 
     if (jeu.joueurs.tableau[0].pts != 0) return false;
     if (jeu.joueurs.tableau[1].pts != 0) return false;
     if (jeu.joueurs.tableau[2].pts != 0) return false;
     nb_meeple[1] = 2;
 
-    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10, false);
 
     if (jeu.joueurs.tableau[1].pts != 10) return false;
 
     nb_meeple[2] = 2;
     jeu.joueurs.tableau[1].pts = 0;
 
-    attribution_points(&jeu, loc_meeple, nb_meeple, 10);
+    attribution_points(&jeu, loc_meeple, nb_meeple, 10, false);
 
     if (jeu.joueurs.tableau[1].pts != 10) return false;
     if (jeu.joueurs.tableau[1].pts != 10) return false;
@@ -1018,6 +1019,42 @@ bool test_jeu_attribution_points(void)
     detruire_jeu(jeu);
     return true;
 }
+
+bool test_jeu_tour(void)
+{
+    Jeu jeu = creer_jeu(3, 1, 4);
+
+    Tuile tuile1 = creer_tuile();
+    tuile1->milieu = Z_VILLAGE;
+    tuile1->sud = Z_ROUTE;
+
+    Tuile tuile2 = creer_tuile();
+    tuile2->sud = Z_VILLE;
+    tuile2->milieu = Z_VILLE;
+    tuile2->est = Z_VILLE;
+    tuile2->ouest = Z_VILLE;
+    tuile2->nord = Z_ROUTE;
+
+    Tuile tuile3 = creer_tuile();
+    tuile3->milieu = Z_ROUTE;
+    tuile3->nord = Z_ROUTE;
+    tuile3->sud = Z_ROUTE;
+    Tuile tuile4 = creer_tuile();
+    set(&jeu.grille, tuile1, 0, 0);
+
+    tour(&jeu, tuile3, 1, 0, true, D_NORD);
+    tour(&jeu, tuile2, 0, 1, true, D_NORD);
+    tour(&jeu,tuile4, 0, -1, false, D_MILIEU);
+    if (jeu.joueurs.tableau[0].pts != 0) return false;
+
+    if (fin(&jeu) != 1) return false;
+    if (jeu.joueurs.tableau[1].pts != 2) return false;
+    if (jeu.joueurs.tableau[0].pts != 1) return false;
+    detruire_jeu(jeu);
+
+    return true;
+}
+
 bool test_grille_recherche_abbaye_complete(void)
 {
     Vec2D grille = generer_recherche_abbaye_complete();
@@ -1404,6 +1441,7 @@ Test unit_tests[] = {
     TEST(test_grille_verification_abbaye),
     TEST(test_jeu_maximal),
     TEST(test_jeu_attribution_points),
+    TEST(test_jeu_tour),
     TEST(test_csv_compter_lignes),
     TEST(test_csv_lecture_zone),
     TEST(test_csv_lecture_fichier),

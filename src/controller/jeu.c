@@ -1,3 +1,4 @@
+
 #include "libca.h"
 #include "jeu.h"
 #include "tuile.h"
@@ -36,7 +37,7 @@ int maximal(int *nb_meeples, int nb_joueur)
     return maxi;
 }
 
-void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts)
+void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts, bool fin)
 {
     if (pts == -1)
         return;
@@ -50,15 +51,20 @@ void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts)
 
     L_meeple tmp = loc_meeple;
     while (tmp != NULL) {
-        retirer_meeple(jeu->grille, jeu->joueurs, tmp->x,tmp->y);
+        // si le jeu est encore en cours, il faut retirer proprement le meeple
+        // avec retirer_meeple(), sinon, on le retire simplement de la grille pour laisser fin()
+        // iterer sur la localisation_meeple du joueur.
+        if (!fin) retirer_meeple(jeu->grille, jeu->joueurs, tmp->x,tmp->y);
+        else      get(jeu->grille, tmp->x, tmp->y)->id_meeple = -1;
+
         tmp = tmp->next;
     }
-
     return;
 }
 
-bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction position_meeple)
+bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction position_meeple)
 {
+
     if (!placer_tuile(&jeu->grille, x, y, tuile))
         return false;
 
@@ -67,7 +73,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
     L_meeple loc_meeple = NULL;
 
     // il faut traiter le cas du meeple en premier car il peut annuler le placement
-    if (id_meeple != -1) {
+    if (place_meeple) {
         // on lance la recherche à partir de la zone où sera placé le meeple
         enum Zone zone = zone_tuile(tuile, position_meeple);
         int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, zone, position_meeple, false);
@@ -84,7 +90,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         }
 
         // de meme si le placement du meeple est invalide
-        if (!placer_meeple(jeu->grille, &jeu->joueurs.tableau[id_meeple], x , y , position_meeple)) {
+        if (!placer_meeple(jeu->grille, &jeu->joueurs.tableau[jeu->joueurs.tour], x , y , position_meeple)) {
             set((&jeu->grille), NULL, x, y);
             free(nb_meeple);
             detruire_liste_meeple(loc_meeple);
@@ -92,13 +98,14 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
         }
 
         // sinon, on peut retroactivement ajouter le meeple et attribuer les points
-        nb_meeple[id_meeple] += 1;
-        attribution_points(jeu, loc_meeple, nb_meeple, pts);
+        nb_meeple[jeu->joueurs.tour] += 1;
+        ajouter_maillon_meeple(&loc_meeple, creer_maillon_meeple(x,y));
+        attribution_points(jeu, loc_meeple, nb_meeple, pts, false);
     }
 
     // lancer la recherche sur tous les autres cotés
     for (enum Direction d = 0; d < D_MILIEU; d++) {
-        if (id_meeple != -1 && d == position_meeple)
+        if (jeu->joueurs.tour != -1 && d == position_meeple)
             continue; // on a deja fait cette recherche
 
         // on réinitialise les listes utilisées par recherche()
@@ -109,7 +116,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
 
         int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, zone_tuile(tuile, d), d, false);
         recherche_est_verifie(jeu->grille, x, y);
-        attribution_points(jeu, loc_meeple, nb_meeple, pts);
+        attribution_points(jeu, loc_meeple, nb_meeple, pts, false);
     }
 
     // verifier si il y des abbaye sur ou au abords de la tuile
@@ -118,10 +125,12 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, int id_meeple, enum Direction pos
 
     free(nb_meeple);
     detruire_liste_meeple(loc_meeple);
+
+    jeu->joueurs.tour = (jeu->joueurs.tour + 1) % jeu->joueurs.nb_joueurs;
     return true;
 }
 
-void fin(Jeu *jeu)
+int fin(Jeu *jeu)
 {
     // preparation des arguments pour la recherche
     int *nb_meeple = ca_alloc(jeu->joueurs.nb_joueurs, sizeof(int));
@@ -144,12 +153,22 @@ void fin(Jeu *jeu)
                 int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, meeple->x, meeple->y,
                                     zone_tuile(t, t->position_meeple), t->position_meeple, true);
                 recherche_est_verifie(jeu->grille, meeple->x, meeple->y);
-                attribution_points(jeu, loc_meeple, nb_meeple, pts);
+                attribution_points(jeu, loc_meeple, nb_meeple, pts, true);
             }
+        }
+    }
+
+    int pts_max = jeu->joueurs.tableau[0].pts;
+    int id_max = 0;
+    for (int i = 1; i < jeu->joueurs.nb_joueurs; i++) {
+        if (pts_max < jeu->joueurs.tableau[i].pts) {
+            pts_max = jeu->joueurs.tableau[i].pts;
+            id_max = i;
         }
     }
 
     free(nb_meeple);
     detruire_liste_meeple(loc_meeple);
-    return;
+
+    return id_max;
 }

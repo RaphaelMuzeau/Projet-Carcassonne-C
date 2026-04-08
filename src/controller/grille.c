@@ -39,9 +39,7 @@ int zone_pts(enum Zone zone)
     if (zone == Z_ROUTE)  return 1;
     if (zone == Z_VILLE)  return 2;
     if (zone == Z_BLASON) return 4;
-
-    fprintf(stderr, "carcassonne: recherche sur une zone invalide\n");
-    exit(EXIT_FAILURE);
+    return 0;
 }
 
 int recherche_suite(Vec2D grille, L_meeple *loc_meeple, enum Zone z, enum Direction d_arrive, enum Direction d_depart , Tuile t, int *nb_meeples, int x, int y, bool fin)
