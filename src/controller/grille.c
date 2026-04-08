@@ -82,6 +82,8 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
     }
 
     int pts = zone_pts(zone_tuile(t, d_arrive), fin);
+    if (pts == 0) return 0;
+
     bool complete = true; // la zone est-elle complete ?
 
     // effectuer la recherche sur tous les cote de la tuile
