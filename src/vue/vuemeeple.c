@@ -86,7 +86,6 @@ void dessiner_meeple(Vector2 position, Color couleur)
     DrawRectanglePro(champ, origin, 45.0f, couleur);
 }
 
-
 void dessiner_listeplacements(ListePlacements placements, Plateau plateau)
 {
     BeginMode2D(plateau.camera);
