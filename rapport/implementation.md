@@ -89,8 +89,8 @@ La fonction ***`generer_tuile`*** sert à générer une tuile (respectant les r�
 La génération aléatoire est une des demandes à respecter ajouté à l'analyse du projet. Pour pouvoir la réaliser nous avons étuider longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
 Une règle implicite que nous ajoutons au jeu est le fait que si une zone "route" ou "ville" apparaît au milieu, alors celle-ci fait le lien entre deux autres zones, comme sous cet exemple : 
 
-![](../data/analyse/exemple_tuile.svg)
-
+![](../data/analyse/exemple_tuile.svg "exemple de tuiles")
+**
 Nous autorisons aussi la génération de tuiles qui n'existent pas dans le Carcassonne d'origine, comme celles-ci, par exemple : 
 
  ![](../data/analyse/exemple_abbaye_non_commun.png)
@@ -150,7 +150,7 @@ Avec les fonctions suivantes :
 - `void detruire_pile(Pile *p)`
 
 ### Schéma de la pile :
-![](../data/analyse/schema_pile.png)
+![](../data/analyse/schema_pile.svg)
 
 #### Précisions sur certaines fonctions :
 
@@ -158,6 +158,81 @@ La fonction ***`recup_tuile`*** quand *`gen_aleatoire`* vaut `false`, récupère
 Si *`gen_aleatoire`* vaut `false`, ***`recup_tuile`***  appellera la fonction ***`generer_tuile`*** .
 
 La fonction ***`bool inserer_tuile`*** est une fonction qui nous servira seulement lors de la lecture de `.csv`. Elle insère une `Tuile` dans le tableau de la pile.
+
+## Plateau :
+
+La question de la représentation du tableau était restée longtemps un sujet d'étude. Plusieurs suggestions ont été proposées et ont vu le jour, comme : 
+
+- Tableau 2D statique : <br>
+    Avantage, simple, pratique.   
+    Désavantages : Coûteux en mémoire.
+    
+ - Listes n-chaînées : <br>
+	Avantage : Réduction du coup mémoire  
+	Désavantage : Complexité d'utilisation liée à la recherche, enchaînements implicites (localisation compliqué lors de l'enchaînement)
+
+Nous étions à l'origine parti sur un simple tableau 2D statique, dont la taille restait personnalisable. Mais lors de l'implémentation de la structure de `Varstring`, une idée a émergée.  
+Celle du **`Vec2D`**. L'idée était simple mais excessivement efficace. Le coût mémoire était grandement réduit, et nous gardions la simplicité d'accessibilité d'un tableau via des fonctions très simple d'accès.
+
+Le vec2D repose sur deux structures presque identiques. La première : 
+```C
+typedef struct _Vec {
+    Tuile *_tableau;
+    int _capacite; // nombre de tuiles pouvant être contenues
+    int _decy;
+} Vec;
+
+```
+
+ Cette structure `Vec` est celle qui contiendra les `Tuiles`, la variable *decy* nous est utile pour pouvoir indexer avec des valeurs négatives. Si une tuile est posé en *-1* sur le plateau, le décalage augmente de 1, pour que lors de l'indexation sur *`_tableau`, la valeur soit tout de même comprise entre [0, *`_capacite`*].
+ 
+ Voici un schéma visuel de ce que fait la structure : <br>
+ 
+![](../data/analyse/schema_Vec.svg)
+
+Cette structure sert donc à gérer les *colonnes* de notre plateau, ne reste plus qu'à gérer les *lignes*. C'est là qu'intervient notre 2nd structure : 
+
+```C
+typedef struct _Vec2D {
+    Vec *_tableau;
+    int _capacite;
+    int _decx;
+} Vec2D;
+```
+
+
+Le principe y est le même, notre tableau indexe ici des *`Vec`*, mais tout le reste fonctionne de la même manière. 
+  
+  
+Accompagné de son schéma : 
+
+![](../data/analyse/schema_Vec2D.svg)
+
+<br>
+
+Liste exhaustive des fonctions : 
+
+- ***`Vec2D creer_vec2D(void)`***
+- ***`void detruire_vec2D(Vec2D g)`***
+- ***`Tuile get(Vec2D g, int x, int y)`***
+- ***`void set(Vec2D *g, Tuile t, int x, int y)`***
+
+#### Précisions sur certaines fonctions :
+
+La fonction ***`creer_vec2D`*** initialise notre vecteur avec toutes ses valeurs à 0 (zéro).
+
+La fonction ***`get`*** sert à récupérer une tuile sur la grille aux coordonnées du plateau [INT_MIN, INT_MAX], elle renvoie la tuile si elle est trouvée, et renvoie *NULL* sinon.
+
+La fonction ***`set`*** pose la tuile aux coordonées passées en argument.
+
+## Joueurs :
+
+Vient ensuite, la représentation de nos joueurs, ici encore, une réflexion rapide nous à apporter toutes les informations que nous **voulions** dans notre strucutre, ce qui nous a donné le code suivant : 
+
+```
+
+```
+
 
 ## Fichiers :
 
