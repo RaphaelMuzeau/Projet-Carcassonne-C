@@ -113,6 +113,8 @@ enum Page page_jeu(Jeu *jeu)
             rotation_tuile = 0;
             tuile = recup_tuile(&jeu->pile);
             render_tuile = generer_render_tuile(tuile, spritesheet);
+
+            rafraichir_controles(&ctrl, jeu->pile.nb_element);
         }
 
         /* barre joueurs */
