@@ -35,6 +35,11 @@ Controles creer_controles(int nb_tuiles)
     return ctrl;
 }
 
+void detruire_controles(Controles ctrl)
+{
+    free(ctrl.nb_tuiles.contenu);
+}
+
 void update_controles(Controles *ctrl)
 {
     int largeur_ecran = GetScreenWidth();

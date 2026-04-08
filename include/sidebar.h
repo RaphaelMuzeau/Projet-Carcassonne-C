@@ -22,6 +22,8 @@ typedef struct _Controles {
 } Controles;
 
 Controles creer_controles(int nb_tuiles);
+void detruire_controles(Controles ctrl);
+
 void update_controles(Controles *ctrl);
 void rafraichir_controles(Controles *ctrl, int nb_tuiles);
 void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rotation);

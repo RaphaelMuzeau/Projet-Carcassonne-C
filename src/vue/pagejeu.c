@@ -137,9 +137,12 @@ enum Page page_jeu(Jeu *jeu)
         EndDrawing();
     }
 
+    free(tuile);
+
     detruire_plateau(plateau);
     detruire_listeplacements(placements_meeple);
     detruire_barrejoueurs(barrejoueurs);
+    detruire_controles(ctrl);
 
     UnloadTexture(spritesheet);
     UnloadRenderTexture(render_tuile);
