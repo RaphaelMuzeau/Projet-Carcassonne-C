@@ -16,7 +16,7 @@ Joueur creer_joueur(int id, int nb_meeple)
     joueur.couleur.r = rand()%CHAR_MAX;
     joueur.couleur.g = rand()%CHAR_MAX;
     joueur.couleur.b = rand()%CHAR_MAX;
-    joueur.couleur.a = CHAR_MAX;
+    joueur.couleur.a = 255;
 
     return joueur;
 }

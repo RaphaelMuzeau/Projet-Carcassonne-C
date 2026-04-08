@@ -27,16 +27,16 @@ void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotat
 void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y, float rotation);
 
 /* informations necessaires au placement d'une tuile */
-typedef struct _Placement {
+typedef struct _PlacementTuile {
     int x;
     int y;
     enum Direction position_meeple;
     bool placer_meeple;
-} Placement;
+} PlacementTuile;
 
 // Met à jour le plateau et renvoit le placement décidé par le joueur.
 // renvoit un placement avec (x, y) = (0, 0) si le joueur
 // n'a pas encore décidé de placer une tuile.
-Placement update_plateau(Plateau *plateau);
+PlacementTuile update_plateau(Plateau *plateau);
 
 #endif

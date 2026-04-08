@@ -50,9 +50,9 @@ void detruire_plateau(Plateau plateau)
     free(plateau.chunks);
 }
 
-Placement update_plateau(Plateau *plateau)
+PlacementTuile update_plateau(Plateau *plateau)
 {
-    Placement placement = { 0 };
+    PlacementTuile placement = { 0 };
 
     plateau->vue.width = GetScreenWidth() - SIDEBAR_WIDTH;
     plateau->vue.height = GetScreenHeight();

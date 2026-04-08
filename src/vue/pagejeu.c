@@ -6,6 +6,7 @@
 #include "jeu.h"
 #include "render.h"
 #include "plateau.h"
+#include "vuemeeple.h"
 #include "sidebar.h"
 #include "popup.h"
 #include "fichier.h"
@@ -29,6 +30,7 @@ enum Page page_jeu(Jeu *jeu)
 
     // Elements de la page
     Plateau plateau = creer_plateau(jeu, spritesheet);
+    ListePlacements placements_meeple = creer_listeplacements();
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
     Bouton centrer = creer_bouton_adapte(retour.champ.width + 30, retour.champ.y, "centrer");
     Controles ctrl = creer_controles(jeu->pile.nb_element);
@@ -75,12 +77,13 @@ enum Page page_jeu(Jeu *jeu)
         /* gestion du plateau */
 
         if (!afficher_popup && !centre_camera) {
-            Placement placement = update_plateau(&plateau);
+            PlacementTuile placement = update_plateau(&plateau);
             if (placement.x != 0 || placement.y != 0) {
                 if (tour(jeu, tuile, placement.x, placement.y, placement.placer_meeple, placement.position_meeple)) {
                     // mettre à jour l'hud
                     rafraichir_controles(&ctrl, jeu->pile.nb_element);
                     rafraichir_barrejoueurs(&barrejoueurs);
+                    rafraichir_listeplacements(&placements_meeple, jeu);
                     placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
 
                     // piocher la prochaine tuile
@@ -121,6 +124,7 @@ enum Page page_jeu(Jeu *jeu)
 
             // dessin de la grille
             dessiner_plateau(plateau, render_tuile, rotation_tuile);
+            dessiner_listeplacements(placements_meeple, plateau);
 
             // dessin de la sidebar
             dessiner_barrejoueurs(barrejoueurs, jeu->joueurs.tour);
@@ -134,6 +138,7 @@ enum Page page_jeu(Jeu *jeu)
     }
 
     detruire_plateau(plateau);
+    detruire_listeplacements(placements_meeple);
     detruire_barrejoueurs(barrejoueurs);
 
     UnloadTexture(spritesheet);
