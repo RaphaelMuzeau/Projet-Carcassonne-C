@@ -8,7 +8,7 @@
 
 /* Ces fonctions acceptent uniquement
  * des .csv valident pour le jeu Carcasonne */
-Pile lire_tuiles_csv(char* nom_fichier);
+bool lire_tuiles_csv(char* nom_fichier, Pile *p);
 bool lire_zone(enum Zone *p, FILE *f);
 int compter_lignes(FILE *f);
 

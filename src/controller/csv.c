@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include "libca.h"
 #include "csv.h"
 #include "pile.h"
 #include "tuile.h"
@@ -66,37 +67,39 @@ int compter_lignes(FILE *f)
     return nb_lignes;
 }
 
-Pile lire_tuiles_csv(char* nom_fichier)
+bool lire_tuiles_csv(char* nom_fichier, Pile *p)
 {
     FILE *fichier = fopen(nom_fichier, "r");
+    if (fichier == NULL) return false;
     int max_element = compter_lignes(fichier);
-    Pile p = creer_pile(max_element, false);
-    if (fichier == NULL) return p;
+    *p = creer_pile(max_element, false);
 
     Tuile t;
     fseek(fichier, 0, SEEK_SET);
 
-    if (fichier == NULL) return p;
+    if (fichier == NULL) return false;
 
-    while (p.nb_element < p.nb_element_max) {
+    while (p->nb_element < p->nb_element_max) {
         t = creer_tuile();
         if (!lire_zone(&t->nord, fichier)) goto fichier_invalide;
         if (!lire_zone(&t->sud, fichier)) goto fichier_invalide;
         if (!lire_zone(&t->est, fichier)) goto fichier_invalide;
         if (!lire_zone(&t->ouest, fichier)) goto fichier_invalide;
         if (!lire_zone(&t->milieu, fichier)) goto fichier_invalide;
-        inserer_tuile(&p, t);
+        inserer_tuile(p, t);
 
     }
 
     fclose(fichier);
-    return p;
+    return true;
 
 fichier_invalide:
     fclose(fichier);
     free(t);
-    detruire_pile(&p);
-    p = creer_pile(0, false);
-    return p;
+    detruire_pile(p);
+    *p = creer_pile(0,0);
+    #ifndef RUN_UNIT_TESTS // n'affiche pas le message lors des tests
+    ca_warn("fichier invalide (csv)");
+    #endif
+    return false;
 }
-

@@ -1164,7 +1164,8 @@ bool test_csv_lecture_zone(void)
 bool test_csv_lecture_fichier(void)
 {
     int i;
-    Pile p = lire_tuiles_csv("data/test/1_test.csv");
+    Pile p;
+    if (!lire_tuiles_csv("data/test/1_test.csv", &p)) return false;
 
     if (p.nb_element < p.nb_element_max) return false;
 
@@ -1208,7 +1209,7 @@ bool test_csv_lecture_fichier(void)
 bool test_csv_fichier_vide(void)
 {
     Pile p;
-    p = lire_tuiles_csv("data/test/2_test.csv");
+    if (!lire_tuiles_csv("data/test/2_test.csv", &p)) return false;
 
     if (p.nb_element_max != 0) return false;
     detruire_pile(&p);
@@ -1218,8 +1219,8 @@ bool test_csv_fichier_vide(void)
 
 bool test_csv_fichier_introuvable(void)
 {
-    Pile p;
-    p = lire_tuiles_csv("data/test/test_non_existant.csv");
+    Pile p = creer_pile(0, 0);
+    if (lire_tuiles_csv("data/test/test_non_existant.csv", &p)) return false;
 
     if (p.nb_element_max != 0) return false;
     detruire_pile(&p);
@@ -1230,7 +1231,7 @@ bool test_csv_fichier_introuvable(void)
 bool test_csv_fichier_invalide(void)
 {
     Pile p;
-    p = lire_tuiles_csv("data/test/3_test.csv");
+    if (lire_tuiles_csv("data/test/3_test.csv", &p)) return false;
 
     if (p.nb_element_max != 0) return false;
 
