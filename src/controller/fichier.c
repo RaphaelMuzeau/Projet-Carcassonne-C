@@ -34,13 +34,13 @@ bool charger_partie(Jeu *partie, char *fname)
 {
     FILE *f = fopen(fname, "r");
     if (f == NULL) {
-        perror("carcassonne");
+        ca_warn("carcassonne");
         return false;
     }
 
     char version[LEN_VER] = { 0 };
-    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, "SV0.2")) {
-        perror("carcassonne");
+    if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, VERSION)) {
+        ca_warn("carcassonne");
         fclose(f);
         return false;
     }
