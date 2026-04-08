@@ -94,6 +94,7 @@ enum Page page_jeu(Jeu *jeu)
                     placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
 
                     // piocher la prochaine tuile
+                    UnloadRenderTexture(render_tuile);
                     tuile          = recup_tuile(&jeu->pile);
                     render_tuile   = generer_render_tuile(tuile, spritesheet);
                     rotation_tuile = 0.0f;
