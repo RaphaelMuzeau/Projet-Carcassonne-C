@@ -111,7 +111,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction
 
     // lancer la recherche sur tous les autres cotés
     for (enum Direction d = 0; d < D_MILIEU; d++) {
-        if (jeu->joueurs.tour != -1 && d == position_meeple)
+        if (place_meeple && d == position_meeple)
             continue; // on a deja fait cette recherche
 
         // on réinitialise les listes utilisées par recherche()

@@ -48,7 +48,7 @@ int recherche_suite(Vec2D grille, L_meeple *loc_meeple, enum Zone z, enum Direct
 
     // traiter ce coté si c'est celui où a commencé la recherche
     // ou si on peut y acceder par le milieu
-    if (d_depart == d_arrive || ((zone_tuile(t, d_depart) & z) && (t->milieu & z))) {
+    if (d_depart == d_arrive || (zone_tuile(t, d_depart) & t->milieu & z)) {
 
         // ajouter un meeple aux listes s'il est present sur ce coté
         if (t->id_meeple != -1 && t->position_meeple == d_depart) {
@@ -76,7 +76,7 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
     t->est_verifie = true;
 
     // traiter le cas du meeple au milieu en premier
-    if (t->id_meeple != -1 && t->position_meeple == D_MILIEU) {
+    if (t->id_meeple != -1 && t->position_meeple == D_MILIEU && t->milieu & z) {
         nb_meeple[t->id_meeple] += 1;
         L_meeple maillon = creer_maillon_meeple(x, y);
         ajouter_maillon_meeple(loc_meeple, maillon);
