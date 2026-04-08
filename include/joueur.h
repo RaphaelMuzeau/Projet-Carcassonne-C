@@ -14,8 +14,9 @@ typedef struct _Joueur {
 } Joueur;
 
 typedef struct _ListeJoueurs {
-    int nb_joueurs;
     Joueur *tableau;
+    int nb_joueurs;
+    int nb_meeple_max;
     int tour;
 } ListeJoueurs;
 

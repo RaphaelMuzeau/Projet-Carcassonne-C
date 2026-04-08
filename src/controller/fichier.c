@@ -10,7 +10,7 @@
 #include "grille.h"
 #include "pile.h"
 
-#define VERSION "SV0.3"
+#define VERSION "SV0.4"
 #define LEN_VER sizeof(VERSION)
 
 bool sauvegarder_partie(Jeu partie, char *fname)
@@ -158,6 +158,7 @@ erreur_pile:
 void sauvegarder_liste_joueurs(ListeJoueurs tab, FILE *f)
 {
     fwrite(&tab.nb_joueurs, sizeof(int), 1, f);
+    fwrite(&tab.nb_meeple_max, sizeof(int), 1, f);
     for (int i = 0; i < tab.nb_joueurs; i++) {
         sauvegarder_joueur(tab.tableau[i], f);
     }
@@ -169,7 +170,11 @@ ListeJoueurs charger_liste_joueurs(FILE *f)
     if (fread(&nb_joueurs, sizeof(int), 1, f) != 1)
         goto erreur_liste_joueurs;
 
-    ListeJoueurs joueurs = creer_listejoueurs(nb_joueurs, 0);
+    int nb_meeple_max = 0;
+    if (fread(&nb_meeple_max, sizeof(int), 1, f) != 1)
+        goto erreur_liste_joueurs;
+
+    ListeJoueurs joueurs = creer_listejoueurs(nb_joueurs, nb_meeple_max);
 
     for (int i = 0; i < joueurs.nb_joueurs; i++)
         joueurs.tableau[i] = charger_joueur(f);

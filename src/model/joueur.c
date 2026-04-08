@@ -32,6 +32,7 @@ ListeJoueurs creer_listejoueurs(int nb_joueurs, int nb_meeple)
 
     joueurs.tableau = ca_alloc(nb_joueurs, sizeof(Joueur));
     joueurs.nb_joueurs  = nb_joueurs;
+    joueurs.nb_meeple_max = nb_meeple;
     joueurs.tour = 0;
 
     for (int i = 0; i < nb_joueurs; i++)

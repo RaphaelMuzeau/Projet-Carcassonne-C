@@ -580,9 +580,10 @@ bool test_listejoueurs_creer(void)
 {
     ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
 
-    if (joueurs.nb_joueurs != 3) return false;
-    if (joueurs.tableau == NULL) return false;
-    if (joueurs.tour != 0)       return false;
+    if (joueurs.nb_joueurs != 3)    return false;
+    if (joueurs.nb_meeple_max != 5) return false;
+    if (joueurs.tableau == NULL)    return false;
+    if (joueurs.tour != 0)          return false;
 
     if (joueurs.tableau[0].id != 0) return false;
     if (joueurs.tableau[1].id != 1) return false;
@@ -1356,7 +1357,8 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     generer_fichier_liste_joueurs();
     FILE* f_read = fopen("data/test/fichier_test_liste_joueurs.bin", "r");
     ListeJoueurs tab = charger_liste_joueurs(f_read);
-    if (tab.nb_joueurs != 3) return false;
+    if (tab.nb_joueurs != 3)    return false;
+    if (tab.nb_meeple_max != 4) return false;
 
     if (strcmp(tab.tableau[0].nom, "Damien")) return false;
     if (tab.tableau[0].id != 0) return false;
