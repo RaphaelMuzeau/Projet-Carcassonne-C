@@ -33,11 +33,11 @@ bool placer_tuile(Vec2D *grille, int x, int y, Tuile t)
 
 /* recherche */
 
-int zone_pts(enum Zone zone)
+int zone_pts(enum Zone zone, bool fin)
 {
     if (zone == Z_ROUTE)  return 1;
-    if (zone == Z_VILLE)  return 2;
-    if (zone == Z_BLASON) return 4;
+    if (zone == Z_VILLE)  return fin ? 1 : 2;
+    if (zone == Z_BLASON) return fin ? 2 : 4;
     return 0;
 }
 
@@ -81,7 +81,7 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
         ajouter_maillon_meeple(loc_meeple, maillon);
     }
 
-    int pts = zone_pts(zone_tuile(t, d_arrive));
+    int pts = zone_pts(zone_tuile(t, d_arrive), fin);
     bool complete = true; // la zone est-elle complete ?
 
     // effectuer la recherche sur tous les cote de la tuile
