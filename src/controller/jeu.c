@@ -1,11 +1,9 @@
-
 #include "libca.h"
 #include "jeu.h"
 #include "tuile.h"
 #include "grille.h"
 #include "meeple.h"
 
-//TODO: TESTS
 Jeu creer_jeu(int nb_joueurs, int nb_meeple, int nb_tuiles)
 {
     Jeu jeu;
@@ -70,7 +68,6 @@ void attribution_points(Jeu *jeu, L_meeple loc_meeple, int *nb_meeples, int pts,
 
 bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction position_meeple)
 {
-
     if (!placer_tuile(&jeu->grille, x, y, tuile))
         return false;
 
@@ -88,7 +85,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction
         // si d'autres meeple ont été trouvés, annuler le placement et renvoyer faux
         for (int i = 0; i < jeu->joueurs.nb_joueurs; i++) {
             if (nb_meeple[i] != 0) {
-                set((&jeu->grille), NULL, x, y);
+                set(&jeu->grille, NULL, x, y);
                 free(nb_meeple);
                 detruire_liste_meeple(loc_meeple);
                 return false;

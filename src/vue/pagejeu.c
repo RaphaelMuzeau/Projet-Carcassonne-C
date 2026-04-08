@@ -51,11 +51,37 @@ enum Page page_jeu(Jeu *jeu)
             afficher_popup = true;
 
         centre_camera = false;
-        if (update_bouton(&centrer))
-            centre_camera = true;
+        if (update_bouton(&centrer)) {
+            plateau.camera.target = (Vector2) { 0.0f, 0.0f };
+            plateau.camera.offset.x = plateau.vue.width  / 2.0f - TEXTURE_SIZE / 2.0f;
+            plateau.camera.offset.y = plateau.vue.height / 2.0f - TEXTURE_SIZE / 2.0f;
+
+            centre_camera = true; // evite de mettre à jour le plateau au moment du clique
+        }
 
         if (tuile == NULL)
             prochaine_page = P_TITRE;
+
+        /* gestion du plateau */
+
+        if (!afficher_popup && !centre_camera) {
+            PlacementTuile placement = update_plateau(&plateau);
+            if (placement.x != 0 || placement.y != 0) {
+                if (tour(jeu, tuile, placement.x, placement.y, placement.placer_meeple, placement.position_meeple)) {
+                    // mettre à jour l'hud
+                    rafraichir_controles(&ctrl, jeu->pile.nb_element);
+                    rafraichir_barrejoueurs(&barrejoueurs);
+                    rafraichir_listeplacements(&placements_meeple, jeu);
+                    placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
+
+                    // piocher la prochaine tuile
+                    UnloadRenderTexture(render_tuile);
+                    tuile          = recup_tuile(&jeu->pile);
+                    render_tuile   = generer_render_tuile(tuile, spritesheet);
+                    rotation_tuile = 0.0f;
+                }
+            }
+        }
 
         /* gestion du popup de sauvegarde */
 
@@ -81,37 +107,16 @@ enum Page page_jeu(Jeu *jeu)
             }
         }
 
-        /* gestion du plateau */
-
-        if (!afficher_popup && !centre_camera) {
-            PlacementTuile placement = update_plateau(&plateau);
-            if (placement.x != 0 || placement.y != 0) {
-                if (tour(jeu, tuile, placement.x, placement.y, placement.placer_meeple, placement.position_meeple)) {
-                    // mettre à jour l'hud
-                    rafraichir_controles(&ctrl, jeu->pile.nb_element);
-                    rafraichir_barrejoueurs(&barrejoueurs);
-                    rafraichir_listeplacements(&placements_meeple, jeu);
-                    placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
-
-                    // piocher la prochaine tuile
-                    UnloadRenderTexture(render_tuile);
-                    tuile          = recup_tuile(&jeu->pile);
-                    render_tuile   = generer_render_tuile(tuile, spritesheet);
-                    rotation_tuile = 0.0f;
-                }
-            }
-        }
-
         /* controles de la tuile */
 
         update_controles(&ctrl);
 
-        if (update_bouton_adapte(&ctrl.rotation) || IsKeyPressed(KEY_R)) {
+        if (!plateau.placement && (update_bouton_adapte(&ctrl.rotation) || IsKeyPressed(KEY_R))) {
             pivot_90(tuile);
             rotation_tuile = fmod(rotation_tuile + 90.0f, 360.0f);
         }
 
-        if (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D)) {
+        if (!plateau.placement && (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D))) {
             free(tuile);
             UnloadRenderTexture(render_tuile);
             rotation_tuile = 0;

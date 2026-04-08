@@ -20,9 +20,10 @@ Plateau creer_plateau(Jeu *jeu, Texture spritesheet)
     plateau.vue.width  = GetScreenWidth() - SIDEBAR_WIDTH;
     plateau.vue.height = GetScreenHeight();
 
-    plateau.camera.target = (Vector2) { 0, 0 };
     plateau.camera.zoom   = 0.5f;
-    plateau.camera.offset = (Vector2) { plateau.vue.width/2.0f, plateau.vue.height/2.0f };
+    plateau.camera.target = (Vector2) { 0.0f, 0.0f };
+    plateau.camera.offset.x = plateau.vue.width  / 2.0f - TEXTURE_SIZE / 2.0f;
+    plateau.camera.offset.y = plateau.vue.height / 2.0f - TEXTURE_SIZE / 2.0f;
     plateau.camera.offset = Vector2Scale(plateau.camera.offset, plateau.camera.zoom);
 
     // intialiser les boutons de placement de meeple
