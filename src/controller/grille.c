@@ -57,14 +57,16 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
      * cette zone n'a pas encore été verifié car
      * la recherche ne revient pas sur ses pas. */
     if (!(t->milieu & z)) {
+        if (!t->est_verifie)
+            pts = 0; // pas besoin d'ajouter des points dupliqués
+        t->est_verifie = true;
+
         // ajouter un meeple aux liste si il est sur le coté d'arrivée
         if (t->id_meeple != -1 && t->position_meeple == d_arrive) {
             nb_meeple[t->id_meeple] += 1;
             L_meeple maillon = creer_maillon_meeple(x, y);
             ajouter_maillon_meeple(loc_meeple, maillon);
         }
-
-        return t->est_verifie ? 0 : pts;
     }
     /* on peut acceder aux autres cotes par le milieu et la tuile
      * n'a pas encore été verifiée */
@@ -111,6 +113,8 @@ int amorce_recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, 
     // si on peut commencer par le milieu, pas besoin d'amorce
     if (t->milieu & z)
         return recherche(grille, nb_meeple, loc_meeple, x, y, z, D_MILIEU, fin);
+
+    t->est_verifie = true;
 
     // sinon, on ajoute le meeple present si il y en a un
     if (t->id_meeple != -1 && t->position_meeple == d) {
