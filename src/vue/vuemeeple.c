@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "libca.h"
 #include "raylib.h"
 #include "plateau.h"
@@ -12,8 +13,10 @@ PlacementMeeple creer_placement(Jeu *jeu, int x, int y)
 
     Tuile t = get(jeu->grille, x, y);
 
-    if (t == NULL)
-        ca_error("meeple sur tuile NULL");
+    if (t == NULL) {
+        ca_warn("meeple sur tuile NULL");
+        fprintf(stderr, "position : { %d, %d }\n", x, y);
+    }
 
     if (t->id_meeple == -1) {
         ca_warn("creation de placement pour un meeple absent");

@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdio.h>
 #include <string.h>
 #include "libca.h"
 #include "raylib.h"
@@ -9,7 +10,10 @@
 #include "vuemeeple.h"
 #include "sidebar.h"
 #include "popup.h"
+#include "bouton.h"
 #include "fichier.h"
+
+enum Page page_fin(ListeJoueurs joueurs, int id_gagnant);
 
 enum Page page_jeu(Jeu *jeu)
 {
@@ -59,8 +63,10 @@ enum Page page_jeu(Jeu *jeu)
             centre_camera = true; // evite de mettre à jour le plateau au moment du clique
         }
 
-        if (tuile == NULL)
-            prochaine_page = P_TITRE;
+        if (tuile == NULL) {
+            prochaine_page = page_fin(jeu->joueurs, fin(jeu));
+            continue; // ne pas afficher cette frame
+        }
 
         /* gestion du plateau */
 
@@ -163,5 +169,46 @@ enum Page page_jeu(Jeu *jeu)
 
     SetExitKey(KEY_ESCAPE);
 
+    return prochaine_page;
+}
+
+enum Page page_fin(ListeJoueurs joueurs, int id_gagnant)
+{
+    // Etat initial de la page
+    enum Page prochaine_page = P_JEU;
+
+    // Formater le message de felicitations
+    char *nom_gagnant = joueurs.tableau[id_gagnant].nom;
+    int pts_gagnant   = joueurs.tableau[id_gagnant].pts;
+
+    size_t taille_message = strlen(nom_gagnant) + 32;
+    char *message = ca_alloc(taille_message, sizeof(char));
+    snprintf(message, taille_message, "%s a gagné avec %d points!", nom_gagnant, pts_gagnant);
+
+    // Elements de la page
+    Bouton retour = creer_bouton_adapte(10.0f, 10.0f, "<- retour");
+    Texte felicitations = creer_texte(0, 0, message);
+    felicitations.taille = 60.0f;
+    Vector2 taille_felicitations = mesurer_texte(felicitations);
+
+    while (prochaine_page == P_JEU) {
+        if (update_bouton(&retour) || IsKeyPressed(KEY_ESCAPE))
+            prochaine_page = P_TITRE;
+
+        if (WindowShouldClose())
+            prochaine_page = P_QUITTER;
+
+        felicitations.position.x = GetScreenHeight()/2.0f - taille_felicitations.x/2.0f;
+        felicitations.position.y = GetScreenHeight()/2.0f - taille_felicitations.y/2.0f;
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+
+            dessiner_bouton(retour);
+            dessiner_texte(felicitations);
+        EndDrawing();
+    }
+
+    free(message);
     return prochaine_page;
 }

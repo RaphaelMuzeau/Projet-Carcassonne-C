@@ -160,17 +160,19 @@ void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin
 
     for(int i = -1; i < 2; i++) {
         for (int j = -1; j < 2; j++) {
-            t = get(grille, x + i, y + j);
+            Tuile tmp = get(grille, x + i, y + j);
 
-            if (t != NULL)
+            if (tmp != NULL)
                 pts += 1;
             else if (!fin)
                 return;
 
         }
     }
+
     joueurs.tableau[id_joueur].pts += pts;
-    retirer_meeple(grille, joueurs, x, y);
+    if (!fin) retirer_meeple(grille, joueurs, x, y);
+    else t->id_meeple = -1;
 }
 
 void verification_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y)

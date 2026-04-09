@@ -154,8 +154,7 @@ int fin(Jeu *jeu)
                 detruire_liste_meeple(loc_meeple);
                 loc_meeple = NULL;
 
-                int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, meeple->x, meeple->y,
-                                    zone_tuile(t, t->position_meeple), t->position_meeple, true);
+                int pts = amorce_recherche(jeu->grille, nb_meeple, &loc_meeple, meeple->x, meeple->y, t->position_meeple, true);
                 recherche_est_verifie(jeu->grille, meeple->x, meeple->y);
                 attribution_points(jeu, loc_meeple, nb_meeple, pts, true);
             }
