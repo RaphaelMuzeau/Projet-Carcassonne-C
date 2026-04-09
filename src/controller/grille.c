@@ -57,7 +57,7 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
      * cette zone n'a pas encore été verifié car
      * la recherche ne revient pas sur ses pas. */
     if (!(t->milieu & z)) {
-        if (!t->est_verifie)
+        if (t->est_verifie)
             pts = 0; // pas besoin d'ajouter des points dupliqués
         t->est_verifie = true;
 
