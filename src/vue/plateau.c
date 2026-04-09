@@ -224,7 +224,6 @@ void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y,
     plateau->chunks[plateau->nb_chunks].y = y_chunk;
 
     BeginTextureMode(plateau->chunks[plateau->nb_chunks].render);
-        ClearBackground(GRAY);
         dessiner_tuile(render, position_tuile, rotation, 255);
     EndTextureMode();
 
