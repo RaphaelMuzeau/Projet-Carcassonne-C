@@ -78,7 +78,6 @@ enum Page page_jeu(Jeu *jeu)
                     UnloadRenderTexture(render_tuile);
                     tuile          = recup_tuile(&jeu->pile);
                     render_tuile   = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
-                    rotation_tuile = 0.0f;
                 }
             }
         }
@@ -119,7 +118,6 @@ enum Page page_jeu(Jeu *jeu)
         if (!plateau.placement && (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D))) {
             free(tuile);
             UnloadRenderTexture(render_tuile);
-            rotation_tuile = 0;
             tuile = recup_tuile(&jeu->pile);
             render_tuile = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
 

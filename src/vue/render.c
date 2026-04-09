@@ -52,6 +52,8 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet, float *rotati
     BeginTextureMode(render);
     ClearBackground(PRE_COLOR);
 
+    *rotation = 0.0f;
+
     if (t->milieu & (Z_PRE | Z_VILLAGE | Z_ABBAYE)) {
         // dessiner le sprite correspondant à chaque coté
         for (enum Direction d = 0; d < D_MILIEU; d++)
@@ -86,7 +88,7 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet, float *rotati
         if (nb_pivots == 4) ca_warn("Le sprite de la tuile courante n'a pas pu être generé");
 
         // puis on indique la rotation et on la remet dans le bon sens
-        *rotation = 90.0f * (4 - nb_pivots);
+        *rotation = fmod(90.0f * (4 - nb_pivots), 360.f);
         for (int pivots = 0; pivots < 4 - nb_pivots; pivots++)
             pivot_90(t);
     }
