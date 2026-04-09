@@ -49,6 +49,7 @@ typedef struct _Tuile *Tuile;
 
 Il est à noter que le type `Tuile` est un **pointeur**. La variable `id_meeple` aura une valeur supérieure à 0 si un meeple est posé dessus, -1 s'il n'y a aucun meeple sur la tuile. Il est importante de re-préciser qu'il ne peut y avoir qu'**un seul meeple** par tuile. Le booléen `est_verifie` variera entre false et true selon l'état dans recherche.<br>
 Il nous faut aussi un moyen de connaître la position de notre meeple, nous avons donc créer une dernière structure utile au repérage du meeple sur la tuile : 
+
 ```C
 enum Direction {
     D_SUD = 0,
@@ -63,11 +64,11 @@ Cette structure aura aussi d'autres utilitées dans la *recherche*.
 
 Notre tuile ainsi définie intéragit avec différentes fonctions, en voici une liste exhautive (via leurs signatures) qui peut être retrouvée dans `tuile.h` :
 
-- `Tuile creer_tuile(void)` 
-- `void pivot_90(Tuile piece)`
-- `enum Zone zone_tuile(Tuile t, enum Direction d)`
-- `bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)`
-- `Tuile generer_tuile(void)`
+- ***`Tuile creer_tuile(void)` ***
+- ***`void pivot_90(Tuile piece)`***
+- ***`enum Zone zone_tuile(Tuile t, enum Direction d)`***
+- ***`bool compatibilite_tuile(Tuile depart, Tuile arrivee, enum Direction d)`***
+- ***`Tuile generer_tuile(void)`***
 
 ### Schéma de la tuile :
 ![](../data/analyse/schema_tuile.svg)
@@ -141,12 +142,12 @@ typedef struct _Pile {
 
 Avec les fonctions suivantes : 
 
-- `Pile creer_pile(int max_element, bool gen)`
-- `bool pile_vide(Pile p)`
-- `bool pile_pleine(Pile p)`
-- `Tuile recup_tuile(Pile *p)`
-- `bool inserer_tuile(Pile *p, Tuile t)`
-- `void detruire_pile(Pile *p)`
+- ***`Pile creer_pile(int max_element, bool gen)`***
+- ***`bool pile_vide(Pile p)`***
+- ***`bool pile_pleine(Pile p)`***
+- ***`Tuile recup_tuile(Pile *p)`***
+- ***`bool inserer_tuile(Pile *p, Tuile t)`***
+- ***`void detruire_pile(Pile *p)`***
 
 ### Schéma de la pile :
 ![](../data/analyse/schema_pile.svg)
@@ -180,7 +181,6 @@ typedef struct _Vec {
     int _capacite; // nombre de tuiles pouvant être contenues
     int _decy;
 } Vec;
-
 ```
 
  Cette structure `Vec` est celle qui contiendra les `Tuiles`, la variable *decy* nous est utile pour pouvoir indexer avec des valeurs négatives. Si une tuile est posé en *-1* sur le plateau, le décalage augmente de 1, pour que lors de l'indexation sur *`_tableau`, la valeur soit tout de même comprise entre [0, *`_capacite`*].
@@ -228,7 +228,7 @@ La fonction ***`set`*** pose la tuile aux coordonées passées en argument.
 
 Vient ensuite, la représentation de nos joueurs, ici encore, une réflexion rapide nous à apporter toutes les informations que nous **voulions** dans notre strucutre, ce qui nous a donné le code suivant : 
 
-```
+```C
 typedef struct _Joueur {
     char *nom;
     int id;
@@ -254,7 +254,7 @@ Liste exhaustive des fonctions :
 
 Il nous fallait un endroit où réunir tous nos joueurs, donc nous avons créer un tableau où se trouvent tous nos joueurs : 
 
-```
+```C
 typedef struct _ListeJoueurs {
     int nb_joueurs;
     Joueur *tableau;
@@ -386,7 +386,48 @@ La fonction ***`charger_partie`*** prend elle aussi le nom d'un fichier via une 
 
 Ci-dessous, peut être retrouvé un schéma représentant l'agencement des données dans un fichier complet :
 
-![](../data/analyse/schema_fichier.svg)
+!["Schéma fichier")](../data/analyse/schema_fichier.svg)
 
 Ce schéma est simplifié pour la vision humaine, souvenez-vous que ce ne sont que des bits qui y sont normalement écrits, l'ordre choisit pour représenter le sein de chaque donnée est arbitraire. L'ordre des structures lui respecte l'implémentation actuelle. <br>
-Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur en cas de question.
+Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur en cas de questions.
+
+# Implémentation graphique :
+
+Nous utilisons la librairie graphique [Raylib](https://github.com/raysan5/raylib) via un précompilé `.a` pour créer et gérer toute l'interface graphique.
+
+Nous nous servons du `main.c` pour naviguer entre différentes pages. Ces pages sont "en réalité" différents fichiers qui gèrent l'affichage d'une fenêtre (avec leus propres comportement dans leurs propres header).
+
+Voici les différentes pages : 
+
+- Page titre
+- Page jeu
+- page conf
+- page charger
+- page gagnant
+
+Chaque page est gérée indépendament mais certaines fonctionnalités restent récurrentes. C'est pour cela que nous les gérons comme des "widgets" (éléments interactifs) généraux, qui possèdent leurs propres fichiers. Par exemple, les boutons sont considérés comme tels et peuvent être retrouvés dans `bouton.h`, voici une liste exhaustive des widgets existants sur le projet :
+
+- ***bouton.h***
+- ***champsaisie.h***
+- ***scrollbar.h***
+- ***sidebar.h***
+  
+Par exemple, la page de jeu qui est là où sont posées les tuiles et où la partie se déroule dans son ensemble se sert de la sidebar, de la scrollbar, du champs de saisie etc.
+La page de configuration inclut des champs de saisies, la scrollbar.
+
+Les champs de saisies sont gérées via VarString, une implémentation de chaine de texte pouvant être supprimée, caractère par caractère (touche retour), supprimer l'ensemble de la chaîne (Supppr). Ajouter des cacractères.
+
+La dernière partie graphique a détaillée est le fichier `render.h`. Ce fichier nous sert à allouer des `chunks`, un `chunk` est une texture, pouvant en contenir plusieurs (selon des tailles définies par des macros), ici, celles des tuiles. Cette méthode permet de gérer rapidement le dessins de la tuile et de préparer des zones allouées en amont pour les tuiles. 
+Les textures des tuiles (sprites) sont générés aléatoirement via un algorithme se trouvant dans "dessiner_tuile", de façon à respecter la tuile générer aléatoirement, ou celle du `.csv`.
+
+Toutes les textures sont mises en mémoire dans le GPU (VRAM) et permettent un rendu fluide.
+
+Pour finir ce rapport, voici les quelques raccourcis claviers disponibles dans notre implémentation :
+
+##### Jeu :
+- **R**, permet de faire tourner la pile.
+- Les flèches directionnelles permettent de se déplacer sur la page. Il est aussi possible d'utiliser le clique droit enfoncé et de bouger la souris.
+- **D** permet de supprimer une tuile.
+
+
+- **suppr** permet de supprimer une chaîne complète dans la page de configuration
