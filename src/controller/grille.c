@@ -64,7 +64,7 @@ int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, 
             ajouter_maillon_meeple(loc_meeple, maillon);
         }
 
-        t->est_verifie = true;
+        return t->est_verifie ? 0 : pts;
     }
     /* on peut acceder aux autres cotes par le milieu et la tuile
      * n'a pas encore été verifiée */
