@@ -26,7 +26,7 @@ typedef struct _ListePlacements {
     int capacite;
 } ListePlacements;
 
-ListePlacements creer_listeplacements(void);
+ListePlacements creer_listeplacements(Jeu *jeu);
 void detruire_listeplacements(ListePlacements placements);
 void rafraichir_listeplacements(ListePlacements *placements, Jeu *jeu);
 void dessiner_listeplacements(ListePlacements placements, Plateau plateau);

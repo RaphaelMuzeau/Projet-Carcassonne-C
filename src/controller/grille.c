@@ -135,6 +135,7 @@ void recherche_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y, bool fin
         }
     }
     joueurs.tableau[id_joueur].pts += pts;
+    retirer_meeple(grille, joueurs, x, y);
 }
 
 void verification_abbaye(Vec2D grille, ListeJoueurs joueurs, int x, int y)

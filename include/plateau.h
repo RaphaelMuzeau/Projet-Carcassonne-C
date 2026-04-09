@@ -4,6 +4,9 @@
 #include "render.h"
 #include "bouton.h"
 #include "jeu.h"
+#include "vec.h"
+
+#define CHUNKS_REALLOC_SIZE 8
 
 /* Le Plateau est une vue scrollable et zoomable sur toute la grille,
  * il gere le placement graphique de tuiles, l'affichage de la tuile courante
@@ -22,6 +25,7 @@ typedef struct _Plateau {
 
 Plateau creer_plateau(Jeu *jeu, Texture spritesheet);
 void detruire_plateau(Plateau plateau);
+void dessiner_grille(Plateau *plateau, Texture spritesheet, Vec2D grille, int x, int y);
 
 void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotation);
 void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y, float rotation);

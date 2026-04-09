@@ -11,6 +11,10 @@ PlacementMeeple creer_placement(Jeu *jeu, int x, int y)
     PlacementMeeple p = { 0 };
 
     Tuile t = get(jeu->grille, x, y);
+
+    if (t == NULL)
+        ca_error("meeple sur tuile NULL");
+
     if (t->id_meeple == -1) {
         ca_warn("creation de placement pour un meeple absent");
         return p;
@@ -43,9 +47,11 @@ PlacementMeeple creer_placement(Jeu *jeu, int x, int y)
     return p;
 }
 
-ListePlacements creer_listeplacements(void)
+ListePlacements creer_listeplacements(Jeu *jeu)
 {
-    return (ListePlacements) { 0 };
+    ListePlacements placements = { 0 };
+    rafraichir_listeplacements(&placements, jeu);
+    return placements;
 }
 
 void detruire_listeplacements(ListePlacements placements)

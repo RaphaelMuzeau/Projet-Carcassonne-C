@@ -27,12 +27,12 @@ enum Page page_jeu(Jeu *jeu)
 
     // Piocher la premiere tuile
     Tuile tuile = recup_tuile(&jeu->pile);
-    RenderTexture2D render_tuile = generer_render_tuile(tuile, spritesheet);
     float rotation_tuile = 0.0f;
+    RenderTexture2D render_tuile = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
 
     // Elements de la page
     Plateau plateau = creer_plateau(jeu, spritesheet);
-    ListePlacements placements_meeple = creer_listeplacements();
+    ListePlacements placements_meeple = creer_listeplacements(jeu);
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
     Bouton centrer = creer_bouton_adapte(retour.champ.width + 30, retour.champ.y, "centrer");
     Controles ctrl = creer_controles(jeu->pile.nb_element);
@@ -77,7 +77,7 @@ enum Page page_jeu(Jeu *jeu)
                     // piocher la prochaine tuile
                     UnloadRenderTexture(render_tuile);
                     tuile          = recup_tuile(&jeu->pile);
-                    render_tuile   = generer_render_tuile(tuile, spritesheet);
+                    render_tuile   = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
                     rotation_tuile = 0.0f;
                 }
             }
@@ -121,7 +121,7 @@ enum Page page_jeu(Jeu *jeu)
             UnloadRenderTexture(render_tuile);
             rotation_tuile = 0;
             tuile = recup_tuile(&jeu->pile);
-            render_tuile = generer_render_tuile(tuile, spritesheet);
+            render_tuile = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
 
             rafraichir_controles(&ctrl, jeu->pile.nb_element);
         }

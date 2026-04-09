@@ -44,7 +44,7 @@ void dessiner_sprite(Texture spritesheet, enum Zone zone, enum Sprite sprite, fl
     DrawTexturePro(spritesheet, source, dest, origin, rotation, WHITE);
 }
 
-RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet)
+RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet, float *rotation)
 {
     RenderTexture2D render = LoadRenderTexture(TEXTURE_SIZE, TEXTURE_SIZE);
     if (t == NULL) return render;
@@ -84,6 +84,11 @@ RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet)
                 pivot_90(t);
         }
         if (nb_pivots == 4) ca_warn("Le sprite de la tuile courante n'a pas pu être generé");
+
+        // puis on indique la rotation et on la remet dans le bon sens
+        *rotation = 90.0f * (4 - nb_pivots);
+        for (int pivots = 0; pivots < 4 - nb_pivots; pivots++)
+            pivot_90(t);
     }
 
     EndTextureMode();

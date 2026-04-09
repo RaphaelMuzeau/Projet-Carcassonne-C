@@ -33,7 +33,7 @@ enum Sprite {
     S_PLEIN,
 };
 
-RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet);
+RenderTexture2D generer_render_tuile(Tuile t, Texture spritesheet, float *rotation);
 
 void dessiner_chunk(Chunk chunk);
 void dessiner_tuile(RenderTexture2D render_tuile, Vector2 position, float rotation, int alpha);

@@ -63,6 +63,7 @@ void retirer_maillon_meeple(L_meeple *liste, int x, int y)
         tmp2 = tmp2->next;
     }
 }
+
 bool verification_presence_meeple(L_meeple *liste, int x, int y)
 {
     if (*liste == NULL) return false;

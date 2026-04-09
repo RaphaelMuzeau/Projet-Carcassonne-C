@@ -5,6 +5,7 @@
 #include "render.h"
 #include "sidebar.h"
 #include "jeu.h"
+#include "grille.h"
 
 Plateau creer_plateau(Jeu *jeu, Texture spritesheet)
 {
@@ -37,9 +38,9 @@ Plateau creer_plateau(Jeu *jeu, Texture spritesheet)
     plateau.aucun.texte.contenu = "x";
     adapter_bouton(&plateau.aucun);
 
-    // afficher la tuile racine
-    RenderTexture2D render = generer_render_tuile(get(jeu->grille, 0, 0), spritesheet);
-    placer_render_tuile(&plateau, render, 0, 0, 0.0f);
+    // afficher toutes les tuiles placés
+    dessiner_grille(&plateau, spritesheet, jeu->grille, 0, 0);
+    recherche_est_verifie(jeu->grille, 0, 0);
 
     return plateau;
 }
@@ -172,6 +173,25 @@ void dessiner_plateau(Plateau plateau, RenderTexture2D render_tuile, float rotat
     EndMode2D();
 }
 
+void dessiner_grille(Plateau *plateau, Texture spritesheet, Vec2D grille, int x, int y)
+{
+    Tuile t = get(grille, x, y);
+
+    if (t == NULL) return;
+    if (t->est_verifie) return;
+
+    t->est_verifie = true;
+
+    float rotation = 0.0f;
+    RenderTexture2D render = generer_render_tuile(t, spritesheet, &rotation);
+    placer_render_tuile(plateau, render, x, y, rotation);
+
+    dessiner_grille(plateau, spritesheet, grille, x-1, y);
+    dessiner_grille(plateau, spritesheet, grille, x+1, y);
+    dessiner_grille(plateau, spritesheet, grille, x, y-1);
+    dessiner_grille(plateau, spritesheet, grille, x, y+1);
+}
+
 void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y, float rotation)
 {
     // On passe de la position dans la grille à la position graphique
@@ -192,12 +212,19 @@ void placer_render_tuile(Plateau *plateau, RenderTexture2D render, int x, int y,
         }
     }
 
+    // Reallouer si besoin
+    if (plateau->nb_chunks == plateau->max_chunks) {
+        plateau->chunks = ca_realloc(plateau->chunks, plateau->max_chunks + CHUNKS_REALLOC_SIZE, sizeof(Chunk));
+        plateau->max_chunks += CHUNKS_REALLOC_SIZE;
+    }
+
     // Sinon, il faut le creer
     plateau->chunks[plateau->nb_chunks].render = LoadRenderTexture(CHUNK_SIZE, CHUNK_SIZE);
     plateau->chunks[plateau->nb_chunks].x = x_chunk;
     plateau->chunks[plateau->nb_chunks].y = y_chunk;
 
     BeginTextureMode(plateau->chunks[plateau->nb_chunks].render);
+        ClearBackground(GRAY);
         dessiner_tuile(render, position_tuile, rotation, 255);
     EndTextureMode();
 
