@@ -31,7 +31,7 @@ endif
 
 # Commmandes
 
-.PHONY: default all release debug test run runvg clean bear help
+.PHONY: default all release debug test run runvg clean bear tar help
 default: debug
 
 all: debug release test
@@ -61,6 +61,9 @@ clean:
 
 bear: compile_commands.json
 
+tar:
+	git ls-files | xargs tar -xvaf carcassonne.tar.gz
+
 help:
 	@echo "Commandes disponibles:"
 	@echo "  all     - Lancer toutes les cibles (release, debug, test)"
@@ -71,6 +74,7 @@ help:
 	@echo "  runvg   - Executer le programme en version debug avec valgrind"
 	@echo "  clean   - Supprimer les artefacts de compilation et les executables"
 	@echo "  bear    - Generer compile_commands.json (nécessite bear)"
+	@echo "  tar     - Archive la repo dans un tar avec compression gzip"
 	@echo "  help    - Afficher ce message d'aide"
 
 # Recherche des fichiers
