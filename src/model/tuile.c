@@ -79,7 +79,7 @@ enum Zone generer_milieu(void)
 enum Zone generer_cote(int aleatoire)
 {
     if      (aleatoire <= 40) return Z_PRE;
-    else if (aleatoire <= 67) return Z_VILLE;
+    else if (aleatoire <= 67) return rand()%100 <= 20 ? Z_BLASON:Z_VILLE;
     else                      return Z_ROUTE;
 }
 
@@ -119,20 +119,21 @@ Tuile generer_tuile(void)
         do {
             cmpt = 0;
             t->est = generer_cote(rand()%100);
-            if (t->milieu == Z_BLASON && t->est == Z_VILLE) t->est = Z_BLASON;
+            if (t->milieu & t->est) t->est = t->milieu;
             if (t->est & t->milieu) cmpt++;
 
             t->sud = generer_cote(rand()%100);
-            if (t->milieu == Z_BLASON && t->sud == Z_VILLE) t->sud = Z_BLASON;
+            if (t->milieu & t->sud) t->sud = t->milieu;
             if (t->sud & t->milieu) cmpt++;
 
             t->nord = generer_cote(rand()%100);
-            if (t->milieu == Z_BLASON && t->nord == Z_VILLE) t->nord = Z_BLASON;
+            if (t->milieu & t->nord) t->nord = t->milieu;
             if (t->nord & t->milieu) cmpt++;
 
             t->ouest = generer_cote(rand()%100);
-            if (t->milieu == Z_BLASON && t->ouest == Z_VILLE) t->ouest = Z_BLASON;
+            if (t->milieu & t->ouest) t->ouest = t->milieu;
             if (t->ouest & t->milieu) cmpt++;
+
         } while (cmpt < 2);
     }
 
