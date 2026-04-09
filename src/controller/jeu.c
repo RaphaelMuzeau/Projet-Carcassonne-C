@@ -78,8 +78,7 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction
     // il faut traiter le cas du meeple en premier car il peut annuler le placement
     if (place_meeple) {
         // on lance la recherche à partir de la zone où sera placé le meeple
-        enum Zone zone = zone_tuile(tuile, position_meeple);
-        int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, zone, position_meeple, false);
+        int pts = amorce_recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, position_meeple, false);
         recherche_est_verifie(jeu->grille, x, y);
 
         // si d'autres meeple ont été trouvés, annuler le placement et renvoyer faux
@@ -119,12 +118,12 @@ bool tour(Jeu *jeu, Tuile tuile, int x, int y, bool place_meeple, enum Direction
         detruire_liste_meeple(loc_meeple);
         loc_meeple = NULL;
 
-        int pts = recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, zone_tuile(tuile, d), d, false);
+        int pts = amorce_recherche(jeu->grille, nb_meeple, &loc_meeple, x, y, d, false);
         recherche_est_verifie(jeu->grille, x, y);
         attribution_points(jeu, loc_meeple, nb_meeple, pts, false);
     }
 
-    // verifier si il y des abbaye sur ou au abords de la tuile
+    // verifier si il y a des abbaye sur ou au abords de la tuile
     // et attribuer les points correspondants si elles sont completes
     verification_abbaye(jeu->grille, jeu->joueurs, x, y);
 

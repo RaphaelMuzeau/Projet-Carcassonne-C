@@ -901,7 +901,7 @@ bool test_grille_recherche(void)
     // ville incomplete
 
     grille = generer_recherche_ville_incomplete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 2, 1, Z_VILLE, D_OUEST, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 2, 1, D_OUEST, false);
 
     if (pts != -1) return false;
 
@@ -915,7 +915,7 @@ bool test_grille_recherche(void)
     // vile complete
 
     grille = generer_recherche_ville_complete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_VILLE, D_SUD, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 0, 0, D_SUD, false);
 
     if (pts != 8) return false;
     if (nb_meeple[0] != 1) return false;
@@ -935,7 +935,7 @@ bool test_grille_recherche(void)
     // ville avec blason
 
     grille = generer_recherche_ville_blason();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 2, Z_VILLE, D_EST, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 0, 2, D_EST, false);
 
     if (pts != 22) return false;
     if (nb_meeple[0] != 2) return false;
@@ -956,7 +956,7 @@ bool test_grille_recherche(void)
     // route complete, arret sur un village
 
     grille = generer_route_village();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_ROUTE, D_SUD, false);
+    pts =  amorce_recherche(grille, nb_meeple, &loc_meeple, 2, 1, D_SUD, false);
 
     if (pts != 5) return false;
     if (nb_meeple[0] != 2) return false;
@@ -974,7 +974,7 @@ bool test_grille_recherche(void)
     // route complete, arret sur une ville
 
     grille = generer_route_ville();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 1, 1, Z_ROUTE, D_EST, false);
+    pts =  amorce_recherche(grille, nb_meeple, &loc_meeple, 1, 1, D_EST, false);
 
     if (pts != 4) return false;
     if (nb_meeple[0] != 1) return false;
