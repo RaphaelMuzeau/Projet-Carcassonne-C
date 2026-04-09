@@ -17,7 +17,7 @@ bool sauvegarder_partie(Jeu partie, char *fname)
 {
     FILE *f = fopen(fname, "w");
     if (f == NULL) {
-        perror("carcassonne");
+        ca_perror();
         return false;
     }
 
@@ -34,13 +34,13 @@ bool charger_partie(Jeu *partie, char *fname)
 {
     FILE *f = fopen(fname, "r");
     if (f == NULL) {
-        ca_warn("carcassonne");
+        ca_perror();
         return false;
     }
 
     char version[LEN_VER] = { 0 };
     if (fread(version, sizeof(char), LEN_VER, f) != LEN_VER || strcmp(version, VERSION)) {
-        ca_warn("carcassonne");
+        ca_warn("fichier invalide (version antérieure)");
         fclose(f);
         return false;
     }
