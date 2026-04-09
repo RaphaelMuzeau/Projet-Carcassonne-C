@@ -13,10 +13,10 @@ Joueur creer_joueur(int id, int nb_meeple)
     joueur.nb_meeple_restant = nb_meeple;
     joueur.localisation_meeple = NULL;
 
-    joueur.couleur.r = rand()%CHAR_MAX;
-    joueur.couleur.g = rand()%CHAR_MAX;
-    joueur.couleur.b = rand()%CHAR_MAX;
-    joueur.couleur.a = 255;
+    joueur.couleur.r = rand()%UCHAR_MAX;
+    joueur.couleur.g = rand()%UCHAR_MAX;
+    joueur.couleur.b = rand()%UCHAR_MAX;
+    joueur.couleur.a = UCHAR_MAX;
 
     return joueur;
 }

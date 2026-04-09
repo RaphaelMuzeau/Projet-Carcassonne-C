@@ -568,7 +568,7 @@ bool test_joueur_creer(void)
     if (joueur.nom != NULL) return false;
     if (joueur.id != 2)  return false;
     if (joueur.pts != 0) return false;
-    if (joueur.couleur.a != CHAR_MAX) return false;
+    if (joueur.couleur.a != UCHAR_MAX) return false;
     if (joueur.nb_meeple_restant != 5) return false;
     if (joueur.localisation_meeple != NULL) return false;
 
