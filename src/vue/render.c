@@ -31,8 +31,9 @@ void dessiner_sprite(Texture spritesheet, enum Zone zone, enum Sprite sprite, fl
 
     // se referer à la spritesheet pour ces decalages
 
-    if (zone & (Z_ABBAYE | Z_VILLAGE))         source.y = TEXTURE_SIZE * 2;
-    if (zone == Z_ROUTE)                       source.y = TEXTURE_SIZE;
+    if (zone & (Z_ABBAYE | Z_VILLAGE))         source.y = TEXTURE_SIZE * 3;
+    if (zone == Z_ROUTE)                       source.y = TEXTURE_SIZE * 2;
+    if (zone == Z_BLASON)                      source.y = TEXTURE_SIZE;
 
     if (zone & (Z_ROUTE | Z_BLASON | Z_VILLE)) source.x = TEXTURE_SIZE * sprite;
     if (zone == Z_VILLAGE)                     source.x = TEXTURE_SIZE;
