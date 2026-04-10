@@ -6,8 +6,142 @@
 
 ---
 
-Le rapport d'implémentation sera découpé en sous-chapitres qui représentent chaque structure de données. Chaque structure présentera aussi les fonctions avec lesquelles elle intéragit.  
-Les fonctions qui ne seront pas détaillées sont considérées comme assez simples pour lire le code source. Les autres auront des détails apporté dans ce même rapport.
+# Architecture de l'arborescence
+
+La repo est organisé de la manière suivante :
+
+```
+├── bin
+├── build
+├── data
+│   ├── ...
+│   ├── parties
+│   ├── pictures
+│   └── test
+├── lib
+├── rapport
+└── src
+    ├── controller
+    ├── model
+    └── vue
+```
+
+La seul différence notable avec la partie analyse du rapport et que les artefacts de compilations ont migrés vers `build/`, afin de souligner
+que ce dossier n'est plus limité au stockages des objets `.o`, mais contient également des sous-makefiles `.d` générés par gcc pour traquer
+les dependences entres les fichiers sources et headers.
+
+Meme si le fonctionnement détaillé du makefile ne sera pas décrit ici, quelques points sont à souligner :
+
+Trois cibles de compilations differentes sont disponibles :
+    - release, voué à la distribution finale du programme, compilé avec optimisations
+    - debug, voué à être inspecté avec des outils de debug durant le developpement
+    - test, un mode spécial de debug qui lance la suite de test sous l'outil valgrind s'il est disponible
+
+De plus, nous avons decidé de faire usage d'un LSP (clangd) pour fluidifier le processus `ecriture -> compilation -> test`,
+son usage est optionel, mais le makefile permet de generer le fichier `compile_commands.json` necessaire à son fonctionnement avec la commande `make bear`.
+
+## Model MVC
+
+Les structures de données et fonctions utilisés seront décrites plus bas, en premier lieu, voici un schema explicatif des interactions entre 
+le model, la vue et le controler :
+
+![](../data/analyse/arborescence.png)
+
+## Librairie de support
+
+Nous avons elaboré deux petites librairies pour soutenir le reste de la base de code
+
+#### test
+
+le header `test.h` propose la fonction `_Noreturn void lancer_tests(void)` appelé par main à la place du corps si le fichier est compilé avec 
+RUN_UNIT_TESTS définie (par `make test`).
+
+Cette fonction executera toutes les fonctions de test définies dans `test.c`, et génère un rapport sur leurs resultats de la forme suivante:
+
+```shell
+lancement de la suite de tests:
+  test_tuile_creer:  ok
+  test_tuile_pivot90:  ok
+  test_tuile_compatibilite:  ok
+  test_tuile_generer:  ok
+  test_pile_creer:  ok
+  test_pile_creer_aleatoire:  ok
+  test_pile_inserer_tuile:  ok
+  test_pile_recuperer_tuile_non_aleatoire:  ok
+  test_pile_recuperer_tuile_aleatoire:  ok
+  test_vec_creer:  ok
+  test_vec_get_null:  ok
+  ... # omis pour ne pas polluer ce document
+  test_csv_compter_lignes:  ok
+  test_csv_lecture_zone:  ok
+  test_csv_lecture_fichier:  ok
+  test_csv_fichier_vide:  ok
+  test_csv_fichier_introuvable:  ok
+  test_csv_fichier_invalide:  ok
+  test_fichier_charger_grille:  ok
+  test_fichier_charger_pile:  ok
+  test_fichier_charger_pile_aleatoire:  ok
+  test_fichier_charger_joueur:  ok
+  test_fichier_charger_joueur_liste_vide:  ok
+  test_fichier_sauvegarder_liste_joueurs:  ok
+resultats:
+  50 ok, 0 echecs.. exiting
+ ```
+
+Ces fonctions sont voués à tester l'integralité du model et du controleur, généralement avec un ou plusieurs tests par fonction "publique";
+elle sont de la forme suivante:
+
+```C
+bool test_nomdefichier_nomdefonction(void)
+```
+
+Leur pointeurs et leur noms sont ensuites toutes ajoutés à la liste statique `unit_tests[]` dans l'ordre d'execution voulu :
+(un test qui utilise un fonction "foo" doit etre lancé après le test de la fonction foo.).
+Qui sera lue par `lancer_tests`.
+
+Le pointeur de fonction et le nom de chaque fonction sont groupés à l'aide de la structure :
+
+```C
+typedef struct _Test {
+    bool (*run)(void);
+    const char *name;
+} Test;
+#define TEST(FUNCTION) { FUNCTION, #FUNCTION }
+```
+
+Notons la macro TEST, utilisé pour faciliter l'ajout d'un test à `unit_tests[]` comme tel :
+
+```C
+// ajout à la liste de tests à executer
+Test unit_tests[] = {
+    ...
+    TEST(test_nomdefichier_nomdefonction),
+    ...
+};
+```
+
+#### libca
+
+libca (lire: lib carcassonne) offre deux types de fonctions:
+
+- ***`void *ca_alloc(size_t n, size_t size);`***
+- ***`void *ca_realloc(void *p, size_t n, size_t size);`***
+- ***`void ca_warn(const char *message);`***
+- ***`_Noreturn void ca_error(const char *message);`***
+- ***`_Noreturn void ca_perror(void);`***
+
+`ca_alloc` et `ca_realloc` sont des wrappers autour de `calloc` et `realloc` respectivement, avec deux sécurités ajoutés: 
+declence un crash propre avec message d'erreur lors d'une erreur d'allocation, ou si la multiplication de `n` et `size` declenche un overflow.
+
+les fonctions `ca_warn`, `ca_error`, `ca_perror` affichent une erreur avec un format standardisé, et crash proprement en cas d'erreur.
+
+ainsi qu'une macro `max(A, B)` pour simplifier cette operation.
+
+# Structures de données
+
+Cette section sera découpé en sous-chapitres qui représentent chaque structure de données.
+Chaque structure présentera aussi les fonctions importantes à souligner utilisées pour intéragir avec elle.
+Les fonctions plus simples sont omises par soucis de lisibilité, et car elles portent plutot un role de soutient à ces fonctions primaires.
 
 ## Tuiles : 
 
@@ -26,7 +160,6 @@ enum Zone {
 };
 ```
 
-
 Il est à noté qu'il y a un bit en commun entre `Z_VILLE` et `Z_BLASON` pour que les deux puissent être considérées égaux via l'opération `&` ("et binaire") en C. <br>
 
 Vient ensuite l'implémentation de la tuile, elle-même. Nous avons donc eu à réfléchir aux informations dont nous avions besoins dans une tuile : 
@@ -35,7 +168,6 @@ Vient ensuite l'implémentation de la tuile, elle-même. Nous avons donc eu à r
 - Un id meeple pour savoir si un meeple est posé sur la tuile,
 - La position du meeple,
 - Savoir si on a vérifié notre tuile lors de la recherche,
-
 
 ```C
 struct _Tuile {
@@ -47,7 +179,7 @@ struct _Tuile {
 typedef struct _Tuile *Tuile;
 ```
 
-Il est à noter que le type `Tuile` est un **pointeur**. La variable `id_meeple` aura une valeur supérieure à 0 si un meeple est posé dessus, -1 s'il n'y a aucun meeple sur la tuile. Il est importante de re-préciser qu'il ne peut y avoir qu'**un seul meeple** par tuile. Le booléen `est_verifie` variera entre false et true selon l'état dans recherche.<br>
+Il est à noter que le type `Tuile` est un **pointeur**. La variable `id_meeple` aura une valeur supérieure à 0 si un meeple est posé dessus, -1 s'il n'y a aucun meeple sur la tuile. Il est importante de re-préciser qu'il ne peut y avoir qu'**un seul meeple** par tuile. Le booléen `est_verifie` variera entre false et true durant la recherche, il indique si la tuile a déjà été avalué par l'algorithme durant ce passage.<br>
 Il nous faut aussi un moyen de connaître la position de notre meeple, nous avons donc créer une dernière structure utile au repérage du meeple sur la tuile : 
 
 ```C
@@ -164,17 +296,26 @@ La fonction ***`bool inserer_tuile`*** est une fonction qui nous servira seuleme
 La question de la représentation du tableau était restée longtemps un sujet d'étude. Plusieurs suggestions ont été proposées et ont vu le jour, comme : 
 
 - Tableau 2D statique : <br>
-    Avantage, simple, pratique.   
-    Désavantages : Coûteux en mémoire.
-    
- - Listes n-chaînées : <br>
-	Avantage : Réduction du coup mémoire  
-	Désavantage : Complexité d'utilisation liée à la recherche, enchaînements implicites (localisation compliqué lors de l'enchaînement)
+    Avantages : simple, pratique, très rapide à traverser.
+    Désavantages : Coûteux en mémoire, necessite `(2*n)^2 * sizeof(Tuile)` octets pour n tuiles.
 
-Nous étions à l'origine parti sur un simple tableau 2D statique, dont la taille restait personnalisable. Mais lors de l'implémentation de la structure de `Varstring`, une idée a émergée.  
-Celle du **`Vec2D`**. L'idée était simple mais excessivement efficace. Le coût mémoire était grandement réduit, et nous gardions la simplicité d'accessibilité d'un tableau via des fonctions très simple d'accès.
+ - Listes n-chaînées : <br>
+	Avantage : Réduction du coup mémoire
+	Désavantage : Complexité d'utilisation liée à la recherche, cout en temps des dereferencement, enchaînements implicites (localisation compliqué lors de l'enchaînement)
+
+Nous étions à l'origine parti sur un simple tableau 2D statique, dont la taille restait personnalisable. Mais lors de l'implémentation de la structure de `Varstring`, une idée a émergé,
+Celle du **`Vec2D`**, un tableau initalisé sans allocation mémoire initiale, indexable de INT_MIN à INT_MAX, donc meme dans les negatifs.
+Ceci a plusieurs avantages évidents pour nous:
+
+- On conserve la rapidité d'iteration d'un tableau statique
+- Un nombre de tuiles maximal important n'implique pas une allocation excessive
+- Fait coincider l'index dans la grille et l'index du sprite dans la vue
+- Ne necessite aucune verification de bord durant la recherche
+
+Le coût mémoire était grandement réduit, et nous gardions la simplicité d'accessibilité d'un tableau via des fonctions très simple d'accès.
 
 Le vec2D repose sur deux structures presque identiques. La première : 
+
 ```C
 typedef struct _Vec {
     Tuile *_tableau;
@@ -184,6 +325,9 @@ typedef struct _Vec {
 ```
 
  Cette structure `Vec` est celle qui contiendra les `Tuiles`, la variable *decy* nous est utile pour pouvoir indexer avec des valeurs négatives. Si une tuile est posé en *-1* sur le plateau, le décalage augmente de 1, pour que lors de l'indexation sur *`_tableau`, la valeur soit tout de même comprise entre [0, *`_capacite`*].
+
+Un vec est manipulé de manière analogue à celle d'un tableau standard, grâce à aux fonctions de placement et d'accès `vget(Vec, int x, int y)` et `void vset(Vec*, Tuile, int x, int y)`.
+Toutes les cases sont, du point de vue de l'utilisateur, intialisées à NULL.
  
  Voici un schéma visuel de ce que fait la structure : <br>
  
@@ -199,11 +343,9 @@ typedef struct _Vec2D {
 } Vec2D;
 ```
 
-
 Le principe y est le même, notre tableau indexe ici des *`Vec`*, mais tout le reste fonctionne de la même manière. 
-  
-  
-Accompagné de son schéma : 
+
+Accompagné de son schéma :
 
 ![](../data/implementation/schema_Vec2D.svg)
 
@@ -393,31 +535,54 @@ Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur
 
 # Implémentation graphique :
 
-Nous utilisons la librairie graphique [Raylib](https://github.com/raysan5/raylib) via un précompilé `.a` pour créer et gérer toute l'interface graphique.
+Nous utilisons la librairie graphique [Raylib](https://github.com/raysan5/raylib) pour créer et gérer toute l'interface graphique, la librairie est distribué sous forme pre-compilé et lié statiquement pour permettre l'execution sans modification de l'environnement de l'utilisateur.
 
-Nous nous servons du `main.c` pour naviguer entre différentes pages. Ces pages sont "en réalité" différents fichiers qui gèrent l'affichage d'une fenêtre (avec leus propres comportement dans leurs propres header).
-
+Nous nous servons du `main.c` pour naviguer entre différentes pages, à l'execution, main() configure l'etat global tel que les flags openGL, la graine aleatoire, et la case memoire de la structure jeu, puis switch entre chaque page jusqu'à recevoir P_QUITTER. Ces pages sont assignées à différentes fonctions qui gèrent chacune l'affichage d'un écran du jeu independemment des autres tel que definis dans le rapport d'analys (page de d'ecran titre, page de configuration, page du jeu principal..) et renvoit la prochaine page à afficher tel que definie par l'enum Page :
 Voici les différentes pages : 
 
-- Page titre
-- Page jeu
-- page conf
-- page charger
-- page gagnant
+```C
+enum Page {
+    P_TITRE,
+    P_JEU,
+    P_CONF_NORMAL, // ces trois enum mènent à la meme page
+    P_CONF_CUSTOM, // avec des options differentes
+    P_CONF_CSV,    // selon le niveau de personalisation requis.
+    P_JOUEURS,
+    P_CHARGER,
+    P_AIDE,
+    P_QUITTER,
+};
+```
 
 Chaque page est gérée indépendament mais certaines fonctionnalités restent récurrentes. C'est pour cela que nous les gérons comme des "widgets" (éléments interactifs) généraux, qui possèdent leurs propres fichiers. Par exemple, les boutons sont considérés comme tels et peuvent être retrouvés dans `bouton.h`, voici une liste exhaustive des widgets existants sur le projet :
 
 - ***bouton.h***
+- ***texte.h***
 - ***champsaisie.h***
 - ***scrollbar.h***
 - ***sidebar.h***
-  
-Par exemple, la page de jeu qui est là où sont posées les tuiles et où la partie se déroule dans son ensemble se sert de la sidebar, de la scrollbar, du champs de saisie etc.
-La page de configuration inclut des champs de saisies et la scrollbar.
+- ***cartejoueur.h***
 
-Les champs de saisies sont gérées via VarString, une implémentation de chaine de texte pouvant être supprimée, caractère par caractère (touche retour), supprimer l'ensemble de la chaîne (suppr). Ajouter des cacractères.
+Par exemple, la page de jeu qui est celle où sont posées les tuiles et où la partie se déroule dans son ensemble se sert de la sidebar, de la scrollbar, du champs de saisie etc,
+la page de configuration inclut des champs de saisies, une scrollbar, casiment toutes les pages font usage de boutons et de texte.
 
-La dernière partie graphique a détaillée est le fichier `render.h`. Ce fichier nous sert à allouer des `chunks`, un `chunk` est une texture, pouvant en contenir plusieurs (selon des tailles définies par des macros), ici, celles des tuiles. Cette méthode permet de gérer rapidement le dessins de la tuile et de préparer des zones allouées en amont pour les tuiles. 
-Les textures des tuiles (sprites) sont générés aléatoirement via un algorithme se trouvant dans "dessiner_tuile", de façon à respecter la tuile générer aléatoirement, ou celle du `.csv`.
+Les champs de saisies sont gérées via `VarString`, une implémentation de chaine de texte à taille variable qui permet toutes les manipulations textuelles d'une entrée utilisateur simple (ajout, retrait, suprression total, duplication pour l'extraction de l'entrée).
 
-Toutes les textures sont mises en mémoire dans le GPU (VRAM) et permettent un rendu fluide.
+#### Affichage du model
+
+Une problematique interessante etait de minimiser la poids calculatoire de chaque generation de frame, et laisser le gros du travail au controlleur. 
+Il a donc été important pour nous de chercher des moyens de conserver des formats de données très rapidement affichable par la vue, et non pas aller chercher de nouveau ces données sur le model pour chaque frame.
+Plusieurs Techniques entres donc en jeu, décrites ci-dessous.
+
+Incluses dans `render.h` sont les fonctions nous servant à allouer des `chunk`s, un `chunk` est une texture utilisé pour stocker le resultat visuelle du placement de plusieurs textures de tuiles,
+formant une unique bitmap pour tout un jeu de tuile, jusqu'à 32^2 tuiles dans l'implementation actuelle, meme si cette valeur reste configurable dans le header.
+Le groupement par chunk pre-generés stockés dans la vram GPU des sprites de tuiles placés permet un dessin très rapide du plateau tout entier, seulement 4 ou 5 appels openGL pour une partie moyenne au lieu d'un par tuile avec une implementation naive.
+
+Les textures des tuiles (sprites) sont générés aléatoirement via un algorithme se trouvant dans `render.h`, de façon à respecter la tuile généré aléatoirement, ou celle du `.csv`.
+Ces textures sont composés à partir de plusieurs 'sous-sprites' representant les elements possibles d'une tuile (route, abbaye, differentes formes de villes...) stockés dans une spritesheet pour n'avoir à charger qu'un seul fichier à l'initialisation.
+
+La position des meeple est également 'caché' à partir des listes chainés des joueurs, pour ne pas avoir à parcourir la chaine à chaque frame, on conserve la couleur et les positions {x, y} relatives au plateau de chaque meeple posé pour pouvoir rapidement toutes les dessiner. 
+
+Il vient alors la question de quand parcourir les listes, et quand se reposer sur les valeurs cachés ? De meme pour les chunks et les informations presentes dans la sidebar.
+
+Remarquons que la model n'est modifié qu'à chaque tour, et reste inchangé tant que la vue n'a pas appelé `tour(...)`, on peut donc rafraichir nos informations sur le model qu'après un placement réussi par le joueur, et se baser sur des formats de données plus rapide d'accés pour le dessin habituelle de chaque frame, 60 fois par seconde.
