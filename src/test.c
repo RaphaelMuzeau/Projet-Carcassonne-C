@@ -134,14 +134,14 @@ bool test_tuile_generer(void)
             if (tmp->ouest == Z_ROUTE) return false;
         }
 
-        if (tmp->milieu & (Z_ROUTE | Z_VILLE | Z_BLASON) ) {
+        if (tmp->milieu & (Z_ROUTE | Z_VILLE | Z_BLASON)) {
             int cmpt = 0;
             if (tmp->est == tmp->milieu) cmpt++;
             if (tmp->sud == tmp->milieu) cmpt++;
             if (tmp->nord == tmp->milieu) cmpt++;
             if (tmp->ouest == tmp->milieu) cmpt++;
 
-            if(cmpt < 2) return false;
+            if (cmpt < 2) return false;
         }
         free(tmp);
     }
