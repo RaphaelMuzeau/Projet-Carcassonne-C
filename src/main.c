@@ -43,8 +43,8 @@ int main(void)
         case P_CHARGER:
             prochaine_page = page_charger(&jeu);
             break;
-        case P_REGLES:
-            if (system("xdg-open rapport/analyse.pdf &") == 127) // specifique à linux
+        case P_AIDE:
+            if (system("xdg-open rapport/aide.pdf &") == 127) // specifique à linux
                 ca_warn("l'ouverture des règles nécessite xdg-open");
             prochaine_page = P_TITRE;
             break;

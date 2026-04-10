@@ -21,7 +21,7 @@ enum Page page_titre(void)
     Bouton btn_nouvelle = creer_bouton_adapte(50, 150, "Nouvelle Partie");
     Bouton btn_custom   = creer_bouton_adapte(50, 220, "Nouvelle Partie Custom");
     Bouton btn_charger  = creer_bouton_adapte(50, 290, "Charger Partie");
-    Bouton btn_regles   = creer_bouton_adapte(50, 360, "Règles du Jeu");
+    Bouton btn_aide     = creer_bouton_adapte(50, 360, "Règles du Jeu / Aide");
     Bouton btn_quitter  = creer_bouton_adapte(50, 430, "Quitter Le Jeu");
 
     while (prochaine_page == P_TITRE) {
@@ -31,7 +31,7 @@ enum Page page_titre(void)
         if (update_bouton(&btn_nouvelle)) prochaine_page = P_CONF_NORMAL;
         if (update_bouton(&btn_custom))   prochaine_page = P_CONF_CUSTOM;
         if (update_bouton(&btn_charger))  prochaine_page = P_CHARGER;
-        if (update_bouton(&btn_regles))   prochaine_page = P_REGLES;
+        if (update_bouton(&btn_aide))     prochaine_page = P_AIDE;
         if (update_bouton(&btn_quitter) || WindowShouldClose()) prochaine_page = P_QUITTER;
 
         echelle = max((float) largeur_ecran / fond.width, (float) hauteur_ecran / fond.height);
@@ -48,7 +48,7 @@ enum Page page_titre(void)
             dessiner_bouton(btn_nouvelle);
             dessiner_bouton(btn_custom);
             dessiner_bouton(btn_charger);
-            dessiner_bouton(btn_regles);
+            dessiner_bouton(btn_aide);
             dessiner_bouton(btn_quitter);
         EndDrawing();
     }

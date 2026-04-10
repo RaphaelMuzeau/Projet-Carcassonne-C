@@ -16,7 +16,7 @@ enum Page {
     P_CONF_CSV,
     P_JOUEURS,
     P_CHARGER,
-    P_REGLES,
+    P_AIDE,
     P_QUITTER,
 };
 
