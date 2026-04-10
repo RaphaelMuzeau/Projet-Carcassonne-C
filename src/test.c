@@ -568,6 +568,7 @@ bool test_joueur_creer(void)
     if (joueur.nom != NULL) return false;
     if (joueur.id != 2)  return false;
     if (joueur.pts != 0) return false;
+    if (joueur.couleur.a != UCHAR_MAX) return false;
     if (joueur.nb_meeple_restant != 5) return false;
     if (joueur.localisation_meeple != NULL) return false;
 
@@ -579,9 +580,10 @@ bool test_listejoueurs_creer(void)
 {
     ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
 
-    if (joueurs.nb_joueurs != 3) return false;
-    if (joueurs.tableau == NULL) return false;
-    if (joueurs.tour != 0)       return false;
+    if (joueurs.nb_joueurs != 3)    return false;
+    if (joueurs.nb_meeple_max != 5) return false;
+    if (joueurs.tableau == NULL)    return false;
+    if (joueurs.tour != 0)          return false;
 
     if (joueurs.tableau[0].id != 0) return false;
     if (joueurs.tableau[1].id != 1) return false;
@@ -899,7 +901,7 @@ bool test_grille_recherche(void)
     // ville incomplete
 
     grille = generer_recherche_ville_incomplete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 2, 1, Z_VILLE, D_OUEST, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 2, 1, D_OUEST, false);
 
     if (pts != -1) return false;
 
@@ -913,7 +915,7 @@ bool test_grille_recherche(void)
     // vile complete
 
     grille = generer_recherche_ville_complete();
-    pts = recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_VILLE, D_SUD, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 0, 0, D_SUD, false);
 
     if (pts != 8) return false;
     if (nb_meeple[0] != 1) return false;
@@ -933,7 +935,7 @@ bool test_grille_recherche(void)
     // ville avec blason
 
     grille = generer_recherche_ville_blason();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 2, Z_VILLE, D_EST, false);
+    pts = amorce_recherche(grille, nb_meeple, &loc_meeple, 0, 2, D_EST, false);
 
     if (pts != 22) return false;
     if (nb_meeple[0] != 2) return false;
@@ -954,7 +956,7 @@ bool test_grille_recherche(void)
     // route complete, arret sur un village
 
     grille = generer_route_village();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 0, 0, Z_ROUTE, D_SUD, false);
+    pts =  amorce_recherche(grille, nb_meeple, &loc_meeple, 2, 1, D_SUD, false);
 
     if (pts != 5) return false;
     if (nb_meeple[0] != 2) return false;
@@ -972,7 +974,7 @@ bool test_grille_recherche(void)
     // route complete, arret sur une ville
 
     grille = generer_route_ville();
-    pts =  recherche(grille, nb_meeple, &loc_meeple, 1, 1, Z_ROUTE, D_EST, false);
+    pts =  amorce_recherche(grille, nb_meeple, &loc_meeple, 1, 1, D_EST, false);
 
     if (pts != 4) return false;
     if (nb_meeple[0] != 1) return false;
@@ -1355,7 +1357,8 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     generer_fichier_liste_joueurs();
     FILE* f_read = fopen("data/test/fichier_test_liste_joueurs.bin", "r");
     ListeJoueurs tab = charger_liste_joueurs(f_read);
-    if (tab.nb_joueurs != 3) return false;
+    if (tab.nb_joueurs != 3)    return false;
+    if (tab.nb_meeple_max != 4) return false;
 
     if (strcmp(tab.tableau[0].nom, "Damien")) return false;
     if (tab.tableau[0].id != 0) return false;

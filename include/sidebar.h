@@ -6,7 +6,7 @@
 
 #define CONTROLES_PADDING 20.0f
 #define CONTROLES_APERCU_SIZE 128.0f
-#define CONTROLES_HEIGHT (CONTROLES_APERCU_SIZE + 2 * CONTROLES_PADDING)
+#define CONTROLES_HEIGHT (CONTROLES_APERCU_SIZE + 2 * CONTROLES_PADDING + 20.0f)
 
 #define CARTEJOUEUR_WIDTH 250.0f
 #define CARTEJOUEUR_HEIGHT 100.0f
@@ -18,22 +18,25 @@ typedef struct _Controles {
     Rectangle apercu;
     Bouton rotation;
     Bouton detruire;
+    Texte nb_tuiles;
 } Controles;
 
-Controles creer_controles(void);
+Controles creer_controles(int nb_tuiles);
+void detruire_controles(Controles ctrl);
+
 void update_controles(Controles *ctrl);
-void dessiner_controles(Controles ctrl);
+void rafraichir_controles(Controles *ctrl, int nb_tuiles);
+void dessiner_controles(Controles ctrl, RenderTexture2D render_tuile, float rotation);
 
 typedef struct _CarteJoueur {
     Joueur *joueur;
-    Color couleur;
     Rectangle champ;
     Texte texte_nom;
     Texte texte_pts;
     Texte texte_meeple;
 } CarteJoueur;
 
-CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur, Color couleur);
+CarteJoueur creer_cartejoueur(float x, float y, Joueur *joueur);
 void detruire_cartejoueur(CarteJoueur carte);
 void rafraichir_cartejoueur(CarteJoueur *carte);
 void dessiner_cartejoueur(CarteJoueur carte, bool tour);
@@ -51,7 +54,7 @@ void detruire_barrejoueurs(BarreJoueurs barre);
 
 void update_barrejoueurs(BarreJoueurs *barre);
 // met à jour le compteur de points et de meeple de chaque joueur
-void rafrachir_barrejoueurs(BarreJoueurs *barre);
+void rafraichir_barrejoueurs(BarreJoueurs *barre);
 void dessiner_barrejoueurs(BarreJoueurs barre, int id_tour);
 
 #endif

@@ -46,6 +46,7 @@ enum Page page_charger(Jeu *jeu)
         if ((partie_selectionne = update_listeparties(parties, scrollbar.vue)) != NULL) {
             if (IsFileExtension(partie_selectionne, ".csv")) {
                 lire_tuiles_csv(partie_selectionne, &jeu->pile);
+                set(&jeu->grille, recup_tuile(&jeu->pile), 0, 0);
                 prochaine_page = P_CONF_CSV;
             } else if (charger_partie(jeu, partie_selectionne))
                 prochaine_page = P_JEU;

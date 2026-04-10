@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <time.h>
 #include "test.h"
 #include "libca.h"
 #include "raylib.h"
@@ -13,6 +14,7 @@ int main(void)
 
     // Configuration global
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+    srand(time(NULL));
     // SetTraceLogLevel();
     int largeur_ecran = 640;
     int hauteur_ecran = 480;

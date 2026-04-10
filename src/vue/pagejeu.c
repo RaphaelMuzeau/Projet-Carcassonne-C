@@ -1,73 +1,109 @@
+#include <math.h>
+#include <stdio.h>
 #include <string.h>
 #include "libca.h"
-#include "fichier.h"
 #include "raylib.h"
 #include "page.h"
+#include "jeu.h"
+#include "render.h"
+#include "plateau.h"
+#include "vuemeeple.h"
 #include "sidebar.h"
-#include "champsaisie.h"
+#include "popup.h"
+#include "bouton.h"
+#include "fichier.h"
+
+enum Page page_fin(ListeJoueurs joueurs, int id_gagnant);
 
 enum Page page_jeu(Jeu *jeu)
 {
-    // Etat initial
+    // Etat initial de la page
     enum Page prochaine_page = P_JEU;
-    int largeur_ecran = GetScreenWidth();
-    int hauteur_ecran = GetScreenHeight();
-
     bool afficher_popup = false;
+    bool centre_camera = false;
+
+    SetExitKey(KEY_NULL);
+
+    // Charger la Spritesheet
+    Texture spritesheet = LoadTexture("data/sprites/spritesheet.png");
+    if (!IsTextureValid(spritesheet))
+        ca_error("Echec lors du chargement de la spritesheet");
+
+    // Piocher la premiere tuile
+    Tuile tuile = recup_tuile(&jeu->pile);
+    float rotation_tuile = 0.0f;
+    RenderTexture2D render_tuile = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
 
     // Elements de la page
+    Plateau plateau = creer_plateau(jeu, spritesheet);
+    ListePlacements placements_meeple = creer_listeplacements(jeu);
     Bouton retour = creer_bouton_adapte(10, 10, "<- retour");
-
-    Controles ctrl = creer_controles();
+    Bouton centrer = creer_bouton_adapte(retour.champ.width + 30, retour.champ.y, "centrer");
+    Controles ctrl = creer_controles(jeu->pile.nb_element);
     BarreJoueurs barrejoueurs = creer_barrejoueurs(jeu->joueurs);
+    Popup popup = creer_popup();
 
-    Rectangle popup = { .width = 700, .height = 200 };
-    ChampSaisie champ_partie = creer_champsaisie(0, 0, popup.width * 0.8f, 50, false);
-    Bouton annuler = creer_bouton_adapte(0, 0, "annuler");
-    Bouton sauvegarder = creer_bouton_adapte(0, 0, "sauvegarder\net quitter");
-    Bouton quitter = creer_bouton_adapte(0, 0, "quitter sans\nsauvegarder");
-    annuler.texte.taille = 20.0f;
-    quitter.texte.taille = 15.0f;
-    sauvegarder.texte.taille = 15.0f;
+    // Vue de la grille
 
     while (prochaine_page == P_JEU) {
-        largeur_ecran = GetScreenWidth();
-        hauteur_ecran = GetScreenHeight();
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            if (plateau.placement) plateau.placement = false;
+            else afficher_popup = true;
+        }
 
         if (update_bouton(&retour) || WindowShouldClose())
             afficher_popup = true;
 
-        // centrer le popup
+        centre_camera = false;
+        if (update_bouton(&centrer)) {
+            plateau.camera.target = (Vector2) { 0.0f, 0.0f };
+            plateau.camera.offset.x = plateau.vue.width  / 2.0f - TEXTURE_SIZE / 2.0f;
+            plateau.camera.offset.y = plateau.vue.height / 2.0f - TEXTURE_SIZE / 2.0f;
+
+            centre_camera = true; // evite de mettre à jour le plateau au moment du clique
+        }
+
+        if (tuile == NULL) {
+            prochaine_page = page_fin(jeu->joueurs, fin(jeu));
+            continue; // ne pas afficher cette frame
+        }
+
+        /* gestion du plateau */
+
+        if (!afficher_popup && !centre_camera) {
+            PlacementTuile placement = update_plateau(&plateau);
+            if (placement.x != 0 || placement.y != 0) {
+                if (tour(jeu, tuile, placement.x, placement.y, placement.placer_meeple, placement.position_meeple)) {
+                    // mettre à jour l'hud
+                    rafraichir_controles(&ctrl, jeu->pile.nb_element);
+                    rafraichir_barrejoueurs(&barrejoueurs);
+                    rafraichir_listeplacements(&placements_meeple, jeu);
+                    placer_render_tuile(&plateau, render_tuile, placement.x, placement.y, rotation_tuile);
+
+                    // piocher la prochaine tuile
+                    UnloadRenderTexture(render_tuile);
+                    tuile          = recup_tuile(&jeu->pile);
+                    render_tuile   = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
+                }
+            }
+        }
+
+        /* gestion du popup de sauvegarde */
+
         if (afficher_popup) {
-            popup.x = largeur_ecran/2.0f - popup.width/2.0f;
-            popup.y = hauteur_ecran/2.0f - popup.height/2.0f;
+            centrer_popup(&popup);
+            update_champsaisie(&popup.champ_partie);
 
-            champ_partie.champ.x = popup.x + popup.width * 0.1f;
-            champ_partie.champ.y = popup.y + popup.height * 0.25f;
-
-            quitter.champ.x = popup.x + popup.width * 0.1f;
-            quitter.champ.y = champ_partie.champ.y + champ_partie.champ.height + 20.0f;
-
-            annuler.champ.x = popup.x + popup.width/2.0f - annuler.champ.width/2.0f;
-            annuler.champ.y = champ_partie.champ.y + champ_partie.champ.height + 20.0f;
-            annuler.champ.height = quitter.champ.height;
-
-            sauvegarder.champ.x = popup.x + popup.width * 0.9f - sauvegarder.champ.width;
-            sauvegarder.champ.y = champ_partie.champ.y + champ_partie.champ.height + 20.0f;
-
-            // gerer l'entrée utilisateur
-            update_champsaisie(&champ_partie);
-
-            if (update_bouton_centre(&annuler))
+            if (update_bouton_centre(&popup.annuler))
                 afficher_popup = false;
 
-            if (update_bouton_adapte(&quitter))
+            if (update_bouton_adapte(&popup.quitter))
                 prochaine_page = P_TITRE;
 
-            if (update_bouton_adapte(&sauvegarder) && champ_partie.saisie.len != 0) {
-                char *fname = ca_alloc(sizeof(CHEMIN_PARTIES) + champ_partie.saisie.len, sizeof(char));
+            if (update_bouton_adapte(&popup.sauvegarder) && popup.champ_partie.saisie.len != 0) {
+                char *fname = ca_alloc(sizeof(CHEMIN_PARTIES) + popup.champ_partie.saisie.len, sizeof(char));
                 memcpy(fname, CHEMIN_PARTIES, sizeof(CHEMIN_PARTIES));
-                strcat(fname, champ_partie.saisie.texte);
+                strcat(fname, popup.champ_partie.saisie.texte);
 
                 if (sauvegarder_partie(*jeu, fname))
                     prochaine_page = P_TITRE;
@@ -76,29 +112,103 @@ enum Page page_jeu(Jeu *jeu)
             }
         }
 
+        /* controles de la tuile */
+
         update_controles(&ctrl);
+
+        if (!plateau.placement && (update_bouton_adapte(&ctrl.rotation) || IsKeyPressed(KEY_R))) {
+            pivot_90(tuile);
+            rotation_tuile = fmod(rotation_tuile + 90.0f, 360.0f);
+        }
+
+        if (!plateau.placement && (update_bouton_adapte(&ctrl.detruire) || IsKeyPressed(KEY_D))) {
+            free(tuile);
+            UnloadRenderTexture(render_tuile);
+            tuile = recup_tuile(&jeu->pile);
+            render_tuile = generer_render_tuile(tuile, spritesheet, &rotation_tuile);
+
+            rafraichir_controles(&ctrl, jeu->pile.nb_element);
+        }
+
+        /* barre joueurs */
+
         update_barrejoueurs(&barrejoueurs);
+
+        /* dessin */
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
 
-            dessiner_barrejoueurs(barrejoueurs, 3);
-            dessiner_controles(ctrl);
+            // dessin de la grille
+            dessiner_plateau(plateau, render_tuile, rotation_tuile);
+            dessiner_listeplacements(placements_meeple, plateau);
 
+            // dessin de la sidebar
+            dessiner_barrejoueurs(barrejoueurs, jeu->joueurs.tour);
+            dessiner_controles(ctrl, render_tuile, rotation_tuile);
+
+            // dessin de l'interface
             dessiner_bouton(retour);
-
-            if (afficher_popup) {
-                DrawRectangleRec(popup, DARKGRAY);
-                dessiner_champsaisie(champ_partie);
-                dessiner_bouton(annuler);
-                dessiner_bouton(sauvegarder);
-                dessiner_bouton(quitter);
-            }
+            dessiner_bouton(centrer);
+            if (afficher_popup) dessiner_popup(popup);
         EndDrawing();
     }
 
+    free(tuile);
+
+    detruire_plateau(plateau);
+    detruire_listeplacements(placements_meeple);
     detruire_barrejoueurs(barrejoueurs);
+    detruire_controles(ctrl);
+
+    UnloadTexture(spritesheet);
+    UnloadRenderTexture(render_tuile);
+
     detruire_jeu(*jeu);
     *jeu = (Jeu) { 0 };
+
+    SetExitKey(KEY_ESCAPE);
+
+    return prochaine_page;
+}
+
+enum Page page_fin(ListeJoueurs joueurs, int id_gagnant)
+{
+    // Etat initial de la page
+    enum Page prochaine_page = P_JEU;
+
+    // Formater le message de felicitations
+    char *nom_gagnant = joueurs.tableau[id_gagnant].nom;
+    int pts_gagnant   = joueurs.tableau[id_gagnant].pts;
+
+    size_t taille_message = strlen(nom_gagnant) + 32;
+    char *message = ca_alloc(taille_message, sizeof(char));
+    snprintf(message, taille_message, "%s a gagné avec %d points!", nom_gagnant, pts_gagnant);
+
+    // Elements de la page
+    Bouton retour = creer_bouton_adapte(10.0f, 10.0f, "<- retour");
+    Texte felicitations = creer_texte(0, 0, message);
+    felicitations.taille = 60.0f;
+    Vector2 taille_felicitations = mesurer_texte(felicitations);
+
+    while (prochaine_page == P_JEU) {
+        if (update_bouton(&retour) || IsKeyPressed(KEY_ESCAPE))
+            prochaine_page = P_TITRE;
+
+        if (WindowShouldClose())
+            prochaine_page = P_QUITTER;
+
+        felicitations.position.x = GetScreenHeight()/2.0f - taille_felicitations.x/2.0f;
+        felicitations.position.y = GetScreenHeight()/2.0f - taille_felicitations.y/2.0f;
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+
+            dessiner_bouton(retour);
+            dessiner_texte(felicitations);
+        EndDrawing();
+    }
+
+    free(message);
     return prochaine_page;
 }

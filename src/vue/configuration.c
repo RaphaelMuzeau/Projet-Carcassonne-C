@@ -12,8 +12,7 @@ enum Page page_configuration(Jeu *jeu, enum Configuration config) {
   enum Page prochaine_page = P_CONF_CUSTOM;
   int largeur_ecran = GetScreenWidth();
 
-  SetExitKey(
-      KEY_NULL); // echape retourne à l'ecran titre au lieu de fermer la fenetre
+  SetExitKey(KEY_NULL); // echape retourne à l'ecran titre au lieu de fermer la fenetre
 
   int nb_joueur = 4;
   int nb_meeple = 7;
@@ -84,25 +83,19 @@ enum Page page_configuration(Jeu *jeu, enum Configuration config) {
     adapter_bouton(&confirmer); // recentre le texte après le decalage
 
     /* centrer les champs et leurs titres */
-    champ_nb_joueur.champ.x =
-        (float)largeur_ecran / 2 - champ_nb_joueur.champ.width / 2;
-    titre_nb_joueur.position.x =
-        (float)largeur_ecran / 2 - largeur_titre_nb_joueur / 2;
+    champ_nb_joueur.champ.x    = (float)largeur_ecran / 2 - champ_nb_joueur.champ.width / 2;
+    titre_nb_joueur.position.x = (float)largeur_ecran / 2 - largeur_titre_nb_joueur / 2;
     update_champsaisie(&champ_nb_joueur);
 
     if (config == C_CUSTOM || config == C_CSV) {
-      champ_nb_meeple.champ.x =
-          (float)largeur_ecran / 2 - champ_nb_meeple.champ.width / 2;
-      titre_nb_meeple.position.x =
-          (float)largeur_ecran / 2 - largeur_titre_nb_meeple / 2;
+      champ_nb_meeple.champ.x    = (float)largeur_ecran / 2 - champ_nb_meeple.champ.width / 2;
+      titre_nb_meeple.position.x = (float)largeur_ecran / 2 - largeur_titre_nb_meeple / 2;
       update_champsaisie(&champ_nb_meeple);
     }
 
     if (config == C_CUSTOM) {
-      champ_nb_tuiles.champ.x =
-          (float)largeur_ecran / 2 - champ_nb_tuiles.champ.width / 2;
-      titre_nb_tuiles.position.x =
-          (float)largeur_ecran / 2 - largeur_titre_nb_tuiles / 2;
+      champ_nb_tuiles.champ.x    = (float)largeur_ecran / 2 - champ_nb_tuiles.champ.width / 2;
+      titre_nb_tuiles.position.x = (float)largeur_ecran / 2 - largeur_titre_nb_tuiles / 2;
       update_champsaisie(&champ_nb_tuiles);
     }
 

@@ -8,6 +8,7 @@
 
 bool placer_tuile(Vec2D *grille, int x, int y, Tuile t);
 
+int amorce_recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, enum Direction d, bool fin);
 int recherche(Vec2D grille, int *nb_meeple, L_meeple *loc_meeple, int x, int y, enum Zone z, enum Direction d, bool fin);
 void recherche_est_verifie(Vec2D grille, int x, int y);
 
