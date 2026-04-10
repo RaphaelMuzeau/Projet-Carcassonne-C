@@ -45,7 +45,7 @@ son usage est optionel, mais le makefile permet de générer le fichier `compile
 Les structures de données et fonctions utilisés seront décrites plus bas, en premier lieu, voici un schema explicatif des interactions entre 
 le modèle, la vue et le controller:
 
-![](../data/analyse/arborescence.png)
+![](../data/implementation/architecture.png)
 
 ## Librairie de support
 
