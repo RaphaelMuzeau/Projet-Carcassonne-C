@@ -62,7 +62,7 @@ clean:
 bear: compile_commands.json
 
 tar:
-	git ls-files | xargs tar -xvaf carcassonne.tar.gz
+	git ls-files | xargs tar -cvaf carcassonne.tar.gz
 
 help:
 	@echo "Commandes disponibles:"
