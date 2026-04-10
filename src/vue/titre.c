@@ -13,6 +13,9 @@ enum Page page_titre(void)
 
     // Elements de la page
     Texture2D fond = LoadTexture("data/pictures/fond.png");
+    if (!IsTextureValid(fond))
+        ca_warn("echec lors du chargement du fond");
+
     float echelle = 1.0f;
 
     Texte titre = creer_texte(50, 50, "Carcassonne");
