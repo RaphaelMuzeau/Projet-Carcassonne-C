@@ -8,52 +8,52 @@
 
 # Architecture de l'arborescence
 
-La repo est organisé de la manière suivante :
+La repo est organisée de la manière suivante :
 
 ```
 ├── bin
 ├── build
 ├── data
-│   ├── ...
-│   ├── parties
-│   ├── pictures
-│   └── test
+│   ├── ...
+│   ├── parties
+│   ├── pictures
+│   └── test
 ├── lib
 ├── rapport
 └── src
-    ├── controller
-    ├── model
-    └── vue
+    ├── controller
+    ├── model
+    └── vue
 ```
 
-La seul différence notable avec la partie analyse du rapport et que les artefacts de compilations ont migrés vers `build/`, afin de souligner
+La seule différence notable avec la partie analyse du rapport et que les artefacts de compilations ont migrés vers `build/`, afin de souligner
 que ce dossier n'est plus limité au stockages des objets `.o`, mais contient également des sous-makefiles `.d` générés par gcc pour traquer
-les dependences entres les fichiers sources et headers.
+les dépendances entre les fichiers sources et headers.
 
-Meme si le fonctionnement détaillé du makefile ne sera pas décrit ici, quelques points sont à souligner :
+Même si le fonctionnement détaillé du makefile ne sera pas décrit ici, quelques points sont à souligner :
 
 Trois cibles de compilations differentes sont disponibles :
     - release, voué à la distribution finale du programme, compilé avec optimisations
     - debug, voué à être inspecté avec des outils de debug durant le developpement
     - test, un mode spécial de debug qui lance la suite de test sous l'outil valgrind s'il est disponible
 
-De plus, nous avons decidé de faire usage d'un LSP (clangd) pour fluidifier le processus `ecriture -> compilation -> test`,
-son usage est optionel, mais le makefile permet de generer le fichier `compile_commands.json` necessaire à son fonctionnement avec la commande `make bear`.
+De plus, nous avons décidé de faire usage d'un LSP (clangd) pour fluidifier le processus `écriture -> compilation -> test`,
+son usage est optionel, mais le makefile permet de générer le fichier `compile_commands.json` nécessaire à son fonctionnement avec la commande `make bear`.
 
 ## Model MVC
 
 Les structures de données et fonctions utilisés seront décrites plus bas, en premier lieu, voici un schema explicatif des interactions entre 
-le model, la vue et le controler :
+le modèle, la vue et le controller:
 
 ![](../data/analyse/arborescence.png)
 
 ## Librairie de support
 
-Nous avons elaboré deux petites librairies pour soutenir le reste de la base de code
+Nous avons élaboré deux petites librairies pour soutenir le reste de la base de code.
 
 #### test
 
-le header `test.h` propose la fonction `_Noreturn void lancer_tests(void)` appelé par main à la place du corps si le fichier est compilé avec 
+Le header `test.h` propose la fonction `_Noreturn void lancer_tests(void)` appelée par main à la place du corps si le fichier est compilé avec 
 RUN_UNIT_TESTS définie (par `make test`).
 
 Cette fonction executera toutes les fonctions de test définies dans `test.c`, et génère un rapport sur leurs resultats de la forme suivante:
@@ -88,15 +88,15 @@ resultats:
   50 ok, 0 echecs.. exiting
  ```
 
-Ces fonctions sont voués à tester l'integralité du model et du controleur, généralement avec un ou plusieurs tests par fonction "publique";
-elle sont de la forme suivante:
+Ces fonctions sont vouées à tester l'intégralité du modèle et du controller, généralement avec un ou plusieurs tests par fonction "publique";
+elle sont de la forme suivante :
 
 ```C
 bool test_nomdefichier_nomdefonction(void)
 ```
 
-Leur pointeurs et leur noms sont ensuites toutes ajoutés à la liste statique `unit_tests[]` dans l'ordre d'execution voulu :
-(un test qui utilise un fonction "foo" doit etre lancé après le test de la fonction foo.).
+Leur pointeurs et leur noms sont ensuite tous ajoutés à la liste statique `unit_tests[]` dans l'ordre d'exécution voulu :
+(un test qui utilise un fonction "foo" doit être lancé après le test de la fonction foo.).
 Qui sera lue par `lancer_tests`.
 
 Le pointeur de fonction et le nom de chaque fonction sont groupés à l'aide de la structure :
@@ -130,12 +130,11 @@ libca (lire: lib carcassonne) offre deux types de fonctions:
 - ***`_Noreturn void ca_error(const char *message);`***
 - ***`_Noreturn void ca_perror(void);`***
 
-`ca_alloc` et `ca_realloc` sont des wrappers autour de `calloc` et `realloc` respectivement, avec deux sécurités ajoutés: 
-declence un crash propre avec message d'erreur lors d'une erreur d'allocation, ou si la multiplication de `n` et `size` declenche un overflow.
+`ca_alloc` et `ca_realloc` sont des wrappers autour de `calloc` et `realloc` respectivement, avec deux sécurité ajoutées: déclenche un crash propre avec message d'erreur lors d'une erreur d'allocation, ou si la multiplication de `n` et `size` déclenche un overflow.
 
-les fonctions `ca_warn`, `ca_error`, `ca_perror` affichent une erreur avec un format standardisé, et crash proprement en cas d'erreur.
+Les fonctions `ca_warn`, `ca_error`, `ca_perror` affichent une erreur avec un format standardisé, et crash proprement en cas d'erreur.
 
-ainsi qu'une macro `max(A, B)` pour simplifier cette operation.
+Ainsi qu'une macro `max(A, B)` pour simplifier cette operation.
 
 # Structures de données
 
@@ -160,7 +159,7 @@ enum Zone {
 };
 ```
 
-Il est à noté qu'il y a un bit en commun entre `Z_VILLE` et `Z_BLASON` pour que les deux puissent être considérées égaux via l'opération `&` ("et binaire") en C. <br>
+Il est à noter qu'il y a un bit en commun entre `Z_VILLE` et `Z_BLASON` pour que les deux puissent être considérées égaux via l'opération `&` ("et binaire") en C. <br>
 
 Vient ensuite l'implémentation de la tuile, elle-même. Nous avons donc eu à réfléchir aux informations dont nous avions besoins dans une tuile : 
 
@@ -179,7 +178,7 @@ struct _Tuile {
 typedef struct _Tuile *Tuile;
 ```
 
-Il est à noter que le type `Tuile` est un **pointeur**. La variable `id_meeple` aura une valeur supérieure à 0 si un meeple est posé dessus, -1 s'il n'y a aucun meeple sur la tuile. Il est importante de re-préciser qu'il ne peut y avoir qu'**un seul meeple** par tuile. Le booléen `est_verifie` variera entre false et true durant la recherche, il indique si la tuile a déjà été avalué par l'algorithme durant ce passage.<br>
+Il est à noter que le type `Tuile` est un **pointeur**. La variable `id_meeple` aura une valeur supérieure à 0 si un meeple est posé dessus, -1 s'il n'y a aucun meeple sur la tuile. Il est importante de re-préciser qu'il ne peut y avoir qu'**un seul meeple** par tuile. Le booléen `est_verifie` variera entre false et true durant la recherche, il indique si la tuile a déjà été évaluée par l'algorithme durant ce passage.<br>
 Il nous faut aussi un moyen de connaître la position de notre meeple, nous avons donc créer une dernière structure utile au repérage du meeple sur la tuile : 
 
 ```C
@@ -219,7 +218,7 @@ La fonction ***`generer_tuile`*** sert à générer une tuile (respectant les r�
 
 #### Générer tuiles : 
 
-La génération aléatoire est une des demandes à respecter ajouté à l'analyse du projet. Pour pouvoir la réaliser nous avons étuider longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
+La génération aléatoire est une des demandes à respecter ajoutée à l'analyse du projet. Pour pouvoir la réaliser nous avons étudier longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
 Une règle implicite que nous ajoutons au jeu est le fait que si une zone "route" ou "ville" apparaît au milieu, alors celle-ci fait le lien entre deux autres zones, comme sous cet exemple : 
 
 ![](../data/implementation/exemple_tuile.svg)
@@ -256,10 +255,10 @@ typedef struct _Maillon *L_meeple;
 
 S'accompagnant de toutes les fonctions classiques d'une liste chaînée :
 
-- `L_meeple creer_maillon_meeple(int x, int y, enum Direction d)`
-- `void detruire_liste_meeple(L_meeple liste)`
-- `void ajouter_maillon_meeple(L_meeple *liste, L_meeple nouveau)`
-- `void retirer_maillon_meeple(L_meeple *liste, int x, int y)`
+- ***`L_meeple creer_maillon_meeple(int x, int y, enum Direction d)`***
+- ***`void detruire_liste_meeple(L_meeple liste)`***
+- ***`void ajouter_maillon_meeple(L_meeple *liste, L_meeple nouveau)`***
+- ***`void retirer_maillon_meeple(L_meeple *liste, int x, int y)`***
 
 ## Pile :
 
@@ -303,18 +302,17 @@ La question de la représentation du tableau était restée longtemps un sujet d
 	Avantage : Réduction du coup mémoire
 	Désavantage : Complexité d'utilisation liée à la recherche, cout en temps des dereferencement, enchaînements implicites (localisation compliqué lors de l'enchaînement)
 
-Nous étions à l'origine parti sur un simple tableau 2D statique, dont la taille restait personnalisable. Mais lors de l'implémentation de la structure de `Varstring`, une idée a émergé,
-Celle du **`Vec2D`**, un tableau initalisé sans allocation mémoire initiale, indexable de INT_MIN à INT_MAX, donc meme dans les negatifs.
+Nous étions à l'origine parti sur un simple tableau 2D statique, dont la taille restait personnalisable. Mais lors de l'implémentation de la structure de `Varstring`, une idée a émergée. Celle du **`Vec2D`**, un tableau sans allocation mémoire initiale, indexable de INT_MIN à INT_MAX, donc même dans les negatifs.
 Ceci a plusieurs avantages évidents pour nous:
 
-- On conserve la rapidité d'iteration d'un tableau statique
-- Un nombre de tuiles maximal important n'implique pas une allocation excessive
-- Fait coincider l'index dans la grille et l'index du sprite dans la vue
-- Ne necessite aucune verification de bord durant la recherche
+- On conserve la rapidité d'iteration d'un tableau statique.
+- Un nombre de tuiles maximal important n'implique pas une allocation excessive.
+- Fait coincider l'index dans la grille et l'index du sprite dans la vue.
+- Ne nécessite aucune verification de bord durant la recherche.
 
 Le coût mémoire était grandement réduit, et nous gardions la simplicité d'accessibilité d'un tableau via des fonctions très simple d'accès.
 
-Le vec2D repose sur deux structures presque identiques. La première : 
+Le Vec2D repose sur deux structures presque identiques. La première : 
 
 ```C
 typedef struct _Vec {
@@ -410,24 +408,24 @@ typedef struct _ListeJoueurs {
 ## Algorithmique :
 
 
-## Jeu :
+## Recherche :
 
-Cette algorithme s'exécute lorsqu'une procédure de recherche est engagée. Exemple : Lors d'un placement de tuile. Cette fonction permet de renvoyer les points que nous allons pouvoir attribuer par la suit, la recherche effectue également l'analyse du nombre de meeple présents dans un tableau indexé par l'id des joueurs sur la zone recherchée et sauvegarde leurs localisations dans *loc_meeple_all*, une liste chaînée contenant tous les meeples trouvés. <br>
+Cet algorithme s'exécute lorsqu'une procédure de recherche est engagée. Exemple : Lors d'un placement de tuile. Cette fonction permet de renvoyer les points que nous allons pouvoir attribuer par la suite, la recherche effectue également l'analyse du nombre de meeple présents dans un tableau indexé par l'id des joueurs sur la zone recherchée et sauvegarde leurs localisations dans *loc_meeple_all*, une liste chaînée contenant tous les meeples trouvés. <br>
 La recherche s'arrête quand on arrive sur une tuile déjà vérifiée ou une tuile vide.
 
-Cette fonction est récusrive, elle sera appelée sur chaque case de notre recherche.
+Cette fonction est récursive, elle sera appelée sur chaque case de notre recherche.
 
-Il y a un booléen présent dans la recherchen nommé *complete*, définit sur *true*, il peut changer de valeur dans le cas où `recherche_suite` renverait *-1* dans la valeur *tmp*.
+Il y a un booléen présent dans la recherche nommé *complete*, définit sur *true*, il peut changer de valeur dans le cas où `recherche` renverait *-1* dans la valeur *tmp*.
 
-Si `recherche` réussie, elle renvoie le nombre de points, si la zone est complétée. Sinon, elle renvoie -1.
+Si la zone est complétée, recherche renvoit le nombre de points. Sinon, elle renvoie -1.
 
 ![](../data/implementation/code_recherche.svg)
 
-La fonction appelée dans `recherche`, `recherche_suite` est une encapsulation qui permet une meilleur lisibilité du code dans son ensemble. Pour autant elle marche de pair avec `recherche`, en voici le codde : 
+La recherche ne revenant pas sur ses pas, on utilise la fonction `amorce_recherche` pour lancer la recherche vers une direction donnée sur un certaine tuile de depart :
 
 ![](../data/implementation/code_recherche_suite.svg)
 
-Cette fonction consiste simplement à analyser la présence d'un meeple sur une tuile et l'ajouter à *loc_meeple* et appelle de manière récusrive la `recherche` sur les différentes directions qui composent la tuile aux zones compatibles avec celle de la recherche.
+## Jeu :
 
 Liste des fonctions : 
 
@@ -537,7 +535,7 @@ Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur
 
 Nous utilisons la librairie graphique [Raylib](https://github.com/raysan5/raylib) pour créer et gérer toute l'interface graphique, la librairie est distribué sous forme pre-compilé et lié statiquement pour permettre l'execution sans modification de l'environnement de l'utilisateur.
 
-Nous nous servons du `main.c` pour naviguer entre différentes pages, à l'execution, main() configure l'etat global tel que les flags openGL, la graine aleatoire, et la case memoire de la structure jeu, puis switch entre chaque page jusqu'à recevoir P_QUITTER. Ces pages sont assignées à différentes fonctions qui gèrent chacune l'affichage d'un écran du jeu independemment des autres tel que definis dans le rapport d'analys (page de d'ecran titre, page de configuration, page du jeu principal..) et renvoit la prochaine page à afficher tel que definie par l'enum Page :
+Nous nous servons du `main.c` pour naviguer entre différentes pages, à l'exécution, main() configure l'état global tel que les flags openGL, la graine aléatoire, et la case mémoire de la structure Jeu, puis switch entre chaque page jusqu'à recevoir P_QUITTER. Ces pages sont assignées à différentes fonctions qui gèrent chacune l'affichage d'un écran du jeu indépendemment des autres tel que definit dans le rapport d'analyse (page de d'écran titre, page de configuration, page du jeu principal..) et renvoie la prochaine page à afficher tel que définie par l'enum Page :
 Voici les différentes pages : 
 
 ```C
@@ -570,19 +568,18 @@ Les champs de saisies sont gérées via `VarString`, une implémentation de chai
 
 #### Affichage du model
 
-Une problematique interessante etait de minimiser la poids calculatoire de chaque generation de frame, et laisser le gros du travail au controlleur. 
-Il a donc été important pour nous de chercher des moyens de conserver des formats de données très rapidement affichable par la vue, et non pas aller chercher de nouveau ces données sur le model pour chaque frame.
-Plusieurs Techniques entres donc en jeu, décrites ci-dessous.
+Une problématique interessante était de minimiser la poids calculatoire de chaque génération de frame, et laisser le gros du travail au controlleur. 
+Il a donc été important pour nous de chercher des moyens de conserver des formats de données très rapidement affichable par la vue, et non pas aller chercher de nouveau ces données sur le modèle pour chaque frame.
+Plusieurs techniques entrent donc en jeu, décrites ci-dessous :
 
-Incluses dans `render.h` sont les fonctions nous servant à allouer des `chunk`s, un `chunk` est une texture utilisé pour stocker le resultat visuelle du placement de plusieurs textures de tuiles,
-formant une unique bitmap pour tout un jeu de tuile, jusqu'à 32^2 tuiles dans l'implementation actuelle, meme si cette valeur reste configurable dans le header.
-Le groupement par chunk pre-generés stockés dans la vram GPU des sprites de tuiles placés permet un dessin très rapide du plateau tout entier, seulement 4 ou 5 appels openGL pour une partie moyenne au lieu d'un par tuile avec une implementation naive.
+Incluses dans `render.h` sont les fonctions nous servant à allouer des `chunk`s, un `chunk` est une texture utilisé pour stocker le résultat visuel du placement de plusieurs textures de tuiles, formant une unique bitmap pour tout un jeu de tuile, jusqu'à 32^2 tuiles dans l'implementation actuelle, même si cette valeur reste configurable dans le header.
+Le groupement par chunk pré-génerés stockés dans la VRAM GPU des sprites de tuiles placés permet un dessin très rapide du plateau tout entier, seulement 4 ou 5 appels openGL pour une partie moyenne au lieu d'un par tuile avec une implementation naive.
 
-Les textures des tuiles (sprites) sont générés aléatoirement via un algorithme se trouvant dans `render.h`, de façon à respecter la tuile généré aléatoirement, ou celle du `.csv`.
-Ces textures sont composés à partir de plusieurs 'sous-sprites' representant les elements possibles d'une tuile (route, abbaye, differentes formes de villes...) stockés dans une spritesheet pour n'avoir à charger qu'un seul fichier à l'initialisation.
+Les textures des tuiles (sprites) sont générées aléatoirement via un algorithme se trouvant dans `render.h`, de façon à respecter la tuile générée aléatoirement, ou celle du `.csv`.
+Ces textures sont composés à partir de plusieurs 'sous-sprites' representant les éléments possibles d'une tuile (route, abbaye, differentes formes de villes...) stockés dans une spritesheet pour n'avoir à charger qu'un seul fichier à l'initialisation.
 
-La position des meeple est également 'caché' à partir des listes chainés des joueurs, pour ne pas avoir à parcourir la chaine à chaque frame, on conserve la couleur et les positions {x, y} relatives au plateau de chaque meeple posé pour pouvoir rapidement toutes les dessiner. 
+La position des meeple est également 'cachée' à partir des listes chainés des joueurs, pour ne pas avoir à parcourir la chaine à chaque frame, on conserve la couleur et les positions {x, y} relatives au plateau de chaque meeple posé pour pouvoir rapidement toutes les dessiner. 
 
-Il vient alors la question de quand parcourir les listes, et quand se reposer sur les valeurs cachés ? De meme pour les chunks et les informations presentes dans la sidebar.
+Il vient alors la question de quand parcourir les listes, et quand se reposer sur les valeurs cachés ? De même pour les chunks et les informations présentent dans la sidebar.
 
-Remarquons que la model n'est modifié qu'à chaque tour, et reste inchangé tant que la vue n'a pas appelé `tour(...)`, on peut donc rafraichir nos informations sur le model qu'après un placement réussi par le joueur, et se baser sur des formats de données plus rapide d'accés pour le dessin habituelle de chaque frame, 60 fois par seconde.
+Remarquons que le modèle n'est modifiée qu'à chaque tour, et reste inchangé tant que la vue n'a pas appelé `tour(...)`, on peut donc rafraichir nos informations sur le modèle qu'après un placement réussi par le joueur, et se baser sur des formats de données plus rapide d'accés pour le dessin habituelle de chaque frame, 60 fois par seconde.
