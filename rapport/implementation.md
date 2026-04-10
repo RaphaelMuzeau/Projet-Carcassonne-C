@@ -71,7 +71,7 @@ Notre tuile ainsi définie intéragit avec différentes fonctions, en voici une 
 - ***`Tuile generer_tuile(void)`***
 
 ### Schéma de la tuile :
-![](../data/analyse/schema_tuile.svg)
+![](../data/implementation/schema_tuile.svg)
 
 #### Précisions sur certaines fonctions :
 
@@ -90,19 +90,19 @@ La fonction ***`generer_tuile`*** sert à générer une tuile (respectant les r�
 La génération aléatoire est une des demandes à respecter ajouté à l'analyse du projet. Pour pouvoir la réaliser nous avons étuider longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
 Une règle implicite que nous ajoutons au jeu est le fait que si une zone "route" ou "ville" apparaît au milieu, alors celle-ci fait le lien entre deux autres zones, comme sous cet exemple : 
 
-![](../data/analyse/exemple_tuile.svg)
+![](../data/implementation/exemple_tuile.svg)
 
 Nous autorisons aussi la génération de tuiles qui n'existent pas dans le Carcassonne d'origine, comme celles-ci, par exemple : 
 
- ![](../data/analyse/exemple_abbaye_non_commun.png)
- ![](../data/analyse/exemple_village_non_commun.png)
+ ![](../data/implementation/exemple_abbaye_non_commun.png)
+ ![](../data/implementation/exemple_village_non_commun.png)
  
 Pour encore plus de fun !
 
 Les probabilités pour la génération des tuiles ont été calculées via un script R se basant sur le `.csv` fourni pour la réalisation du projet, en voici les diagrammes en barres : 
 
-![](../data/analyse/graphique_milieu.png)
-![](../data/analyse/graphique_cotes.png)
+![](../data/implementation/graphique_milieu.png)
+![](../data/implementation/graphique_cotes.png)
 
 
 ## Meeple :
@@ -150,7 +150,7 @@ Avec les fonctions suivantes :
 - ***`void detruire_pile(Pile *p)`***
 
 ### Schéma de la pile :
-![](../data/analyse/schema_pile.svg)
+![](../data/implementation/schema_pile.svg)
 
 #### Précisions sur certaines fonctions :
 
@@ -187,7 +187,7 @@ typedef struct _Vec {
  
  Voici un schéma visuel de ce que fait la structure : <br>
  
-![](../data/analyse/schema_Vec.svg)
+![](../data/implementation/schema_Vec.svg)
 
 Cette structure sert donc à gérer les *colonnes* de notre plateau, ne reste plus qu'à gérer les *lignes*. C'est là qu'intervient notre 2nd structure : 
 
@@ -205,7 +205,7 @@ Le principe y est le même, notre tableau indexe ici des *`Vec`*, mais tout le r
   
 Accompagné de son schéma : 
 
-![](../data/analyse/schema_Vec2D.svg)
+![](../data/implementation/schema_Vec2D.svg)
 
 <br>
 
@@ -249,7 +249,7 @@ Liste exhaustive des fonctions :
 - ***`void detruire_listejoueurs(ListeJoueurs joueurs)`***
 
 
-![](../data/analyse/schema_joueur.svg)
+![](../data/implementation/schema_joueur.svg)
 
 
 Il nous fallait un endroit où réunir tous nos joueurs, donc nous avons créer un tableau où se trouvent tous nos joueurs : 
@@ -262,7 +262,7 @@ typedef struct _ListeJoueurs {
 ```
 
 
-![](../data/analyse/schema_listejoueurs.svg)
+![](../data/implementation/schema_listejoueurs.svg)
 
 
 ## Algorithmique :
@@ -279,11 +279,11 @@ Il y a un booléen présent dans la recherchen nommé *complete*, définit sur *
 
 Si `recherche` réussie, elle renvoie le nombre de points, si la zone est complétée. Sinon, elle renvoie -1.
 
-![](../data/analyse/code_recherche.svg)
+![](../data/implementation/code_recherche.svg)
 
 La fonction appelée dans `recherche`, `recherche_suite` est une encapsulation qui permet une meilleur lisibilité du code dans son ensemble. Pour autant elle marche de pair avec `recherche`, en voici le codde : 
 
-![](../data/analyse/code_recherche_suite.svg)
+![](../data/implementation/code_recherche_suite.svg)
 
 Cette fonction consiste simplement à analyser la présence d'un meeple sur une tuile et l'ajouter à *loc_meeple* et appelle de manière récusrive la `recherche` sur les différentes directions qui composent la tuile aux zones compatibles avec celle de la recherche.
 
@@ -386,7 +386,7 @@ La fonction ***`charger_partie`*** prend elle aussi le nom d'un fichier via une 
 
 Ci-dessous, peut être retrouvé un schéma représentant l'agencement des données dans un fichier complet :
 
-!["Schéma fichier")](../data/analyse/schema_fichier.svg)
+!["Schéma fichier")](../data/implementation/schema_fichier.svg)
 
 Ce schéma est simplifié pour la vision humaine, souvenez-vous que ce ne sont que des bits qui y sont normalement écrits, l'ordre choisit pour représenter le sein de chaque donnée est arbitraire. L'ordre des structures lui respecte l'implémentation actuelle. <br>
 Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur en cas de questions.
@@ -413,21 +413,11 @@ Chaque page est gérée indépendament mais certaines fonctionnalités restent r
 - ***sidebar.h***
   
 Par exemple, la page de jeu qui est là où sont posées les tuiles et où la partie se déroule dans son ensemble se sert de la sidebar, de la scrollbar, du champs de saisie etc.
-La page de configuration inclut des champs de saisies, la scrollbar.
+La page de configuration inclut des champs de saisies et la scrollbar.
 
-Les champs de saisies sont gérées via VarString, une implémentation de chaine de texte pouvant être supprimée, caractère par caractère (touche retour), supprimer l'ensemble de la chaîne (Supppr). Ajouter des cacractères.
+Les champs de saisies sont gérées via VarString, une implémentation de chaine de texte pouvant être supprimée, caractère par caractère (touche retour), supprimer l'ensemble de la chaîne (suppr). Ajouter des cacractères.
 
 La dernière partie graphique a détaillée est le fichier `render.h`. Ce fichier nous sert à allouer des `chunks`, un `chunk` est une texture, pouvant en contenir plusieurs (selon des tailles définies par des macros), ici, celles des tuiles. Cette méthode permet de gérer rapidement le dessins de la tuile et de préparer des zones allouées en amont pour les tuiles. 
 Les textures des tuiles (sprites) sont générés aléatoirement via un algorithme se trouvant dans "dessiner_tuile", de façon à respecter la tuile générer aléatoirement, ou celle du `.csv`.
 
 Toutes les textures sont mises en mémoire dans le GPU (VRAM) et permettent un rendu fluide.
-
-Pour finir ce rapport, voici les quelques raccourcis claviers disponibles dans notre implémentation :
-
-##### Jeu :
-- **R**, permet de faire tourner la pile.
-- Les flèches directionnelles permettent de se déplacer sur la page. Il est aussi possible d'utiliser le clique droit enfoncé et de bouger la souris.
-- **D** permet de supprimer une tuile.
-
-
-- **suppr** permet de supprimer une chaîne complète dans la page de configuration
