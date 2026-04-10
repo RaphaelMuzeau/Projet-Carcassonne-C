@@ -4,6 +4,18 @@
 
 Jeux-vidéo Carcassonne pour GNU/Linux avec interface graphique avec [Raylib](https://github.com/raysan5/raylib).
 
+## dépendances
+
+#### obligatoire
+
+- bash
+- gcc >= 8.1.0 (C17)
+- GNU make
+
+#### optionels
+
+- xdg-utils (ouverture de la page d'aide)
+
 ## Compilation
 
 Clonez la repo : 
