@@ -45,7 +45,7 @@ son usage est optionel, mais le makefile permet de générer le fichier `compile
 Les structures de données et fonctions utilisés seront décrites plus bas, en premier lieu, voici un schema explicatif des interactions entre 
 le modèle, la vue et le controller:
 
-![](../data/implementation/architecture.png)
+![](../data/implementation/arborescence.png)
 
 ## Librairie de support
 
@@ -202,7 +202,7 @@ Notre tuile ainsi définie intéragit avec différentes fonctions, en voici une 
 - ***`Tuile generer_tuile(void)`***
 
 ### Schéma de la tuile :
-![](../data/implementation/schema_tuile.svg)
+![](../data/implementation/schema_tuile.png)
 
 #### Précisions sur certaines fonctions :
 
@@ -221,7 +221,7 @@ La fonction ***`generer_tuile`*** sert à générer une tuile (respectant les r�
 La génération aléatoire est une des demandes à respecter ajoutée à l'analyse du projet. Pour pouvoir la réaliser nous avons étudier longuement la construction des tuiles du `.csv` et avons ajouté quelques règles pour créer des tuiles dites "valides" dans notre version de Carcassonne. <br> 
 Une règle implicite que nous ajoutons au jeu est le fait que si une zone "route" ou "ville" apparaît au milieu, alors celle-ci fait le lien entre deux autres zones, comme sous cet exemple : 
 
-![](../data/implementation/exemple_tuile.svg)
+![](../data/implementation/exemple_tuile.png)
 
 Nous autorisons aussi la génération de tuiles qui n'existent pas dans le Carcassonne d'origine, comme celles-ci, par exemple : 
 
@@ -281,7 +281,7 @@ Avec les fonctions suivantes :
 - ***`void detruire_pile(Pile *p)`***
 
 ### Schéma de la pile :
-![](../data/implementation/schema_pile.svg)
+![](../data/implementation/schema_pile.png)
 
 #### Précisions sur certaines fonctions :
 
@@ -329,7 +329,7 @@ Toutes les cases sont, du point de vue de l'utilisateur, intialisées à NULL.
  
  Voici un schéma visuel de ce que fait la structure : <br>
  
-![](../data/implementation/schema_Vec.svg)
+![](../data/implementation/schema_vec.png)
 
 Cette structure sert donc à gérer les *colonnes* de notre plateau, ne reste plus qu'à gérer les *lignes*. C'est là qu'intervient notre 2nd structure : 
 
@@ -345,7 +345,7 @@ Le principe y est le même, notre tableau indexe ici des *`Vec`*, mais tout le r
 
 Accompagné de son schéma :
 
-![](../data/implementation/schema_Vec2D.svg)
+![](../data/implementation/schema_vec2d.png)
 
 <br>
 
@@ -389,7 +389,7 @@ Liste exhaustive des fonctions :
 - ***`void detruire_listejoueurs(ListeJoueurs joueurs)`***
 
 
-![](../data/implementation/schema_joueur.svg)
+![](../data/implementation/schema_joueur.png)
 
 
 Il nous fallait un endroit où réunir tous nos joueurs, donc nous avons créer un tableau où se trouvent tous nos joueurs : 
@@ -402,7 +402,7 @@ typedef struct _ListeJoueurs {
 ```
 
 
-![](../data/implementation/schema_listejoueurs.svg)
+![](../data/implementation/schema_listejoueurs.png)
 
 
 ## Algorithmique :
@@ -419,11 +419,11 @@ Il y a un booléen présent dans la recherche nommé *complete*, définit sur *t
 
 Si la zone est complétée, recherche renvoit le nombre de points. Sinon, elle renvoie -1.
 
-![](../data/implementation/code_recherche.svg)
+![](../data/implementation/code_recherche.png)
 
 La recherche ne revenant pas sur ses pas, on utilise la fonction `amorce_recherche` pour lancer la recherche vers une direction donnée sur un certaine tuile de depart :
 
-![](../data/implementation/code_recherche_suite.svg)
+![](../data/implementation/code_amorce_recherche.png)
 
 ## Jeu :
 
@@ -526,7 +526,7 @@ La fonction ***`charger_partie`*** prend elle aussi le nom d'un fichier via une 
 
 Ci-dessous, peut être retrouvé un schéma représentant l'agencement des données dans un fichier complet :
 
-!["Schéma fichier")](../data/implementation/schema_fichier.svg)
+!["Schéma fichier")](../data/implementation/schema_fichier.png)
 
 Ce schéma est simplifié pour la vision humaine, souvenez-vous que ce ne sont que des bits qui y sont normalement écrits, l'ordre choisit pour représenter le sein de chaque donnée est arbitraire. L'ordre des structures lui respecte l'implémentation actuelle. <br>
 Des commentaires pertinents sont aussi annotés sur le schéma, tenez en rigueur en cas de questions.

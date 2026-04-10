@@ -6,13 +6,13 @@ Jeux-vidéo Carcassonne pour GNU/Linux avec interface graphique avec [Raylib](ht
 
 ## dépendances
 
-#### obligatoire
+#### obligatoires
 
 - bash
 - gcc >= 8.1.0 (C17)
 - GNU make
 
-#### optionels
+#### optionel
 
 - xdg-utils (ouverture de la page d'aide)
 
