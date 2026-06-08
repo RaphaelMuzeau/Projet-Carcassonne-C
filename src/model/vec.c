@@ -5,6 +5,7 @@
 #include "libca.h"
 #include "vec.h"
 
+#include <stdio.h>
 /* invariant à retenir:
  * Un Vec admet que pour tout i entre 0 et capacite exclus,
  * tableau[i] contient une valeur valide (NULL ou une Tuile)
@@ -128,4 +129,15 @@ void set(Vec2D *g, Tuile t, int x, int y)
         index = x + g->_decx;
     }
     vset(&g->_tableau[index], t, y);
+}
+
+void print_row(Vec2D g)
+{
+    int zero = 0;
+    fprintf(stderr, "\n");
+    for (int i = -16; i <= 16; i++) {
+        Tuile tmp = get(g, i, zero);
+        if (tmp == NULL) fprintf(stderr, "(%d, zero)\n", i);
+        else fprintf(stderr, "(%d, zero)\t tuile: %d %d %d %d %d\n", i, tmp->nord, tmp->est, tmp->ouest, tmp->sud, tmp->milieu);
+    }
 }

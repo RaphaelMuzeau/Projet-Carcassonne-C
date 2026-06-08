@@ -1557,7 +1557,7 @@ bool test_casser_jeu(void)
     // neuvième tuile
     Tuile t9 = recup_tuile(&p);
     set(&grille, t9, -5, 0);
-
+    print_row(grille);
     // test
     if (get(grille, 0,0) != NULL) return false;
     if (get(grille, -1, 0) != NULL) return false;

@@ -40,4 +40,5 @@ void detruire_vec2D(Vec2D g);
 Tuile get(Vec2D g, int x, int y);
 void set(Vec2D *g, Tuile t, int x, int y);
 
+void print_row(Vec2D g);
 #endif
