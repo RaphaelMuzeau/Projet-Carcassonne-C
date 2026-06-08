@@ -2,8 +2,12 @@
 #define vec_h
 
 #include "tuile.h"
+#ifdef RUN_UNIT_TESTS
+#define VEC_REALLOC_SIZE 64 // nombre d'octets ajoutés pour agrandir un vecteur
+#else
+#define VEC_REALLOC_SIZE 384 // nombre d'octets ajoutés pour agrandir un vecteur
+#endif
 
-#define VEC_REALLOC_SIZE 64                             // nombre d'octets ajoutés pour agrandir un vecteur
 #define VEC_REALLOC_NB (VEC_REALLOC_SIZE/sizeof(Tuile)) // nombre de tuiles ajoutés pour agrandir un vecteur
 _Static_assert(VEC_REALLOC_SIZE > 0, "VEC_REALLOC_SIZE doit etre supérieur à 0");
 _Static_assert(VEC_REALLOC_SIZE % sizeof(Tuile) == 0 , "VEC_REALLOC_SIZE doit etre un multiple de sizeof(Tuile)");
@@ -40,5 +44,4 @@ void detruire_vec2D(Vec2D g);
 Tuile get(Vec2D g, int x, int y);
 void set(Vec2D *g, Tuile t, int x, int y);
 
-void print_row(Vec2D g);
 #endif

@@ -5,7 +5,6 @@
 #include "libca.h"
 #include "vec.h"
 
-#include <stdio.h>
 /* invariant à retenir:
  * Un Vec admet que pour tout i entre 0 et capacite exclus,
  * tableau[i] contient une valeur valide (NULL ou une Tuile)
@@ -63,7 +62,7 @@ void vset(Vec *v, Tuile t, int y)
 
         // decale les anciennes valeurs et les remplace par NULL
         memmove(v->_tableau + diff_cap, v->_tableau, old_cap * sizeof(Tuile));
-        for (int i = 0; i < old_cap; i++)
+        for (int i = 0; i < diff_cap; i++)
             v->_tableau[i] = NULL;
 
         index = y + v->_decy;
@@ -123,21 +122,10 @@ void set(Vec2D *g, Tuile t, int x, int y)
 
         // decale les anciens Vecs et les remplace par des vecteurs vierges
         memmove(g->_tableau + diff_cap, g->_tableau, old_cap * sizeof(Vec));
-        for (int i = 0; i < old_cap; i++)
+        for (int i = 0; i < diff_cap; i++)
             g->_tableau[i] = creer_vec();
 
         index = x + g->_decx;
     }
     vset(&g->_tableau[index], t, y);
-}
-
-void print_row(Vec2D g)
-{
-    int zero = 0;
-    fprintf(stderr, "\n");
-    for (int i = -16; i <= 16; i++) {
-        Tuile tmp = get(g, i, zero);
-        if (tmp == NULL) fprintf(stderr, "(%d, zero)\n", i);
-        else fprintf(stderr, "(%d, zero)\t tuile: %d %d %d %d %d\n", i, tmp->nord, tmp->est, tmp->ouest, tmp->sud, tmp->milieu);
-    }
 }

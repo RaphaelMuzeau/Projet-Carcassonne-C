@@ -247,7 +247,7 @@ bool test_vec_get_null(void)
 
     if (vget(v,  0) != NULL) return false;
     if (vget(v,  5) != NULL) return false;
-    if (vget(v,  5) != NULL) return false;
+    if (vget(v, -5) != NULL) return false;
     if (vget(v, INT_MAX) != NULL) return false;
     if (vget(v, INT_MIN) != NULL) return false;
 
@@ -279,6 +279,7 @@ bool test_vec_set_get(void)
     // acces complexes
     Tuile t1 = creer_tuile();
     vset(&v, t1, -50);
+
     if (v._capacite % VEC_REALLOC_NB != 0) return false;
     if (v._tableau[  0 + v._decy] != t0) return false;
     if (v._tableau[-50 + v._decy] != t1) return false;
@@ -309,9 +310,8 @@ bool test_vec_set_get(void)
     if (vget(v,  50) != t2) return false;
     if (vget(v, -51) != t3) return false;
 
-
     // verifier l'initialisation correcte des cases libres
-    for (int i = -49; i < -1; i++) {
+    for (int i = -49; i < 0; i++) {
         if (v._tableau[i + v._decy] != NULL) return false;
         if (vget(v, i) != NULL) return false;
     }
@@ -323,6 +323,104 @@ bool test_vec_set_get(void)
     // acces hors du tableau marchent encore
     if (vget(v, 5000) != NULL) return false;
     if (vget(v, -5000) != NULL) return false;
+
+    detruire_vec(v);
+    return true;
+}
+
+bool test_vec_decalage(void)
+{
+    Vec v = creer_vec();
+    Tuile t0 = creer_tuile();
+    vset(&v, t0, 0);
+
+    if (v._tableau == NULL) return false;
+    if (v._capacite == 0) return false;
+    if (!(v._capacite == 8)) return false;
+    if (v._capacite != VEC_REALLOC_NB) return false;
+    if (v._decy != 0) return false;
+
+    if (v._tableau[0] != t0) return false;
+    if (vget(v, 0) != t0) return false;
+    for (int i = 1; i < v._capacite; i++) {
+        if (v._tableau[i] != NULL) return false;
+        if (vget(v, i)    != NULL) return false;
+    }
+
+    Tuile t1 = creer_tuile();
+    vset(&v, t1, -8);
+
+    if (v._tableau == NULL) return false;
+    if (v._capacite == 0) return false;
+    if (v._capacite != 24) return false;
+    if (v._decy != 16) return false;
+
+    if (v._tableau[16] != t0) return false;
+    if (vget(v, 0) != t0) return false;
+    if(v._tableau[8] != t1) return false;
+    if (vget(v, -8) != t1) return false;
+
+    for (int i = -7; i < 0; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    Tuile t2 = creer_tuile();
+    vset(&v, t2, -34);
+
+    if (v._tableau == NULL) return false;
+    if (v._capacite == 0) return false;
+    if (v._capacite != 48) return false;
+    if (v._decy != 40) return false;
+
+    if (v._tableau[40] != t0) return false;
+    if (vget(v, 0) != t0) return false;
+    if(v._tableau[32] != t1) return false;
+    if (vget(v, -8) != t1) return false;
+    if(v._tableau[6] != t2) return false;
+    if (vget(v, -34) != t2) return false;
+
+    for (int i = -33; i < -8; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    for (int i = -7; i < 0; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    Tuile t3 = creer_tuile();
+    vset(&v, t3, 49);
+
+    if (v._tableau == NULL) return false;
+    if (v._capacite == 0) return false;
+    if (v._capacite != 96) return false;
+    if (v._decy != 40) return false;
+
+    if (v._tableau[40] != t0) return false;
+    if (vget(v, 0) != t0) return false;
+    if(v._tableau[32] != t1) return false;
+    if (vget(v, -8) != t1) return false;
+    if(v._tableau[6] != t2) return false;
+    if (vget(v, -34) != t2) return false;
+    if(v._tableau[89] != t3) return false;
+    if (vget(v, 49) != t3) return false;
+
+    for (int i = -33; i < -8; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    for (int i = -7; i < 0; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
+
+    for (int i = 1; i < 49; i++) {
+        if (v._tableau[i + v._decy] != NULL) return false;
+        if (vget(v, i) != NULL) return false;
+    }
 
     detruire_vec(v);
     return true;
@@ -437,6 +535,96 @@ bool test_vec2D_set_get(void)
     return true;
 }
 
+
+bool test_vec2D_decalage(void)
+{
+    Vec2D g = creer_vec2D();
+    Tuile t0 = creer_tuile();
+
+    set(&g, t0, 0, 0);
+    if (g._tableau == NULL) return false;
+    if (g._capacite == 0) return false;
+    if (g._capacite != VEC2D_REALLOC_NB) return false;
+    if (g._decx != 0) return false;
+
+    if (g._tableau[0]._tableau[0] != t0) return false;
+    if (get(g, 0, 0) != t0) return false;
+
+    Tuile t1 = creer_tuile();
+    set(&g, t1, -8, 0);
+
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite != 16) return false;
+    if (g._decx != 12) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -8, 0) != t1) return false;
+
+    for (int i = -7; i < 0; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    Tuile t2 = creer_tuile();
+    set(&g, t2, -14, 0);
+
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite != 20) return false;
+    if (g._decx != 16) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -8, 0) != t1) return false;
+    if (get(g, -14, 0) != t2) return false;
+
+    for (int i = -13; i < -8; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    for (int i = -7; i < 0; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    Tuile t3 = creer_tuile();
+    set(&g, t3, 21, 0);
+
+    if (g._capacite % VEC2D_REALLOC_NB != 0) return false;
+    if (g._capacite != 40) return false;
+    if (g._decx != 16) return false;
+    if (get(g,   0,   0) != t0) return false;
+    if (get(g, -8, 0) != t1) return false;
+    if (get(g, -14, 0) != t2) return false;
+    if (get(g, 21, 0) != t3) return false;
+
+    for (int i = -13; i < -8; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    for (int i = -7; i < 0; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    for (int i = 1; i < 21; i++) {
+        if (get(g, i, 0) != NULL) return false;
+        if (g._tableau[i + g._decx]._tableau != NULL) return false;
+        if (g._tableau[i + g._decx]._capacite != 0) return false;
+        if (g._tableau[i + g._decx]._decy != 0) return false;
+    }
+
+    detruire_vec2D(g);
+    return true;
+}
 bool test_varstring_ajouter_char(void)
 {
     VarString s = creer_varstring();
@@ -1407,191 +1595,6 @@ bool test_fichier_sauvegarder_liste_joueurs(void)
     return true;
 }
 
-bool test_casser_jeu(void)
-{
-    /* Le but de ce test est de reproduire
-     * une "vraie fausse partie qui fait crash Carcassonne
-     * Nous ne vérifions pas la compatibilité des tuiles car elles
-     * ne sont pas utiles pour vérifier le comportement du vecteur en lui-même.
-     */
-
-    // init
-
-    Vec2D grille = creer_vec2D();
-    Pile p = creer_pile(72, true);
-
-    // Tuile initiale
-    Tuile t0 = recup_tuile(&p);
-    set(&grille, t0, 0, 0);
-    //test
-    if (get(grille, 0, 0) != t0) return false;
-    if (grille._capacite != 4) return false;
-    if (grille._decx != 0) return false;
-    if (grille._tableau[0]._capacite != 8) return false;
-    if (grille._tableau[0]._decy != 0) return false;
-    // première tuile
-    Tuile t1 = recup_tuile(&p);
-    set(&grille, t1, -1, 0);
-
-    //test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    // Décalez de quatre valeurs car agrandit
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // deuxième tuile
-    Tuile t2 = recup_tuile(&p);
-    set(&grille, t2, 1, 0);
-
-    //test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // troisième tuile
-    Tuile t3 = recup_tuile(&p);
-    set(&grille, t3, -2, 0);
-
-    // test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // quatrième tuile
-    Tuile t4 = recup_tuile(&p);
-    set(&grille, t4, 2, 0);
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (get(grille, 2, 0) != t4) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // cinquième tuile
-    Tuile t5 = recup_tuile(&p);
-    set(&grille, t5, -3, 0);
-
-    // test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (get(grille, 2, 0) != t4) return false;
-    if (get(grille, -3, 0) != t5) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // sixième tuile
-    Tuile t6 = recup_tuile(&p);
-    set(&grille, t6, 3, 0);
-
-    // test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (get(grille, 2, 0) != t4) return false;
-    if (get(grille, -3, 0) != t5) return false;
-    if (get(grille, 3, 0) != t6) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // septième tuile
-    Tuile t7 = recup_tuile(&p);
-    set(&grille, t7, -4, 0);
-
-    // test
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (get(grille, 2, 0) != t4) return false;
-    if (get(grille, -3, 0) != t5) return false;
-    if (get(grille, 3, 0) != t6) return false;
-    if (get(grille, -4, 0) != t7) return false;
-    if (grille._capacite != 8) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // huitième tuile
-    Tuile t8 = recup_tuile(&p);
-    set(&grille, t8, 4, 0);
-
-    // test
-
-    if (get(grille, 0, 0) != t0) return false;
-    if (get(grille, -1, 0) != t1) return false;
-    if (get(grille, 1, 0) != t2) return false;
-    if (get(grille, -2, 0) != t3) return false;
-    if (get(grille, 2, 0) != t4) return false;
-    if (get(grille, -3, 0) != t5) return false;
-    if (get(grille, 3, 0) != t6) return false;
-    if (get(grille, -4, 0) != t7) return false;
-    if (get(grille, 4, 0) != t8) return false;
-    // Décalez de quatre. Comportement normal/attendu.
-    if (grille._capacite != 12) return false;
-    if (grille._decx != 4) return false;
-    if (grille._tableau[4]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    // neuvième tuile
-    Tuile t9 = recup_tuile(&p);
-    set(&grille, t9, -5, 0);
-    print_row(grille);
-    // test
-    if (get(grille, 0,0) != NULL) return false;
-    if (get(grille, -1, 0) != NULL) return false;
-    if (get(grille, 1, 0) != NULL) return false;
-    if (get(grille, -2, 0) != NULL) return false;
-    if (get(grille, 2, 0) != NULL) return false;
-    if (get(grille, -3, 0) != NULL) return false;
-    if (get(grille, 3, 0) != NULL) return false;
-    if (get(grille, -4, 0) != NULL) return false;
-    // Toutes les tuiles précédentes ont disparu.
-    //TODO: Régler le problème bordel de merde.
-    if (get(grille, 4, 0) != t8) return false;
-    if (get(grille, -5, 0) != t9) return false;
-    if (grille._capacite != 16) return false;
-    // Décalage normal ici.
-    if (grille._decx != 8) return false;
-    // Décalage de huit ?
-    if (grille._tableau[12]._capacite != 8) return false;
-    if (grille._tableau[4]._decy != 0) return false;
-
-    detruire_pile(&p);
-    detruire_vec2D(grille);
-    free(t0);
-    free(t1);
-    free(t2);
-    free(t3);
-    free(t4);
-    free(t5);
-    free(t6);
-    free(t7);
-    fprintf(stderr, "\n\tsizeof(Vec)   : %ld\n", sizeof(Vec));
-    fprintf(stderr, "\tsizeof(Tuile) : %ld\n", sizeof(Tuile));
-    return true;
-}
 
 // ajout à la liste de tests à executer
 Test unit_tests[] = {
@@ -1607,9 +1610,11 @@ Test unit_tests[] = {
     TEST(test_vec_creer),
     TEST(test_vec_get_null),
     TEST(test_vec_set_get),
+    TEST(test_vec_decalage),
     TEST(test_vec2D_creer),
     TEST(test_vec2D_get_null),
     TEST(test_vec2D_set_get),
+    TEST(test_vec2D_decalage),
     TEST(test_varstring_ajouter_char),
     TEST(test_varstring_retirer_char),
     TEST(test_varstring_ajouter_chaine),
@@ -1645,7 +1650,6 @@ Test unit_tests[] = {
     TEST(test_fichier_charger_joueur),
     TEST(test_fichier_charger_joueur_liste_vide),
     TEST(test_fichier_sauvegarder_liste_joueurs),
-    TEST(test_casser_jeu),
 };
 
 // ===========================
