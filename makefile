@@ -17,7 +17,7 @@ BEAR := $(shell command -v bear)
 
 VALGRIND := $(shell command -v valgrind)
 ifneq ($(strip $(VALGRIND)),)
-VGFLAGS := -q --leak-check=full --show-leak-kinds=all --suppressions=.vg_suppress
+	VGFLAGS := -q --leak-check=full --show-leak-kinds=all --suppressions=.vg_suppress
 endif
 
 SHELL:= bash
@@ -62,7 +62,7 @@ clean:
 bear: compile_commands.json
 
 tar:
-	git ls-files | xargs tar -cvaf carcassonne.tar.gz
+	git archive --prefix='carcassonne/' --format='tar.gz' -o carcassonne.tar.gz HEAD
 
 help:
 	@echo "Commandes disponibles:"
