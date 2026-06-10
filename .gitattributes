@@ -1,2 +1,6 @@
 .gitignore export-ignore
 .github export-ignore
+
+data/analyse export-ignore
+data/implementation export-ignore
+rapport export-ignore
