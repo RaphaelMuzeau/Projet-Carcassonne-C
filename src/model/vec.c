@@ -24,9 +24,8 @@ void detruire_vec(Vec v)
     free(v._tableau);
 }
 
-// fonction privée,
 // Alloue si besoin l'espace necessaire pour pouvoir acceuillir taille elements
-void agrandir_vec(Vec *v, int taille)
+static void agrandir_vec(Vec *v, int taille)
 {
     // arrondit la nouvelle capacite au prochain multiple de VEC_REALLOC_NB
     int new_cap = taille + (VEC_REALLOC_NB - taille % VEC_REALLOC_NB);
@@ -84,9 +83,8 @@ void detruire_vec2D(Vec2D g)
     free(g._tableau);
 }
 
-// fonction privée,
 // Alloue si besoin l'espace necessaire pour pouvoir acceuillir taille elements
-void agrandir_vec2D(Vec2D *g, int taille)
+static void agrandir_vec2D(Vec2D *g, int taille)
 {
     // arrondit la nouvelle capacite au prochain multiple de VEC_REALLOC_NB
     int new_cap = taille + (VEC2D_REALLOC_NB - taille % VEC2D_REALLOC_NB);

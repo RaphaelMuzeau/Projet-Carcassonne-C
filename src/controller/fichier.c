@@ -53,7 +53,7 @@ bool charger_partie(Jeu *partie, char *fname)
     return true;
 }
 
-int ecrire_grille(Vec2D g, int x, int y, FILE *f)
+static int ecrire_grille(Vec2D g, int x, int y, FILE *f)
 {
     Tuile cur = get(g, x, y);
 

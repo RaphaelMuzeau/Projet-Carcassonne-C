@@ -636,8 +636,8 @@ static bool test_varstring_ajouter_char(void)
     ajouter_char(&s, 'o');
 
     if (strcmp(s.texte, "hello")) return false;
-    if (s.len != strlen(s.texte)) return false;
-    if (s.capacite < strlen(s.texte) + 1) return false;
+    if (s._len != strlen(s.texte)) return false;
+    if (s._capacite < strlen(s.texte) + 1) return false;
 
     detruire_varstring(s);
     return true;
@@ -652,15 +652,15 @@ static bool test_varstring_retirer_char(void)
 
     retirer_char(&s);
     if (strcmp(s.texte, "h")) return false;
-    if (s.len != 1) return false;
+    if (s._len != 1) return false;
 
     retirer_char(&s);
     if (*s.texte != '\0') return false;
-    if (s.len != 0) return false;
+    if (s._len != 0) return false;
 
     retirer_char(&s);
     if (*s.texte != '\0') return false;
-    if (s.len != 0) return false;
+    if (s._len != 0) return false;
 
     detruire_varstring(s);
     return true;
@@ -673,14 +673,14 @@ static bool test_varstring_ajouter_chaine(void)
     ajouter_chaine(&s, "hello");
 
     if (strcmp(s.texte, "hello")) return false;
-    if (s.len != strlen(s.texte)) return false;
-    if (s.capacite < strlen(s.texte) + 1) return false;
+    if (s._len != strlen(s.texte)) return false;
+    if (s._capacite < strlen(s.texte) + 1) return false;
 
     ajouter_chaine(&s, " world");
 
     if (strcmp(s.texte, "hello world")) return false;
-    if (s.len != strlen(s.texte)) return false;
-    if (s.capacite < strlen(s.texte) + 1) return false;
+    if (s._len != strlen(s.texte)) return false;
+    if (s._capacite < strlen(s.texte) + 1) return false;
 
     detruire_varstring(s);
     return true;
@@ -715,7 +715,7 @@ static bool test_varstring_vider(void)
     vider_varstring(&s);
 
     if (*s.texte != '\0') return false;
-    if (s.len != 0) return false;
+    if (s._len != 0) return false;
 
     detruire_varstring(s);
     return true;
@@ -726,15 +726,15 @@ static bool test_varstring_ajouter_null(void)
     VarString s = creer_varstring();
 
     ajouter_chaine(&s, "hello");
-    size_t expected_len = s.len;
-    size_t expected_cap = s.capacite;
+    size_t expected_len = s._len;
+    size_t expected_cap = s._capacite;
 
     ajouter_chaine(&s, NULL);
     ajouter_char(&s, '\0');
 
     if (strcmp(s.texte, "hello")) return false;
-    if (s.len != expected_len) return false;
-    if (s.capacite != expected_cap) return false;
+    if (s._len != expected_len) return false;
+    if (s._capacite != expected_cap) return false;
 
     detruire_varstring(s);
     return true;

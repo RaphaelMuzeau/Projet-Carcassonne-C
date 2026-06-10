@@ -65,21 +65,21 @@ void detruire_listeplacements(ListePlacements placements)
 void rafraichir_listeplacements(ListePlacements *placements, Jeu *jeu)
 {
     // ignorer les placements actuels
-    placements->len = 0;
+    placements->_len = 0;
 
     // iterer sur les localisations meeple de chaque joueur
     // et creer un placement pour chaque.
     for (int i = 0; i < jeu->joueurs.nb_joueurs; i++) {
         for (L_meeple meeple = jeu->joueurs.tableau[i].localisation_meeple; meeple != NULL; meeple = meeple->next) {
             // reallouer de la place si il le faut
-            if (placements->len == placements->capacite) {
+            if (placements->_len == placements->_capacite) {
                 placements->tab = ca_realloc(placements->tab,
-                                             placements->capacite + PLACEMENT_REALLOC_SIZE,
+                                             placements->_capacite + PLACEMENT_REALLOC_SIZE,
                                              sizeof(PlacementMeeple));
-                placements->capacite += PLACEMENT_REALLOC_SIZE;
+                placements->_capacite += PLACEMENT_REALLOC_SIZE;
             }
 
-            placements->tab[placements->len++] = creer_placement(jeu, meeple->x, meeple->y);
+            placements->tab[placements->_len++] = creer_placement(jeu, meeple->x, meeple->y);
         }
     }
 }
@@ -98,7 +98,7 @@ void dessiner_meeple(Vector2 position, Color couleur)
 void dessiner_listeplacements(ListePlacements placements, Plateau plateau)
 {
     BeginMode2D(plateau.camera);
-        for (int i = 0; i < placements.len; i++)
+        for (int i = 0; i < placements._len; i++)
             dessiner_meeple(placements.tab[i].position, placements.tab[i].couleur);
     EndMode2D();
 }
