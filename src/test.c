@@ -1,6 +1,6 @@
 /* framework de test simple:
  * les fonctions de test sont ecrites dans ce fichier avec une signature de
- * type `bool f(void)` et ajouté à la liste "unit_tests".
+ * type `static bool f(void)` et ajouté à la liste "unit_tests".
  * à l'appel de lancer_tests(), tous les tests sont executés en montrant le nombre
  * d'echecs et de reussites à l'utilisateur. */
 
@@ -33,7 +33,7 @@ typedef struct _Test {
 // ==== fonctions de test ====
 // ===========================
 
-bool test_tuile_creer(void)
+static bool test_tuile_creer(void)
 {
     Tuile t = creer_tuile();
 
@@ -48,7 +48,7 @@ bool test_tuile_creer(void)
     return true;
 }
 
-bool test_tuile_pivot90(void)
+static bool test_tuile_pivot90(void)
 {
     Tuile t = creer_tuile();
 
@@ -70,7 +70,7 @@ bool test_tuile_pivot90(void)
     return true;
 }
 
-bool test_tuile_compatibilite(void)
+static bool test_tuile_compatibilite(void)
 {
     Tuile depart  = creer_tuile();
     Tuile arrivee = creer_tuile();
@@ -110,7 +110,7 @@ bool test_tuile_compatibilite(void)
     return true;
 }
 
-bool test_tuile_generer(void)
+static bool test_tuile_generer(void)
 {
     srand(time(NULL));
 
@@ -148,52 +148,52 @@ bool test_tuile_generer(void)
     return true;
 }
 
-bool test_pile_creer(void)
+static bool test_pile_creer(void)
 {
     Pile p = creer_pile(10, false);
 
     if (!pile_vide(p))          return false;
-    if (p.nb_element_max != 10) return false;
+    if (p._nb_element_max != 10) return false;
     if (p.nb_element != 0)      return false;
-    if (p.gen_aleatoire)        return false;
+    if (p._gen_aleatoire)        return false;
 
     detruire_pile(&p);
     return true;
 }
 
-bool test_pile_creer_aleatoire(void)
+static bool test_pile_creer_aleatoire(void)
 {
     Pile p = creer_pile(10, true);
 
     if(!pile_pleine(p))          return false;
     if (p.nb_element != 10)      return false;
-    if (p.nb_element_max != 10)  return false;
-    if (!p.gen_aleatoire)        return false;
-    if (p.tab != NULL)           return false;
+    if (p._nb_element_max != 10)  return false;
+    if (!p._gen_aleatoire)        return false;
+    if (p._tab != NULL)           return false;
 
     detruire_pile(&p);
     return true;
 }
 
-bool test_pile_inserer_tuile(void)
+static bool test_pile_inserer_tuile(void)
 {
     Pile p = creer_pile(10, false);
     Tuile t = NULL;
 
-    for (int i = 0; i < p.nb_element_max ; i++) {
+    for (int i = 0; i < p._nb_element_max ; i++) {
         t = creer_tuile();
         if (!inserer_tuile(&p, t)) return false;
         if (p.nb_element != i+1) return false;
     }
 
-    if (p.nb_element != p.nb_element_max) return false;
+    if (p.nb_element != p._nb_element_max) return false;
     if (inserer_tuile(&p, t)) return false;
 
     detruire_pile(&p);
     return true;
 }
 
-bool test_pile_recuperer_tuile_non_aleatoire(void)
+static bool test_pile_recuperer_tuile_non_aleatoire(void)
 {
     Pile p = creer_pile(5, false);
     Tuile t = creer_tuile();
@@ -208,13 +208,13 @@ bool test_pile_recuperer_tuile_non_aleatoire(void)
     return true;
 }
 
-bool test_pile_recuperer_tuile_aleatoire(void)
+static bool test_pile_recuperer_tuile_aleatoire(void)
 {
     int i = 10;
     Pile p = creer_pile(10, true);
 
-    if (p.nb_element_max != i) return false;
-    if (!p.gen_aleatoire)      return false;
+    if (p._nb_element_max != i) return false;
+    if (!p._gen_aleatoire)      return false;
     if (p.nb_element != i)     return false;
 
     while (i != 0) {
@@ -229,7 +229,7 @@ bool test_pile_recuperer_tuile_aleatoire(void)
     return true;
 }
 
-bool test_vec_creer(void)
+static bool test_vec_creer(void)
 {
     Vec v = creer_vec();
 
@@ -241,7 +241,7 @@ bool test_vec_creer(void)
     return true;
 }
 
-bool test_vec_get_null(void)
+static bool test_vec_get_null(void)
 {
     Vec v = creer_vec();
 
@@ -260,7 +260,7 @@ bool test_vec_get_null(void)
     return true;
 }
 
-bool test_vec_set_get(void)
+static bool test_vec_set_get(void)
 {
     Vec v = creer_vec();
     Tuile t0 = creer_tuile();
@@ -328,7 +328,7 @@ bool test_vec_set_get(void)
     return true;
 }
 
-bool test_vec_decalage(void)
+static bool test_vec_decalage(void)
 {
     Vec v = creer_vec();
     Tuile t0 = creer_tuile();
@@ -426,7 +426,7 @@ bool test_vec_decalage(void)
     return true;
 }
 
-bool test_vec2D_creer(void)
+static bool test_vec2D_creer(void)
 {
     Vec2D g = creer_vec2D();
 
@@ -438,7 +438,7 @@ bool test_vec2D_creer(void)
     return true;
 }
 
-bool test_vec2D_get_null(void)
+static bool test_vec2D_get_null(void)
 {
     Vec2D g = creer_vec2D();
 
@@ -463,7 +463,7 @@ bool test_vec2D_get_null(void)
     return true;
 }
 
-bool test_vec2D_set_get(void)
+static bool test_vec2D_set_get(void)
 {
     Vec2D g = creer_vec2D();
     Tuile t0 = creer_tuile();
@@ -536,7 +536,7 @@ bool test_vec2D_set_get(void)
 }
 
 
-bool test_vec2D_decalage(void)
+static bool test_vec2D_decalage(void)
 {
     Vec2D g = creer_vec2D();
     Tuile t0 = creer_tuile();
@@ -625,7 +625,7 @@ bool test_vec2D_decalage(void)
     detruire_vec2D(g);
     return true;
 }
-bool test_varstring_ajouter_char(void)
+static bool test_varstring_ajouter_char(void)
 {
     VarString s = creer_varstring();
 
@@ -643,7 +643,7 @@ bool test_varstring_ajouter_char(void)
     return true;
 }
 
-bool test_varstring_retirer_char(void)
+static bool test_varstring_retirer_char(void)
 {
     VarString s = creer_varstring();
 
@@ -666,7 +666,7 @@ bool test_varstring_retirer_char(void)
     return true;
 }
 
-bool test_varstring_ajouter_chaine(void)
+static bool test_varstring_ajouter_chaine(void)
 {
     VarString s = creer_varstring();
 
@@ -686,7 +686,7 @@ bool test_varstring_ajouter_chaine(void)
     return true;
 }
 
-bool test_varstring_dupliquer_chaine(void)
+static bool test_varstring_dupliquer_chaine(void)
 {
     VarString s = creer_varstring();
     char *dup;
@@ -707,7 +707,7 @@ bool test_varstring_dupliquer_chaine(void)
     return true;
 }
 
-bool test_varstring_vider(void)
+static bool test_varstring_vider(void)
 {
     VarString s = creer_varstring();
 
@@ -721,7 +721,7 @@ bool test_varstring_vider(void)
     return true;
 }
 
-bool test_varstring_ajouter_null(void)
+static bool test_varstring_ajouter_null(void)
 {
     VarString s = creer_varstring();
 
@@ -740,7 +740,7 @@ bool test_varstring_ajouter_null(void)
     return true;
 }
 
-bool test_varstring_null(void)
+static bool test_varstring_null(void)
 {
     // pourrait declencher un crash
     ajouter_char(NULL, '\0');
@@ -750,7 +750,7 @@ bool test_varstring_null(void)
     return true;
 }
 
-bool test_joueur_creer(void)
+static bool test_joueur_creer(void)
 {
     Joueur joueur = creer_joueur(2, 5);
 
@@ -765,7 +765,7 @@ bool test_joueur_creer(void)
     return true;
 }
 
-bool test_listejoueurs_creer(void)
+static bool test_listejoueurs_creer(void)
 {
     ListeJoueurs joueurs  = creer_listejoueurs(3, 5);
 
@@ -785,7 +785,7 @@ bool test_listejoueurs_creer(void)
     return true;
 }
 
-bool test_liste_meeple_creer(void)
+static bool test_liste_meeple_creer(void)
 {
     L_meeple liste = creer_maillon_meeple(1, 5);
 
@@ -797,7 +797,7 @@ bool test_liste_meeple_creer(void)
     return true;
 }
 
-bool test_liste_meeple_ajouter(void)
+static bool test_liste_meeple_ajouter(void)
 {
     L_meeple liste = NULL;
 
@@ -821,7 +821,7 @@ bool test_liste_meeple_ajouter(void)
     return true;
 }
 
-bool test_liste_meeple_retirer(void)
+static bool test_liste_meeple_retirer(void)
 {
     L_meeple liste = NULL;
 
@@ -859,7 +859,7 @@ bool test_liste_meeple_retirer(void)
     return true;
 }
 
-bool test_liste_meeple_verification_presence_meeple(void)
+static bool test_liste_meeple_verification_presence_meeple(void)
 {
     L_meeple loc_meeple;
     loc_meeple = creer_maillon_meeple(0,0);
@@ -881,7 +881,7 @@ bool test_liste_meeple_verification_presence_meeple(void)
 
 }
 
-bool test_grille_placer_tuile(void)
+static bool test_grille_placer_tuile(void)
 {
     Vec2D grille = creer_vec2D();
     Tuile t = creer_tuile();
@@ -938,7 +938,7 @@ bool test_grille_placer_tuile(void)
     return true;
 }
 
-bool test_grille_placer_meeple(void)
+static bool test_grille_placer_meeple(void)
 {
     Vec2D grille = creer_vec2D();
     Joueur joueur = creer_joueur(0, 3);
@@ -1048,7 +1048,7 @@ bool test_grille_placer_meeple(void)
     return true;
 }
 
-bool test_grille_retirer_meeple(void)
+static bool test_grille_retirer_meeple(void)
 {
     Vec2D grille = creer_vec2D();
     ListeJoueurs joueurs = creer_listejoueurs(2, 2);
@@ -1080,7 +1080,7 @@ bool test_grille_retirer_meeple(void)
     return true;
 }
 
-bool test_grille_recherche(void)
+static bool test_grille_recherche(void)
 {
     int *nb_meeple = ca_alloc(2, sizeof(int));
     L_meeple loc_meeple = NULL;
@@ -1180,7 +1180,7 @@ bool test_grille_recherche(void)
     return true;
 }
 
-bool test_jeu_attribution_points(void)
+static bool test_jeu_attribution_points(void)
 {
     Jeu jeu = creer_jeu(3, 3, 3);
     L_meeple loc_meeple = creer_maillon_meeple(0,0);
@@ -1211,7 +1211,7 @@ bool test_jeu_attribution_points(void)
     return true;
 }
 
-bool test_jeu_tour(void)
+static bool test_jeu_tour(void)
 {
     Jeu jeu = creer_jeu(3, 1, 4);
 
@@ -1246,7 +1246,7 @@ bool test_jeu_tour(void)
     return true;
 }
 
-bool test_grille_recherche_abbaye_complete(void)
+static bool test_grille_recherche_abbaye_complete(void)
 {
     Vec2D grille = generer_recherche_abbaye_complete();
     ListeJoueurs listejoueur = creer_listejoueurs(1,1);
@@ -1260,7 +1260,7 @@ bool test_grille_recherche_abbaye_complete(void)
     return true;
 }
 
-bool test_grille_recherche_abbaye_non_complete(void)
+static bool test_grille_recherche_abbaye_non_complete(void)
 {
     Vec2D grille = generer_recherche_abbaye_non_complete();
     ListeJoueurs listejoueur = creer_listejoueurs(1,1);
@@ -1278,7 +1278,7 @@ bool test_grille_recherche_abbaye_non_complete(void)
     return true;
 }
 
-bool test_grille_verification_abbaye(void)
+static bool test_grille_verification_abbaye(void)
 {
     Vec2D grille = generer_recherche_abbaye_complete();
     ListeJoueurs listejoueur = creer_listejoueurs(1,1);
@@ -1292,7 +1292,7 @@ bool test_grille_verification_abbaye(void)
     return true;
 }
 
-bool test_jeu_maximal(void)
+static bool test_jeu_maximal(void)
 {
     int nb_joueur = 3;
     int nb_meeple[3];
@@ -1307,7 +1307,7 @@ bool test_jeu_maximal(void)
     return true;
 }
 
-bool test_csv_compter_lignes(void)
+static bool test_csv_compter_lignes(void)
 {
 
     FILE *f0, *f1, *f2;
@@ -1330,7 +1330,7 @@ bool test_csv_compter_lignes(void)
     return true;
 }
 
-bool test_csv_lecture_zone(void)
+static bool test_csv_lecture_zone(void)
 {
     FILE *f = fopen("data/test/0_test.csv", "r");
     Tuile t = creer_tuile();
@@ -1352,85 +1352,85 @@ bool test_csv_lecture_zone(void)
     return true;
 }
 
-bool test_csv_lecture_fichier(void)
+static bool test_csv_lecture_fichier(void)
 {
     int i;
     Pile p;
     if (!lire_tuiles_csv("data/test/1_test.csv", &p)) return false;
 
-    if (p.nb_element < p.nb_element_max) return false;
+    if (p.nb_element < p._nb_element_max) return false;
 
-    for (i = 0; i < p.nb_element_max; i++)
-        if (p.tab[i] == NULL) return false;
+    for (i = 0; i < p._nb_element_max; i++)
+        if (p._tab[i] == NULL) return false;
 
-    if (p.tab[0]->nord != Z_VILLE) return false;
-    if (p.tab[0]->sud != Z_VILLE) return false;
-    if (p.tab[0]->est != Z_ROUTE) return false;
-    if (p.tab[0]->ouest != Z_ROUTE) return false;
-    if (p.tab[0]->milieu != Z_ROUTE) return false;
+    if (p._tab[0]->nord != Z_VILLE) return false;
+    if (p._tab[0]->sud != Z_VILLE) return false;
+    if (p._tab[0]->est != Z_ROUTE) return false;
+    if (p._tab[0]->ouest != Z_ROUTE) return false;
+    if (p._tab[0]->milieu != Z_ROUTE) return false;
 
-    if (p.tab[1]->nord != Z_ROUTE) return false;
-    if (p.tab[1]->sud != Z_VILLE) return false;
-    if (p.tab[1]->est != Z_VILLE) return false;
-    if (p.tab[1]->ouest != Z_PRE) return false;
-    if (p.tab[1]->milieu != Z_ABBAYE) return false;
+    if (p._tab[1]->nord != Z_ROUTE) return false;
+    if (p._tab[1]->sud != Z_VILLE) return false;
+    if (p._tab[1]->est != Z_VILLE) return false;
+    if (p._tab[1]->ouest != Z_PRE) return false;
+    if (p._tab[1]->milieu != Z_ABBAYE) return false;
 
-    if (p.tab[2]->nord != Z_BLASON) return false;
-    if (p.tab[2]->sud != Z_BLASON) return false;
-    if (p.tab[2]->est != Z_BLASON) return false;
-    if (p.tab[2]->ouest != Z_BLASON) return false;
-    if (p.tab[2]->milieu != Z_BLASON) return false;
+    if (p._tab[2]->nord != Z_BLASON) return false;
+    if (p._tab[2]->sud != Z_BLASON) return false;
+    if (p._tab[2]->est != Z_BLASON) return false;
+    if (p._tab[2]->ouest != Z_BLASON) return false;
+    if (p._tab[2]->milieu != Z_BLASON) return false;
 
-    if (p.tab[3]->nord != Z_ROUTE) return false;
-    if (p.tab[3]->sud != Z_ROUTE) return false;
-    if (p.tab[3]->est != Z_PRE) return false;
-    if (p.tab[3]->ouest != Z_ROUTE) return false;
-    if (p.tab[3]->milieu != Z_VILLAGE) return false;
+    if (p._tab[3]->nord != Z_ROUTE) return false;
+    if (p._tab[3]->sud != Z_ROUTE) return false;
+    if (p._tab[3]->est != Z_PRE) return false;
+    if (p._tab[3]->ouest != Z_ROUTE) return false;
+    if (p._tab[3]->milieu != Z_VILLAGE) return false;
 
-    if (p.tab[4]->nord != Z_BLASON) return false;
-    if (p.tab[4]->sud != Z_BLASON) return false;
-    if (p.tab[4]->est != Z_BLASON) return false;
-    if (p.tab[4]->ouest != Z_ROUTE) return false;
-    if (p.tab[4]->milieu != Z_BLASON) return false;
+    if (p._tab[4]->nord != Z_BLASON) return false;
+    if (p._tab[4]->sud != Z_BLASON) return false;
+    if (p._tab[4]->est != Z_BLASON) return false;
+    if (p._tab[4]->ouest != Z_ROUTE) return false;
+    if (p._tab[4]->milieu != Z_BLASON) return false;
 
     detruire_pile(&p);
     return true;
 }
 
-bool test_csv_fichier_vide(void)
+static bool test_csv_fichier_vide(void)
 {
     Pile p;
     if (!lire_tuiles_csv("data/test/2_test.csv", &p)) return false;
 
-    if (p.nb_element_max != 0) return false;
+    if (p._nb_element_max != 0) return false;
     detruire_pile(&p);
 
     return true;
 }
 
-bool test_csv_fichier_introuvable(void)
+static bool test_csv_fichier_introuvable(void)
 {
     Pile p = creer_pile(0, 0);
     if (lire_tuiles_csv("data/test/test_non_existant.csv", &p)) return false;
 
-    if (p.nb_element_max != 0) return false;
+    if (p._nb_element_max != 0) return false;
     detruire_pile(&p);
 
     return true;
 }
 
-bool test_csv_fichier_invalide(void)
+static bool test_csv_fichier_invalide(void)
 {
     Pile p;
     if (lire_tuiles_csv("data/test/3_test.csv", &p)) return false;
 
-    if (p.nb_element_max != 0) return false;
+    if (p._nb_element_max != 0) return false;
 
     detruire_pile(&p);
     return true;
 }
 
-bool test_fichier_charger_grille(void)
+static bool test_fichier_charger_grille(void)
 {
     generer_fichier_grille();
     FILE *f = fopen("data/test/fichier_test_grille.bin", "r");
@@ -1453,22 +1453,22 @@ bool test_fichier_charger_grille(void)
     return true;
 }
 
-bool test_fichier_charger_pile(void)
+static bool test_fichier_charger_pile(void)
 {
     generer_fichier_pile();
     FILE *f_read = fopen("data/test/fichier_test_pile.bin", "r");
     Pile p2 = charger_pile(f_read);
 
-    if (p2.nb_element_max != 56) return false;
+    if (p2._nb_element_max != 56) return false;
     if (p2.nb_element != 56) return false;
-    if (p2.gen_aleatoire) return false;
+    if (p2._gen_aleatoire) return false;
 
     for (int i = 0; i < 56; i++) {
-        if (p2.tab[i]->sud != Z_PRE) return false;
-        if (p2.tab[i]->milieu != Z_PRE) return false;
-        if (p2.tab[i]->nord != Z_PRE) return false;
-        if (p2.tab[i]->est != Z_PRE) return false;
-        if (p2.tab[i]->ouest != Z_PRE) return false;
+        if (p2._tab[i]->sud != Z_PRE) return false;
+        if (p2._tab[i]->milieu != Z_PRE) return false;
+        if (p2._tab[i]->nord != Z_PRE) return false;
+        if (p2._tab[i]->est != Z_PRE) return false;
+        if (p2._tab[i]->ouest != Z_PRE) return false;
     }
 
     fclose(f_read);
@@ -1477,23 +1477,23 @@ bool test_fichier_charger_pile(void)
     return true;
 }
 
-bool test_fichier_charger_pile_aleatoire(void)
+static bool test_fichier_charger_pile_aleatoire(void)
 {
     generer_fichier_pile_aleatoire();
     FILE *f = fopen("data/test/fichier_test_pile_aleatoire.bin", "r");
 
     Pile p = charger_pile(f);
     if (p.nb_element != 32) return false;
-    if (p.nb_element_max != 32) return false;
-    if (!p.gen_aleatoire) return false;
-    if (p.tab != NULL) return false;
+    if (p._nb_element_max != 32) return false;
+    if (!p._gen_aleatoire) return false;
+    if (p._tab != NULL) return false;
 
     fclose(f);
     remove("data/test/fichier_test_pile_aleatoire.bin");
     return true;
 }
 
-bool test_fichier_charger_joueur(void)
+static bool test_fichier_charger_joueur(void)
 {
     generer_fichier_joueur();
     FILE *f_read = fopen("data/test/fichier_test_joueur.bin", "r");
@@ -1524,7 +1524,7 @@ bool test_fichier_charger_joueur(void)
 }
 
 
-bool test_fichier_charger_joueur_liste_vide(void)
+static bool test_fichier_charger_joueur_liste_vide(void)
 {
     generer_fichier_joueur_vide();
     FILE *f_read = fopen("data/test/fichier_test_joueur_vide.bin", "r");
@@ -1541,7 +1541,7 @@ bool test_fichier_charger_joueur_liste_vide(void)
     return true;
 }
 
-bool test_fichier_sauvegarder_liste_joueurs(void)
+static bool test_fichier_sauvegarder_liste_joueurs(void)
 {
     generer_fichier_liste_joueurs();
     FILE* f_read = fopen("data/test/fichier_test_liste_joueurs.bin", "r");

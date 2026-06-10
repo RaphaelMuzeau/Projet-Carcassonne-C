@@ -380,7 +380,7 @@ void generer_fichier_pile(void)
 
     Pile p = creer_pile(nb_tuiles, false);
 
-    for (int i = 0; i < p.nb_element_max; i++) {
+    for (int i = 0; i < p._nb_element_max; i++) {
         Tuile tmp = creer_tuile();
         inserer_tuile(&p, tmp);
     }

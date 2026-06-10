@@ -119,11 +119,11 @@ erreur_grille:
 void sauvegarder_pile(Pile p, FILE *f)
 {
     fwrite(&p.nb_element, sizeof(int), 1, f);
-    fwrite(&p.gen_aleatoire, sizeof(bool), 1, f);
+    fwrite(&p._gen_aleatoire, sizeof(bool), 1, f);
 
-    if (!p.gen_aleatoire) {
+    if (!p._gen_aleatoire) {
         for (int i = 0; i < p.nb_element; i++) {
-            fwrite(p.tab[i], sizeof(struct _Tuile), 1, f);
+            fwrite(p._tab[i], sizeof(struct _Tuile), 1, f);
         }
     }
 }
@@ -141,8 +141,8 @@ Pile charger_pile(FILE *f)
 
     Pile p = creer_pile(nb_element, aleatoire);
 
-    if (!p.gen_aleatoire) {
-        for (int i = 0; i < p.nb_element_max; i++) {
+    if (!p._gen_aleatoire) {
+        for (int i = 0; i < p._nb_element_max; i++) {
             Tuile tmp = creer_tuile();
             if (fread(tmp, sizeof(struct _Tuile), 1, f) != 1)
                 goto erreur_pile;
