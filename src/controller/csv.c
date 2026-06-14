@@ -79,7 +79,7 @@ bool lire_tuiles_csv(char* nom_fichier, Pile *p)
 
     if (fichier == NULL) return false;
 
-    while (p->nb_element < p->nb_element_max) {
+    while (p->nb_element < p->_nb_element_max) {
         t = creer_tuile();
         if (!lire_zone(&t->nord, fichier)) goto fichier_invalide;
         if (!lire_zone(&t->sud, fichier)) goto fichier_invalide;

@@ -54,8 +54,8 @@ enum Page page_configuration(Jeu *jeu, enum Configuration config) {
       prochaine_page = P_TITRE;
     }
 
-    if (update_bouton(&confirmer) && champ_nb_joueur.saisie.len != 0 &&
-        champ_nb_meeple.saisie.len != 0 && champ_nb_tuiles.saisie.len != 0) {
+    if (update_bouton(&confirmer) && champ_nb_joueur.saisie._len != 0 &&
+        champ_nb_meeple.saisie._len != 0 && champ_nb_tuiles.saisie._len != 0) {
 
         sscanf(champ_nb_joueur.saisie.texte, "%d", &nb_joueur);
         sscanf(champ_nb_meeple.saisie.texte, "%d", &nb_meeple);
@@ -165,7 +165,7 @@ enum Page page_joueurs(ListeJoueurs joueurs)
 
         if (update_bouton_camera(&retour, scrollbar.vue) || IsKeyPressed(KEY_ESCAPE)) {
             // on abandone la saisie, donc les noms actuellement chargés doivent etre liberés
-            for (int i = 0; i < joueurs.nb_joueurs && champs[i].saisie.len != 0; i++) {
+            for (int i = 0; i < joueurs.nb_joueurs && champs[i].saisie._len != 0; i++) {
                 free(joueurs.tableau[i].nom);
                 joueurs.tableau[i].nom = NULL;
             }
@@ -176,7 +176,7 @@ enum Page page_joueurs(ListeJoueurs joueurs)
          * Si un champ est vide, ne rien faire. */
         if (update_bouton_camera(&confirmer, scrollbar.vue)) {
             int i;
-            for (i = 0; i < joueurs.nb_joueurs && champs[i].saisie.len != 0; i++) {
+            for (i = 0; i < joueurs.nb_joueurs && champs[i].saisie._len != 0; i++) {
                 free(joueurs.tableau[i].nom);
                 joueurs.tableau[i].nom = dupliquer_chaine(&champs[i].saisie);
             }

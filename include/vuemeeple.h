@@ -22,8 +22,8 @@ _Static_assert(PLACEMENT_REALLOC_SIZE > 0, "PLACEMENT_REALLOC_SIZE doit etre sup
  * similairement à une varstring */
 typedef struct _ListePlacements {
     PlacementMeeple *tab;
-    int len;
-    int capacite;
+    int _len;
+    int _capacite;
 } ListePlacements;
 
 ListePlacements creer_listeplacements(Jeu *jeu);

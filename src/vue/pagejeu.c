@@ -13,7 +13,7 @@
 #include "bouton.h"
 #include "fichier.h"
 
-enum Page page_fin(ListeJoueurs joueurs, int id_gagnant);
+static enum Page page_fin(ListeJoueurs joueurs, int id_gagnant);
 
 enum Page page_jeu(Jeu *jeu)
 {
@@ -100,8 +100,8 @@ enum Page page_jeu(Jeu *jeu)
             if (update_bouton_adapte(&popup.quitter))
                 prochaine_page = P_TITRE;
 
-            if (update_bouton_adapte(&popup.sauvegarder) && popup.champ_partie.saisie.len != 0) {
-                char *fname = ca_alloc(sizeof(CHEMIN_PARTIES) + popup.champ_partie.saisie.len, sizeof(char));
+            if (update_bouton_adapte(&popup.sauvegarder) && popup.champ_partie.saisie._len != 0) {
+                char *fname = ca_alloc(sizeof(CHEMIN_PARTIES) + popup.champ_partie.saisie._len, sizeof(char));
                 memcpy(fname, CHEMIN_PARTIES, sizeof(CHEMIN_PARTIES));
                 strcat(fname, popup.champ_partie.saisie.texte);
 
@@ -172,7 +172,7 @@ enum Page page_jeu(Jeu *jeu)
     return prochaine_page;
 }
 
-enum Page page_fin(ListeJoueurs joueurs, int id_gagnant)
+static enum Page page_fin(ListeJoueurs joueurs, int id_gagnant)
 {
     // Etat initial de la page
     enum Page prochaine_page = P_JEU;

@@ -11,8 +11,8 @@ _Static_assert(VARSTRING_REALLOC_SIZE > 0, "VARSTRING_REALLOC_SIZE doit etre sup
  * Il ne faut JAMAIS utiliser une VarString après l'avoir passé par copie. */
 typedef struct _VarString {
     char *texte;
-    size_t len;
-    size_t capacite;
+    size_t _len;
+    size_t _capacite;
 } VarString;
 
 VarString creer_varstring(void);

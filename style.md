@@ -11,5 +11,7 @@ typedef struct _ExType {
     int y;
 } ExType;
 ```
-- Tout le reste s'écrit en snake_case (variables, fonctions, etc.)
+- Tout le reste s'écrit en snake_case (variables, fonctions, etc.).
 - Les gardes des fichiers header sont de la forme `nomdefichier_h` (snake_case).
+- Une fonction privée doit être déclarée avec `static`.
+- Un membre privé d'une structure doit être prefixé d'un `_`.
