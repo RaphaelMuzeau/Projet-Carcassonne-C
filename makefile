@@ -9,7 +9,7 @@ DBG := $(EXE)_dbg
 TEST:= $(EXE)_test
 
 CC := gcc
-CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -D_FORTIFY_SOURCE=3 -fdiagnostics-color -Iinclude
+CFLAGS := -std=c17 -pedantic -Wall -Werror -Wextra -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3 -fdiagnostics-color -Iinclude
 MKFLAGS := -MMD -MP
 LDFLAGS := -Llib -l:libraylib.a -lm # raylib est lié statiquement
 
